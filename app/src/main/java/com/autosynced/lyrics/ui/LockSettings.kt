@@ -188,7 +188,8 @@ fun LockSettingsScreen(onBack: () -> Unit) {
                 SliderRow(tr("Space between lines", "行间距"), "${style.lineSpacing}", style.lineSpacing.toFloat(), 0f..36f, 17) { v ->
                     set { it.copy(lineSpacing = v.roundToInt()) } }
                 SwitchRow(tr("Bold current line", "当前行加粗"), style.boldCurrent) { on -> set { it.copy(boldCurrent = on) } }
-                SwitchRow(tr("Glow around the current line", "当前行发光"), style.glow) { on -> set { it.copy(glow = on) } }
+                GlowSettings(GlowLook(style.glow, style.glowColor, style.glowStrength, style.glowBlur)) { g ->
+                    set { it.copy(glow = g.on, glowColor = g.color, glowStrength = g.strength, glowBlur = g.blur) } }
                 Label(tr("Alignment", "对齐"))
                 ValueChips(listOf("center", "left"), style.align) { v -> set { it.copy(align = v) } }
                 Label(tr("When the line changes", "换行效果"))

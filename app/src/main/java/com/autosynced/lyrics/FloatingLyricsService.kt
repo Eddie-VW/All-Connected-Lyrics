@@ -27,9 +27,9 @@ import kotlin.math.abs
 
 /**
  * The floating lyrics window shown over other apps, styled by [FloatStyle] (settings → Floating lyrics).
- * Drag to move · tap for buttons (play/pause, skip, 译, size, colour, settings, close) ·
- * long-press to turn it off. When it's locked, touches go
- * through to the app underneath; unlock it from the notification or the settings.
+ * Drag to move · tap for buttons (play/pause, skip, translation, size, colour, lock, settings, close).
+ * When it's locked, touches go through to the app underneath, except at an invisible spot at its
+ * top-right corner: double-tap there to unlock, long-press there and drag to move the window.
  * Runs as a foreground service (with a small notification) so Android keeps it on screen.
  *
  * It also runs for lock-screen lyrics: when the screen turns off while music plays, it opens
@@ -194,21 +194,15 @@ class FloatingLyricsService : Service() {
         // drag to move, tap to open the app, long-press to turn off (not while locked: touches pass through)
         val slop = ViewConfiguration.get(this).scaledTouchSlop
         var downX = 0f; var downY = 0f; var startX = 0; var startY = 0; var moved = false
-        val longPress = Runnable {
-            Prefs.setFloating(this, false)
-            Toast.makeText(this, tr("Floating lyrics turned off", "已关闭悬浮歌词"), Toast.LENGTH_SHORT).show()
-            refreshParts()
-        }
         box.setOnTouchListener { _, e ->
             when (e.actionMasked) {
                 MotionEvent.ACTION_DOWN -> {
                     downX = e.rawX; downY = e.rawY; startX = params.x; startY = params.y; moved = false
-                    handler.postDelayed(longPress, ViewConfiguration.getLongPressTimeout().toLong() + 150)
                 }
                 MotionEvent.ACTION_MOVE -> {
                     val dx = e.rawX - downX; val dy = e.rawY - downY
                     if (!moved && (abs(dx) > slop || abs(dy) > slop)) {
-                        moved = true; handler.removeCallbacks(longPress)
+                        moved = true
                     }
                     if (moved) {
                         params.x = startX + dx.toInt(); params.y = startY + dy.toInt()
@@ -216,7 +210,6 @@ class FloatingLyricsService : Service() {
                     }
                 }
                 MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
-                    handler.removeCallbacks(longPress)
                     if (moved) Prefs.setFloatPos(this, params.x, params.y)
                     else if (e.actionMasked == MotionEvent.ACTION_UP) box.showControls(!box.controlsShown)
                 }
@@ -248,13 +241,59 @@ class FloatingLyricsService : Service() {
                 shape = android.graphics.drawable.GradientDrawable.OVAL
                 setColor(0x99000000.toInt())
             }
-            alpha = 0.6f
+            alpha = 0f                               // invisible; shows only while it's being used
             contentDescription = tr("Unlock the floating lyrics", "解锁悬浮歌词")
-            setOnClickListener {
-                Prefs.setFloatStyle(this@FloatingLyricsService, Prefs.floatStyle.value.copy(locked = false))
-                Toast.makeText(this@FloatingLyricsService, tr("Floating lyrics unlocked", "悬浮歌词已解锁"), Toast.LENGTH_SHORT).show()
-            }
+            setOnTouchListener(LockSpotTouch(this))
         }.also { try { wm.addView(it, badgeParams) } catch (_: Exception) {} }
+    }
+
+    /** The hidden lock spot: double-tap = unlock; long-press, then drag = move the window (and the spot). */
+    @SuppressLint("ClickableViewAccessibility")
+    private inner class LockSpotTouch(val spot: View) : View.OnTouchListener {
+        private var lastTap = 0L
+        private var dragging = false
+        private var downX = 0f; private var downY = 0f; private var startX = 0; private var startY = 0
+        private val startDrag = Runnable {
+            dragging = true
+            spot.animate().alpha(0.85f).setDuration(120).start()
+            spot.performHapticFeedback(android.view.HapticFeedbackConstants.LONG_PRESS)
+        }
+
+        override fun onTouch(v: View, e: MotionEvent): Boolean {
+            when (e.actionMasked) {
+                MotionEvent.ACTION_DOWN -> {
+                    downX = e.rawX; downY = e.rawY; startX = params.x; startY = params.y; dragging = false
+                    handler.postDelayed(startDrag, ViewConfiguration.getLongPressTimeout().toLong())
+                }
+                MotionEvent.ACTION_MOVE -> {
+                    val dx = e.rawX - downX; val dy = e.rawY - downY
+                    if (!dragging && (abs(dx) > 24 || abs(dy) > 24)) handler.removeCallbacks(startDrag)
+                    if (dragging) {
+                        params.x = startX + dx.toInt(); params.y = startY + dy.toInt()
+                        card?.let { try { wm.updateViewLayout(it, params) } catch (_: Exception) {} }
+                        showLockBadge()                // follows the window
+                    }
+                }
+                MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
+                    handler.removeCallbacks(startDrag)
+                    if (dragging) {
+                        dragging = false
+                        Prefs.setFloatPos(this@FloatingLyricsService, params.x, params.y)
+                        spot.animate().alpha(0f).setDuration(300).start()
+                    } else if (e.actionMasked == MotionEvent.ACTION_UP) {
+                        val now = android.os.SystemClock.uptimeMillis()
+                        if (now - lastTap < ViewConfiguration.getDoubleTapTimeout()) {
+                            lastTap = 0
+                            spot.alpha = 0.85f
+                            Prefs.setFloatStyle(this@FloatingLyricsService, Prefs.floatStyle.value.copy(locked = false))
+                            Toast.makeText(this@FloatingLyricsService, tr("Floating lyrics unlocked", "悬浮歌词已解锁"),
+                                Toast.LENGTH_SHORT).show()
+                        } else lastTap = now
+                    }
+                }
+            }
+            return true
+        }
     }
 
     private fun removeLockBadge() {
@@ -276,8 +315,9 @@ class FloatingLyricsService : Service() {
             FloatingLyricsView.Action.Lock -> {
                 card?.showControls(false)
                 Prefs.setFloatStyle(this, style.copy(locked = true))
-                Toast.makeText(this, tr("Lyrics locked: touches now go through them. Tap the small lock at the corner " +
-                    "to unlock.", "歌词已锁定：触摸会穿透歌词。点角落的小锁即可解锁。"), Toast.LENGTH_LONG).show()
+                Toast.makeText(this, tr("Lyrics locked: touches go through them. To unlock, double-tap their top-right corner; " +
+                    "to move them, long-press there and drag.", "歌词已锁定：触摸会穿透歌词。双击右上角可解锁；长按右上角并拖动可移动。"),
+                    Toast.LENGTH_LONG).show()
             }
             is FloatingLyricsView.Action.Colour ->
                 Prefs.setFloatStyle(this, style.ownColors(night).copy(currentColor = action.color))

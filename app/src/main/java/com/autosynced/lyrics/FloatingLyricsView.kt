@@ -85,9 +85,10 @@ class FloatingLyricsView(context: Context) : LinearLayout(context) {
         fun text(label: String, action: Action) = TextView(context).apply {
             text = label
             gravity = Gravity.CENTER
-            setTextSize(TypedValue.COMPLEX_UNIT_SP, 14f)
+            setTextSize(TypedValue.COMPLEX_UNIT_SP, if (label.length > 2) 11f else 14f)
+            minWidth = size
             typeface = Typeface.DEFAULT_BOLD
-            layoutParams = LayoutParams(size, size).apply { marginStart = gap; marginEnd = gap }
+            layoutParams = LayoutParams(LayoutParams.WRAP_CONTENT, size).apply { marginStart = gap; marginEnd = gap }
             setOnClickListener { tapped(action) }
             buttons.add(this)
         }
@@ -102,7 +103,7 @@ class FloatingLyricsView(context: Context) : LinearLayout(context) {
             }, LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT))
         }
         playButton = icon(android.R.drawable.ic_media_play, Action.PlayPause)
-        translateButton = text(tr("Tr", "译"), Action.Translate)
+        translateButton = text(translateIcon(), Action.Translate)
         colourDot = View(context).apply {
             layoutParams = LayoutParams(size, size).apply { marginStart = gap; marginEnd = gap }
             setOnClickListener {
@@ -167,7 +168,7 @@ class FloatingLyricsView(context: Context) : LinearLayout(context) {
 
     /** Play / pause icon and the 译 button's on/off look. */
     fun setState(isPlaying: Boolean, translate: Boolean) {
-        tr("Tr", "译").let { if (translateButton.text != it) translateButton.text = it }   // the app's language may change
+        translateIcon().let { if (translateButton.text != it) translateButton.text = it }   // the app's language may change
         if (isPlaying != playing) {
             playing = isPlaying
             playButton.setImageResource(if (playing) android.R.drawable.ic_media_pause else android.R.drawable.ic_media_play)
@@ -237,7 +238,7 @@ class FloatingLyricsView(context: Context) : LinearLayout(context) {
             if (row == null) { v.visibility = View.GONE; continue }
             v.visibility = View.VISIBLE
             when (row.kind) {
-                Row.Kind.CURRENT -> dress(v, style.currentSize.toFloat(), c.current, style.boldCurrent, 2)
+                Row.Kind.CURRENT -> dress(v, style.currentSize.toFloat(), c.current, style.boldCurrent, 2, glow = true)
                 Row.Kind.TRANSLATION -> dress(v, style.currentSize * style.translationPct / 100f, c.translation, false, 2)
                 else -> dress(v, style.otherSize.toFloat(), c.other, false, 1)
             }
@@ -266,7 +267,13 @@ class FloatingLyricsView(context: Context) : LinearLayout(context) {
         }
     }
 
-    private fun dress(v: OutlineTextView, sizeSp: Float, color: Int, bold: Boolean, maxLines: Int) {
+    private fun dress(v: OutlineTextView, sizeSp: Float, color: Int, bold: Boolean, maxLines: Int, glow: Boolean = false) {
+        // glow around the current line: a soft shadow in the glow's (or the line's) colour
+        if (glow && style.glow) {
+            val base = if (style.glowColor == 0) color else style.glowColor
+            v.setShadowLayer(style.glowBlur * resources.displayMetrics.density, 0f, 0f,
+                withAlpha(base, style.glowStrength))
+        } else v.setShadowLayer(0f, 0f, 0f, 0)
         v.setTextSize(TypedValue.COMPLEX_UNIT_SP, sizeSp)
         v.setTextColor(color)
         v.typeface = if (bold) boldTypeface else typeface

@@ -133,8 +133,9 @@ object LyricsRepo {
             if (needsTranslation(lines) && Prefs.aiTranslate.value) {
                 val cfg = withContext(Dispatchers.IO) { Prefs.providerConfig(appContext) }
                 if (!cfg.ready) {
-                    note = tr("Some lines have no translation yet. Add a ${cfg.provider.labelEn} key in Translation settings to fill them in.",
-                        "部分歌词还没有翻译。在翻译设置中添加 ${cfg.provider.labelZh} 的密钥即可补全。")
+                    note = trf("Some lines have no translation yet. Add a {0} key in Translation settings to fill them in.",
+                        "部分歌词还没有翻译。在翻译设置中添加 {0} 的密钥即可补全。",
+                        if (Lang.chinese) cfg.provider.labelZh else cfg.provider.labelEn)
                 } else {
                     try {
                         val before = lines
@@ -157,12 +158,12 @@ object LyricsRepo {
         is PaymentRequiredException -> tr("the Claude account is out of credit.", "Claude 账户余额不足。")
         is RateLimitException -> tr("too many requests right now. Try again in a minute.", "请求太频繁，请一分钟后再试。")
         is OverloadedException -> tr("Claude is busy right now. Try again in a minute.", "Claude 当前繁忙，请一分钟后再试。")
-        is AnthropicServiceException -> tr("Claude's server answered with error ${e.statusCode()}.", "Claude 服务器返回错误 ${e.statusCode()}。")
+        is AnthropicServiceException -> trf("Claude's server answered with error {0}.", "Claude 服务器返回错误 {0}。", e.statusCode())
         is TranslatorException -> when (e.status) {
             401, 403, 52003 -> tr("the key wasn't accepted. Check it in Translation settings.", "密钥无效，请在翻译设置中检查。")
             429, 54003 -> tr("too many requests right now. Try again in a minute.", "请求太频繁，请一分钟后再试。")
             456, 402, 54004 -> tr("the service's free allowance or credit is used up.", "该服务的免费额度或余额已用完。")
-            else -> e.message ?: tr("the service answered with error ${e.status}.", "服务返回错误 ${e.status}。")
+            else -> e.message ?: trf("the service answered with error {0}.", "服务返回错误 {0}。", e.status)
         }
         is AnthropicIoException, is IOException ->
             tr("couldn't reach the service (no internet, or it's blocked where you are).", "无法连接该服务（没有网络，或在你所在地区被屏蔽）。")

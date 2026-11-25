@@ -82,6 +82,7 @@ data class LockContent(
     val positionMs: Long,
     val durationMs: Long,
     val translate: Boolean,
+    val album: String = "",
 )
 
 /**
@@ -205,6 +206,8 @@ private fun SongInfo(style: LockStyle, c: LockContent, accent: Color, family: Fo
                 maxLines = 1, overflow = TextOverflow.Ellipsis)
             if (c.artist.isNotBlank()) Text(c.artist, color = accent.copy(alpha = 0.7f), fontSize = 14.sp, fontFamily = family,
                 maxLines = 1, overflow = TextOverflow.Ellipsis)
+            if (c.album.isNotBlank()) Text(c.album, color = accent.copy(alpha = 0.55f), fontSize = 13.sp, fontFamily = family,
+                maxLines = 1, overflow = TextOverflow.Ellipsis)
         }
     }
     if (center) {
@@ -244,8 +247,8 @@ private fun Lyrics(style: LockStyle, c: LockContent, family: FontFamily) {
                         Text(line.text.ifBlank { "♪" }, color = Color(colors.current), fontSize = style.currentSize.sp,
                             fontFamily = family, textAlign = align, lineHeight = (style.currentSize * 1.25f).sp,
                             fontWeight = if (style.boldCurrent) FontWeight.Bold else FontWeight.Normal,
-                            style = if (style.glow) TextStyle(shadow = Shadow(Color(colors.current).copy(alpha = 0.75f),
-                                Offset.Zero, 28f)) else TextStyle.Default,
+                            style = glowStyle(GlowLook(style.glow, style.glowColor, style.glowStrength, style.glowBlur),
+                                Color(colors.current)),
                             modifier = Modifier.fillMaxWidth())
                         val tr = line.translation
                         if (c.translate && tr != null) {

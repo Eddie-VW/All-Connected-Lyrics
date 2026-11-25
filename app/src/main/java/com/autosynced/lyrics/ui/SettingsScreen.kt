@@ -3,6 +3,7 @@ package com.autosynced.lyrics.ui
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -42,11 +43,12 @@ import com.autosynced.lyrics.Lang
 import com.autosynced.lyrics.NowPlaying
 import com.autosynced.lyrics.Prefs
 import com.autosynced.lyrics.tr
+import com.autosynced.lyrics.trf
 import kotlinx.coroutines.delay
 import kotlin.math.roundToInt
 
 /** The settings pages, opened from the main screen's top bar (or straight from the floating window). */
-enum class Page { HUB, FLOAT, LOCK, MAIN, TRANSLATION, EDITOR }
+enum class Page { HUB, FLOAT, LOCK, MAIN, TRANSLATION, EDITOR, ABOUT }
 
 /** Settings: the language, then one row leading to each page. */
 @Composable
@@ -67,7 +69,7 @@ fun SettingsHub(onBack: () -> Unit, open: (Page) -> Unit) {
                 .padding(horizontal = 16.dp, vertical = 12.dp)) {
                 Text(tr("Language", "语言"), color = pal.text, fontSize = 16.sp, fontWeight = FontWeight.SemiBold)
                 Spacer(Modifier.height(8.dp))
-                ValueChips(listOf(Lang.EN, Lang.ZH), language, { if (it == Lang.ZH) "简体中文" else "English" }) {
+                ValueChips(Lang.LANGUAGES.map { it.first }, language, { Lang.nameOf(it) }) {
                     Prefs.setLanguage(context, it)
                 }
             }
@@ -79,9 +81,11 @@ fun SettingsHub(onBack: () -> Unit, open: (Page) -> Unit) {
             HubRow(tr("Lock screen lyrics", "锁屏歌词"),
                 if (lock.enabled) tr("On · background, clock, cover, lyrics, colours", "已开启 · 背景、时钟、封面、歌词、颜色")
                 else tr("Off · show lyrics over the lock screen", "未开启 · 在锁屏上显示歌词")) { open(Page.LOCK) }
-            HubRow(tr("Chinese translation", "中文翻译"),
+            HubRow(tr("Translation", "翻译"),
                 if (translate) tr("On · services and keys", "已开启 · 服务和密钥") else tr("Off · services and keys", "未开启 · 服务和密钥")) {
                 open(Page.TRANSLATION) }
+            HubRow(tr("About", "关于"), trf("Version {0} · updates · developer", "版本 {0} · 检查更新 · 开发者",
+                com.autosynced.lyrics.BuildConfig.VERSION_NAME)) { open(Page.ABOUT) }
         }
     }
 }
@@ -143,9 +147,8 @@ fun MainScreenSettings(onBack: () -> Unit) {
                         val color = Color(when { k == 0 -> c.current; k < 0 -> c.past; else -> c.upcoming })
                         Text(SAMPLE[i].text, color = color, fontSize = if (k == 0) 16.sp else 14.sp, fontWeight = FontWeight.ExtraBold,
                             maxLines = 1, modifier = if (k != 0) Modifier.softFocus(style.softFocus) else Modifier,
-                            style = if (style.glow && k == 0) androidx.compose.ui.text.TextStyle(shadow = androidx.compose.ui.graphics.Shadow(
-                                color.copy(alpha = 0.75f), androidx.compose.ui.geometry.Offset.Zero, 20f))
-                                else androidx.compose.ui.text.TextStyle.Default)
+                            style = glowStyle(GlowLook(style.glow && k == 0, style.glowColor, style.glowStrength,
+                                (style.glowBlur * 0.7f).toInt()), color))
                         val line = SAMPLE[i].translation
                         if (translateOn && line != null && k == 0) Text(line, color = Color(c.translation),
                             fontSize = 12.sp, fontWeight = FontWeight.SemiBold, maxLines = 1)
@@ -155,6 +158,7 @@ fun MainScreenSettings(onBack: () -> Unit) {
         }
 
         Column(Modifier.weight(1f).verticalScroll(rememberScrollState()).padding(horizontal = 18.dp)) {
+            ThisSong()
             Section(tr("Album cover", "专辑封面")) {
                 Label(tr("Presets", "预设"))
                 ValueChips(CoverStyle.PRESETS.map { it.first }, cover.presetName() ?: "") { name ->
@@ -169,7 +173,7 @@ fun MainScreenSettings(onBack: () -> Unit) {
                     Label(tr("Movement while playing", "播放时的动效"))
                     ValueChips(CoverStyle.MOTIONS, cover.motion) { v -> setCover { it.copy(motion = v) } }
                     if (cover.motion != "still" && cover.motion != "tilt") {
-                        SliderRow(tr("Speed (seconds per movement)", "速度（每次动作的秒数）"), tr("${cover.speed} s", "${cover.speed} 秒"),
+                        SliderRow(tr("Speed (seconds per movement)", "速度（每次动作的秒数）"), trf("{0} s", "{0} 秒", cover.speed),
                             cover.speed.toFloat(), 2f..20f, 17) { v -> setCover { it.copy(speed = v.roundToInt()) } }
                     }
                     if (cover.shape == "vinyl" || cover.shape == "cd") {
@@ -183,7 +187,7 @@ fun MainScreenSettings(onBack: () -> Unit) {
                         setCover { it.copy(reflect = on) } }
                     SliderRow(tr("Size on the main screen", "主界面上的大小"), "${cover.size}", cover.size.toFloat(), 56f..220f, 40) { v ->
                         setCover { it.copy(size = v.roundToInt()) } }
-                    Hint(tr("From ${CoverStyle.LARGE} up, the cover sits above the song title.", "${CoverStyle.LARGE} 以上时，封面显示在歌名上方。"))
+                    Hint(trf("From {0} up, the cover sits above the song title.", "{0} 以上时，封面显示在歌名上方。", CoverStyle.LARGE))
                 }
             }
 
@@ -203,10 +207,14 @@ fun MainScreenSettings(onBack: () -> Unit) {
                     SliderRow(tr("Blur", "模糊程度"), "${style.panelBlur}", style.panelBlur.toFloat(), 0f..100f, 19) { v ->
                         set { it.copy(panelBlur = v.roundToInt()) } }
                 }
-                SwitchRow(tr("Glow around the current line", "当前行发光"), style.glow) { on -> set { it.copy(glow = on) } }
+                GlowSettings(GlowLook(style.glow, style.glowColor, style.glowStrength, style.glowBlur)) { g ->
+                    set { it.copy(glow = g.on, glowColor = g.color, glowStrength = g.strength, glowBlur = g.blur) } }
                 SwitchRow(tr("Full screen", "全屏"), style.fullScreen,
                     tr("The panel's background fills the whole screen, like the lock screen. Also: the ⤢ button above the lyrics.",
                         "面板背景铺满整个屏幕，像锁屏一样。也可以用歌词上方的 ⤢ 按钮切换。")) { on -> set { it.copy(fullScreen = on) } }
+                if (style.fullScreen) SwitchRow(tr("Lively glowing background", "灵动光影背景"), style.lively,
+                    tr("Soft glowing colours from the cover drift slowly behind the lyrics in full screen.",
+                        "全屏时，封面配色的柔和光影在歌词后面缓缓流动。")) { on -> set { it.copy(lively = on) } }
                 SwitchRow(tr("Soft-focus lyrics", "柔焦歌词"), style.softFocus,
                     tr("Lines other than the current one are slightly blurred (Android 12 and newer).",
                         "当前行以外的歌词略微模糊（安卓 12 及以上）。")) { on -> set { it.copy(softFocus = on) } }
@@ -255,5 +263,39 @@ fun MainScreenSettings(onBack: () -> Unit) {
             }
             picking = null
         }
+    }
+}
+
+/** Settings → Main screen → This song: its lyrics file (import / export) and its own cover picture. */
+@Composable
+private fun ThisSong() {
+    val pal = LocalPalette.current
+    val playback by NowPlaying.state.collectAsState()
+    val track = playback.track
+    val files = rememberFileActions(
+        onImported = { lines -> com.autosynced.lyrics.LyricsRepo.saveMine(lines) },
+        toExport = { (com.autosynced.lyrics.LyricsRepo.state.value as? com.autosynced.lyrics.LyricsState.Found)?.lyrics?.lines.orEmpty() },
+    )
+    Section(tr("This song", "当前歌曲")) {
+        if (track == null) { Hint(tr("Play a song to import its lyrics or change its cover.", "播放一首歌，即可导入它的歌词或更换封面。")); return@Section }
+        Text(track.title, color = pal.text, fontSize = 15.sp, fontWeight = FontWeight.SemiBold)
+        Text(listOf(track.artist, track.album).filter { it.isNotBlank() }.joinToString(" · "), color = pal.sub, fontSize = 13.sp)
+        Label(tr("Lyrics file", "歌词文件"))
+        Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            Chip(tr("Import…", "导入…"), false, null) { files.importLyrics() }
+            for (type in com.autosynced.lyrics.LyricFiles.EXPORT_TYPES) Chip(trf("Export .{0}", "导出 .{0}", type), false, null) {
+                files.exportLyrics(type) }
+        }
+        Hint(tr("Import .lrc, .srt, .vtt, .ass or .txt: it becomes this song's lyrics (kept on this phone, edit them any time).",
+            "可导入 .lrc、.srt、.vtt、.ass 或 .txt，作为这首歌的歌词（保存在本机，随时可编辑）。"))
+        Label(tr("Cover picture", "封面图片"))
+        val hasCustom = com.autosynced.lyrics.CustomCovers.has(track.title, track.artist, track.album)
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            Chip(tr("Choose a picture…", "选择图片…"), false, null) { files.pickCover() }
+            if (hasCustom) Chip(tr("Use the original", "恢复原封面"), false, null) {
+                com.autosynced.lyrics.CustomCovers.remove(track.title, track.artist, track.album); NowPlaying.reload() }
+        }
+        Hint(if (track.album.isNotBlank()) trf("Used for every song on the album “{0}”.", "用于专辑《{0}》中的所有歌曲。", track.album)
+            else tr("This song has no album name, so the picture is used for this song only.", "这首歌没有专辑名，图片只用于这首歌。"))
     }
 }

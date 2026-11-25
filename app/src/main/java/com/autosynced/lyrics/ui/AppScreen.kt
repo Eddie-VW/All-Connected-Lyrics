@@ -2,6 +2,7 @@ package com.autosynced.lyrics.ui
 
 import android.graphics.Bitmap
 import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.togetherWith
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
@@ -63,6 +64,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.autosynced.lyrics.tr
+import com.autosynced.lyrics.translateIcon
 import com.autosynced.lyrics.CoverStyle
 import com.autosynced.lyrics.LyricsRepo
 import com.autosynced.lyrics.LyricsState
@@ -92,15 +94,45 @@ fun AppScreen(
         if (requestedPage == com.autosynced.lyrics.MainActivity.PAGE_FLOAT_SETTINGS) { page = Page.FLOAT; fromHub = false; onPageOpened() }
     }
     val back = { page = if (fromHub && page != Page.HUB) Page.HUB else null }
-    when (page) {
-        Page.HUB -> { SettingsHub(onBack = { page = null }) { page = it; fromHub = true }; return }
-        Page.FLOAT -> { FloatSettingsScreen(back); return }
-        Page.LOCK -> { LockSettingsScreen(back); return }
-        Page.MAIN -> { MainScreenSettings(back); return }
-        Page.TRANSLATION -> { TranslationScreen(back); return }
-        Page.EDITOR -> { LyricsEditorScreen(back); return }
-        null -> {}
+    // pages slide and fade: deeper pages come in from the end side, going back slides the other way
+    androidx.compose.animation.AnimatedContent(
+        targetState = page,
+        transitionSpec = {
+            val deeper = depth(targetState) > depth(initialState)
+            val dir = if (deeper) 1 else -1
+            (androidx.compose.animation.slideInHorizontally(tween(320)) { w -> dir * w / 4 } +
+                androidx.compose.animation.fadeIn(tween(320))) togetherWith
+                (androidx.compose.animation.slideOutHorizontally(tween(260)) { w -> -dir * w / 8 } +
+                    androidx.compose.animation.fadeOut(tween(200)))
+        },
+        label = "pages",
+    ) { p ->
+        when (p) {
+            Page.HUB -> SettingsHub(onBack = { page = null }) { page = it; fromHub = true }
+            Page.FLOAT -> FloatSettingsScreen(back)
+            Page.LOCK -> LockSettingsScreen(back)
+            Page.MAIN -> MainScreenSettings(back)
+            Page.TRANSLATION -> TranslationScreen(back)
+            Page.EDITOR -> LyricsEditorScreen(back)
+            Page.ABOUT -> AboutScreen(back)
+            null -> MainScreen(hasAccess, floatingOn, style, onGrantAccess, onToggleStyle, onToggleFloating,
+                open = { target, viaHub -> page = target; fromHub = viaHub })
+        }
     }
+}
+
+/** How deep a page is: main screen 0, the settings list 1, a settings page 2. */
+private fun depth(p: Page?): Int = when (p) { null -> 0; Page.HUB -> 1; else -> 2 }
+
+@Composable
+private fun MainScreen(
+    hasAccess: Boolean, floatingOn: Boolean, style: String, onGrantAccess: () -> Unit, onToggleStyle: () -> Unit,
+    onToggleFloating: () -> Unit, open: (Page, Boolean) -> Unit,
+) {
+    val pal = LocalPalette.current
+    val playback by NowPlaying.state.collectAsState()
+    val tint = remember(playback.art) { dominantColor(playback.art) }
+    val translateOn by Prefs.translate.collectAsState()
     val bgTop by animateColorAsState(
         if (pal.night) (tint ?: Color(0xFF3A3A3A)) else (tint?.copy(alpha = .22f) ?: Color(0x22FA2D48)),
         tween(600), label = "tint")
@@ -110,7 +142,10 @@ fun AppScreen(
     val full = appLyrics.fullScreen && hasAccess
     val toggleFull = { Prefs.setAppLyrics(context, Prefs.appLyrics.value.let { it.copy(fullScreen = !it.fullScreen) }) }
     Box(Modifier.fillMaxSize().background(pal.bg)) {
-        if (full) LyricsPanel(appLyrics, playback.art, Modifier.fillMaxSize(), corner = 0.dp) {}
+        if (full) {
+            LyricsPanel(appLyrics, playback.art, Modifier.fillMaxSize(), corner = 0.dp) {}
+            if (appLyrics.lively) LivelyGlow(playback.art, playback.playing, Modifier.fillMaxSize())
+        }
         Column(
             Modifier
                 .fillMaxSize()
@@ -128,12 +163,12 @@ fun AppScreen(
                 }
             } else {
                 TopBar(style, floatingOn, translateOn, onToggleStyle, onToggleFloating,
-                    onTranslation = { page = Page.TRANSLATION; fromHub = false }, onFloatSettings = { page = Page.HUB })
+                    onTranslation = { open(Page.TRANSLATION, false) }, onFloatSettings = { open(Page.HUB, false) })
             }
             if (!hasAccess) {
                 AccessCard(onGrantAccess)
             } else {
-                NowPlayingScreen(tint, translateOn, full, onEdit = { page = Page.EDITOR; fromHub = false }, onFullScreen = toggleFull)
+                NowPlayingScreen(tint, translateOn, full, onEdit = { open(Page.EDITOR, false) }, onFullScreen = toggleFull)
             }
         }
     }
@@ -150,10 +185,10 @@ private fun TopBar(
         Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Text(tr("Autosynced Lyrics", "同步歌词"), color = pal.text, fontSize = 18.sp, fontWeight = FontWeight.Bold,
+        Text(tr("Lyrics Master", "歌词大师"), color = pal.text, fontSize = 18.sp, fontWeight = FontWeight.Bold,
             maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f))
         // Chinese translation: on/off and AI settings
-        Pill(tr("Trans", "译"), translateOn, onTranslation)
+        Pill(translateIcon(), translateOn, onTranslation)
         Spacer(Modifier.width(8.dp))
         Pill(if (floatingOn) tr("Floating on", "悬浮：开") else tr("Floating off", "悬浮：关"), floatingOn, onToggleFloating)
         // floating window settings (size, colours, font, lines…)
@@ -178,7 +213,7 @@ private fun Pill(text: String, on: Boolean, onClick: () -> Unit) {
         Modifier
             .height(36.dp)
             .clip(RoundedCornerShape(50))
-            .background(if (on) pal.accent else pal.surface2)
+            .background(animateColorAsState(if (on) pal.accent else pal.surface2, tween(250), label = "pill").value)
             .clickable(onClick = onClick)
             .padding(horizontal = 14.dp),
         contentAlignment = Alignment.Center,
@@ -209,7 +244,7 @@ private fun AccessCard(onGrantAccess: () -> Unit) {
             Text(tr("Turn on notification access", "开启通知使用权"), color = pal.accentInk, fontSize = 16.sp, fontWeight = FontWeight.Bold)
         }
         Spacer(Modifier.height(12.dp))
-        Text(tr("In the list that opens, find Autosynced Lyrics, switch it on, then come back.", "在打开的列表中找到本应用并开启，然后返回。"),
+        Text(tr("In the list that opens, find Lyrics Master, switch it on, then come back.", "在打开的列表中找到“歌词大师”并开启，然后返回。"),
             color = pal.faint, fontSize = 13.sp)
     }
 }
@@ -236,7 +271,9 @@ private fun ColumnScope.NowPlayingScreen(tint: Color?, translateOn: Boolean, ful
                 maxLines = 2, overflow = TextOverflow.Ellipsis, textAlign = if (centered) TextAlign.Center else TextAlign.Start)
             Text(track?.artist ?: tr("Play a song in any music app", "在任意音乐应用中播放一首歌"), color = if (pal.night) pal.sub else pal.accent,
                 fontSize = 15.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
-            if (track != null) Text(tr("on ${track.player}", "来自 ${track.player}"), color = pal.faint, fontSize = 12.sp)
+            if (track != null && track.album.isNotBlank()) Text(track.album, color = pal.sub, fontSize = 13.sp, maxLines = 1,
+                overflow = TextOverflow.Ellipsis)
+            if (track != null) Text(trf("on {0}", "来自 {0}", track.player), color = pal.faint, fontSize = 12.sp)
         }
     }
     val coverShown = cover.source != "none"
@@ -282,12 +319,14 @@ private fun ColumnScope.NowPlayingScreen(tint: Color?, translateOn: Boolean, ful
     // in full screen the background is already behind everything, so the lyrics need no box of their own
     LyricsPanel(if (full) appLyrics.copy(panel = "none") else appLyrics, playback.art,
         Modifier.weight(1f).fillMaxWidth().padding(horizontal = 12.dp, vertical = 6.dp)) {
+        androidx.compose.animation.Crossfade(targetState = lyricsState::class, animationSpec = tween(350), label = "lyrics") { _ ->
         when (val s = lyricsState) {
             is LyricsState.Found -> LyricsList(s.lyrics, now, playback.canSeek, translateOn)
             is LyricsState.Loading -> Message(tr("Loading lyrics…", "正在加载歌词…"))
             is LyricsState.NotFound -> Message(tr("No synced lyrics found for this song yet", "暂时没有找到这首歌的同步歌词"))
             is LyricsState.NetworkError -> Message(tr("Network error, unable to fetch lyrics", "网络错误，无法获取歌词"))
             is LyricsState.Idle -> Message(tr("Play a song and its lyrics will appear here, line by line.", "播放一首歌，歌词会在这里逐行显示。"))
+        }
         }
     }
 
@@ -338,10 +377,8 @@ private fun LyricsList(lyrics: com.autosynced.lyrics.Lyrics, now: Long, canSeek:
                         fontSize = (if (lyrics.synced) 24 else 18).sp * scale,
                         fontWeight = if (lyrics.synced) FontWeight.ExtraBold else FontWeight.SemiBold,
                         lineHeight = 30.sp,
-                        style = if (appLyrics.glow && isNow && lyrics.synced)
-                            androidx.compose.ui.text.TextStyle(shadow = androidx.compose.ui.graphics.Shadow(color.copy(alpha = 0.75f),
-                                androidx.compose.ui.geometry.Offset.Zero, 28f))
-                            else androidx.compose.ui.text.TextStyle.Default,
+                        style = glowStyle(GlowLook(appLyrics.glow && isNow && lyrics.synced, appLyrics.glowColor,
+                            appLyrics.glowStrength, appLyrics.glowBlur), color),
                         modifier = Modifier.softFocus(soft),
                     )
                     val lineTr = line.translation

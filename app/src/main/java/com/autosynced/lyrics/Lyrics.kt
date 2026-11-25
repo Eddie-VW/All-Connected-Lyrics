@@ -72,7 +72,7 @@ object LrcParser {
 
 /** Fetches lyrics from LRCLIB, then NetEase, then Kugou (like the PC app). */
 object LyricsSources {
-    private const val UA = "Mozilla/5.0 (Linux; Android 14) AutosyncedLyrics/0.1"
+    private const val UA = "Mozilla/5.0 (Linux; Android 14) LyricsMaster/1.0"
     private const val MAX_LENGTH_DIFF = 10.0      // seconds; more = probably another version
     private val credit = Regex("""(作词|作曲|编曲|制作人|监制|混音|母带|和声|演唱|原唱|填词|lyrics? by|written by|composed by|composer|lyricist|producer|produced by|arranged by|music by|words by)\s*[:：]""", RegexOption.IGNORE_CASE)
     private val noise = Regex("""\s*[-(\[].*?(remaster|live|version|edit|mix|feat|ft\.|mono|stereo).*$""", RegexOption.IGNORE_CASE)

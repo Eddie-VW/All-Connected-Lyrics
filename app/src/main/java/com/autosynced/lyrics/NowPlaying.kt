@@ -123,7 +123,9 @@ object NowPlaying {
             positionMs = ps?.position ?: 0,
             updatedAt = ps?.lastPositionUpdateTime?.takeIf { it > 0 } ?: SystemClock.elapsedRealtime(),
             speed = ps?.playbackSpeed?.takeIf { it > 0f } ?: 1f,
-            art = art ?: _state.value.art.takeIf { _state.value.track?.key == track.key },
+            // your own cover (for this album or song) wins over the music app's
+            art = CustomCovers.get(track.title, track.artist, track.album)
+                ?: art ?: _state.value.art.takeIf { _state.value.track?.key == track.key },
             canSeek = ps != null && (ps.actions and PlaybackState.ACTION_SEEK_TO) != 0L,
         )
         if (new != _state.value) _state.value = new
@@ -133,6 +135,9 @@ object NowPlaying {
         val pm = appContext.packageManager
         pm.getApplicationLabel(pm.getApplicationInfo(pkg, 0)).toString()
     } catch (_: Exception) { pkg }
+
+    /** Read the song's details again (e.g. after a custom cover was picked or removed). */
+    fun reload() { main.post { refresh() } }
 
     // ---- controls ----------------------------------------------------------------------
     fun playPause() {

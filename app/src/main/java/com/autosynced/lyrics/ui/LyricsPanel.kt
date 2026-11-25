@@ -13,7 +13,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.BlurredEdgeTreatment
 import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
@@ -63,3 +67,35 @@ fun LyricsPanel(style: AppLyricsStyle, art: Bitmap?, modifier: Modifier = Modifi
 
 /** Slightly blurred lines (the PC app's soft-focus lyrics); only where Android can blur (12 and newer). */
 fun Modifier.softFocus(on: Boolean): Modifier = if (on) this.blur(1.4.dp, BlurredEdgeTreatment.Unbounded) else this
+
+/**
+ * Full screen's lively background: three soft clouds of light in the cover's colours drifting
+ * slowly behind the lyrics, a little livelier while music plays.
+ */
+@Composable
+fun LivelyGlow(art: Bitmap?, playing: Boolean, modifier: Modifier = Modifier) {
+    val tint = remember(art) { dominantColor(art) } ?: Color(0xFF7C5CFF)
+    val hsv = remember(tint) { FloatArray(3).also { android.graphics.Color.colorToHSV(tint.toArgb(), it) } }
+    fun shade(dh: Float) = Color.hsv((hsv[0] + dh + 360f) % 360f, 0.75f, 1f)
+    val colors = remember(tint) { listOf(shade(0f), shade(40f), shade(-45f)) }
+    val t = androidx.compose.animation.core.rememberInfiniteTransition(label = "lively")
+    val speed = if (playing) 1f else 0.4f
+    val phase by t.animateFloat(0f, (2 * Math.PI).toFloat(),
+        androidx.compose.animation.core.infiniteRepeatable(androidx.compose.animation.core.tween((26_000 / speed).toInt(),
+            easing = androidx.compose.animation.core.LinearEasing)), label = "phase")
+    val breath by t.animateFloat(0.75f, 1f, androidx.compose.animation.core.infiniteRepeatable(
+        androidx.compose.animation.core.tween((3_200 / speed).toInt()), androidx.compose.animation.core.RepeatMode.Reverse), label = "breath")
+    androidx.compose.foundation.Canvas(modifier) {
+        val w = size.width; val h = size.height
+        val spots = listOf(
+            Offset(w * (0.3f + 0.2f * kotlin.math.cos(phase)), h * (0.28f + 0.12f * kotlin.math.sin(phase * 2))),
+            Offset(w * (0.72f + 0.18f * kotlin.math.sin(phase + 1f)), h * (0.55f + 0.15f * kotlin.math.cos(phase))),
+            Offset(w * (0.45f + 0.25f * kotlin.math.sin(phase * 0.5f + 2f)), h * (0.82f + 0.08f * kotlin.math.cos(phase + 2f))),
+        )
+        for ((i, p) in spots.withIndex()) {
+            val r = size.minDimension * (0.55f + 0.1f * i) * breath
+            drawCircle(Brush.radialGradient(listOf(colors[i].copy(alpha = 0.45f), Color.Transparent), p, r), r, p,
+                blendMode = androidx.compose.ui.graphics.BlendMode.Screen)
+        }
+    }
+}

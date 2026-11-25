@@ -145,6 +145,8 @@ fun FloatSettingsScreen(onBack: () -> Unit) {
                 SliderRow(tr("Current line size", "当前行字号"), "${style.currentSize}", style.currentSize.toFloat(), 12f..36f, 23) {
                     set { s -> s.copy(currentSize = it.roundToInt()) } }
                 SwitchRow(tr("Bold current line", "当前行加粗"), style.boldCurrent) { set { s -> s.copy(boldCurrent = it) } }
+                GlowSettings(GlowLook(style.glow, style.glowColor, style.glowStrength, style.glowBlur)) { g ->
+                    set { s -> s.copy(glow = g.on, glowColor = g.color, glowStrength = g.strength, glowBlur = g.blur) } }
                 SliderRow(tr("Translation size", "翻译字号"), "${style.translationPct}%", style.translationPct.toFloat(), 50f..110f, 11) {
                     set { s -> s.copy(translationPct = it.roundToInt()) } }
                 SliderRow(tr("Other lines size", "其他行字号"), "${style.otherSize}", style.otherSize.toFloat(), 10f..28f, 17) {
@@ -187,9 +189,11 @@ fun FloatSettingsScreen(onBack: () -> Unit) {
                     }
                 }
                 SwitchRow(tr("Lock the window", "锁定窗口"), style.locked,
-                    tr("Touches go through it to the app underneath, and it can't be moved. To unlock, tap the small lock " +
-                        "at its corner, the notification, or here. (Android keeps a locked window a little see-through.)",
-                        "触摸会穿透到下面的应用，窗口也不能移动。解锁：点窗口角落的小锁、通知或这里。（安卓会让锁定的窗口略微透明。）")) {
+                    tr("Touches go through it to the app underneath. Its top-right corner hides an invisible lock spot: " +
+                        "double-tap it to unlock, or long-press it and drag to move the window. The notification and this " +
+                        "switch unlock it too. (Android keeps a locked window a little see-through.)",
+                        "触摸会穿透到下面的应用。窗口右上角有一个隐形的锁定点：双击可解锁，长按并拖动可移动窗口。" +
+                            "通知和这个开关也可以解锁。（安卓会让锁定的窗口略微透明。）")) {
                     set { s -> s.copy(locked = it) } }
                 val secs = style.offsetMs / 1000.0
                 SliderRow(tr("Timing", "时间偏移"),

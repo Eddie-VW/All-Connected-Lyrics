@@ -161,7 +161,7 @@ private fun ProviderSetup(p: Provider) {
             }
         }
         AI_PRESETS.firstOrNull { it.name == preset }?.let { a ->
-            Hint(tr(a.noteEn, a.noteZh) + (if (a.keyFrom.isNotEmpty()) tr(" Key from ${a.keyFrom}.", "密钥在 ${a.keyFrom} 获取。") else ""))
+            Hint(tr(a.noteEn, a.noteZh) + (if (a.keyFrom.isNotEmpty()) trf(" Key from {0}.", "密钥在 {0} 获取。", a.keyFrom) else ""))
         }
         Field(tr("Address (base URL)", "地址（Base URL）"), baseUrl, "https://…/v1") { baseUrl = it; saved = false }
         Field(tr("Model", "模型"), model, tr("model name", "模型名")) { model = it; saved = false }

@@ -42,7 +42,10 @@ class MainActivity : ComponentActivity() {
         style = Prefs.style(this)
         requestedPage = intent?.getStringExtra(EXTRA_PAGE)
         setContent {
-            CompositionLocalProvider(LocalPalette provides if (style == "day") DayPalette else NightPalette) {
+            // Arabic reads right to left: the whole layout is mirrored
+            CompositionLocalProvider(LocalPalette provides if (style == "day") DayPalette else NightPalette,
+                androidx.compose.ui.platform.LocalLayoutDirection provides
+                    if (Lang.rtl) androidx.compose.ui.unit.LayoutDirection.Rtl else androidx.compose.ui.unit.LayoutDirection.Ltr) {
                 AppScreen(
                     hasAccess = hasAccess,
                     floatingOn = floating && canDraw,

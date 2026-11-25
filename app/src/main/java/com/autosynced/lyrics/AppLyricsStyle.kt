@@ -18,7 +18,11 @@ data class AppLyricsStyle(
     val panelBlur: Int = 70,                     // 0..100, for "glass"
     val softFocus: Boolean = false,              // lines other than the current one slightly blurred (as on the PC in Day)
     val glow: Boolean = false,                   // soft glow around the current line
+    val glowColor: Int = 0,                      // 0 = the line's own colour
+    val glowStrength: Float = 0.75f,             // 0.1..1
+    val glowBlur: Int = 14,                      // dp, 2..40
     val fullScreen: Boolean = false,             // the panel's background fills the whole screen (lock-screen style)
+    val lively: Boolean = true,                  // full screen: slowly moving glowing colours behind the lyrics
 ) {
     data class Colors(val current: Int, val past: Int, val upcoming: Int, val translation: Int)
 
@@ -40,6 +44,8 @@ data class AppLyricsStyle(
         .put("upcoming", upcoming).put("translation", translation).put("panel", panel).put("panelColor", panelColor)
         .put("panelOpacity", panelOpacity.toDouble()).put("panelBlur", panelBlur).put("softFocus", softFocus)
         .put("glow", glow).put("fullScreen", fullScreen)
+        .put("glowColor", glowColor).put("glowStrength", glowStrength.toDouble()).put("glowBlur", glowBlur)
+        .put("lively", lively)
         .toString()
 
     companion object {
@@ -61,6 +67,10 @@ data class AppLyricsStyle(
                 panelBlur = i("panelBlur", d.panelBlur).coerceIn(0, 100),
                 softFocus = j.optBoolean("softFocus", d.softFocus),
                 glow = j.optBoolean("glow", d.glow),
+                glowColor = i("glowColor", d.glowColor),
+                glowStrength = (if (j.has("glowStrength")) j.optDouble("glowStrength", 0.75).toFloat() else d.glowStrength).coerceIn(0.1f, 1f),
+                glowBlur = i("glowBlur", d.glowBlur).coerceIn(2, 40),
+                lively = j.optBoolean("lively", d.lively),
                 fullScreen = j.optBoolean("fullScreen", d.fullScreen),
             )
         }

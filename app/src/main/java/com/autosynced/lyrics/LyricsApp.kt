@@ -69,6 +69,8 @@ object Prefs {
     }
 
     fun load(c: Context) {
+        Lang.init(c)
+        CustomCovers.init(c)
         _language.value = p(c).getString("language", null) ?: Lang.systemDefault()
         Lang.current = _language.value
         _cover.value = CoverStyle.fromJson(p(c).getString("cover", null))

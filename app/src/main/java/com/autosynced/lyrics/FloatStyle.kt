@@ -38,6 +38,10 @@ data class FloatStyle(
     val animation: String = "fade",       // none / fade / slide, when the line changes
     val locked: Boolean = false,          // touches go through to the app below; can't be dragged
     val controlsOpacity: Float = 0.85f,   // the box behind the window while its buttons show
+    val glow: Boolean = false,            // glow around the current line
+    val glowColor: Int = 0,               // 0 = the line's own colour
+    val glowStrength: Float = 0.75f,
+    val glowBlur: Int = 10,               // dp
     val offsetMs: Long = 0,               // + = lyrics show earlier (e.g. for Bluetooth delay)
 ) {
     companion object {
@@ -82,6 +86,8 @@ data class FloatStyle(
                 animation = s("animation", d.animation).takeIf { it in setOf("none", "fade", "slide") } ?: d.animation,
                 locked = b("locked", d.locked),
                 controlsOpacity = f("controlsOpacity", d.controlsOpacity).coerceIn(0f, 1f),
+                glow = b("glow", d.glow), glowColor = i("glowColor", d.glowColor),
+                glowStrength = f("glowStrength", d.glowStrength).coerceIn(0.1f, 1f), glowBlur = i("glowBlur", d.glowBlur).coerceIn(2, 40),
                 offsetMs = l("offsetMs", d.offsetMs).coerceIn(-5_000, 5_000),
             )
         }
@@ -98,7 +104,8 @@ data class FloatStyle(
         .put("outlineWidth", outlineWidth).put("outlineColor", outlineColor).put("styleColors", styleColors)
         .put("bgColor", bgColor).put("currentColor", currentColor).put("translationColor", translationColor)
         .put("otherColor", otherColor).put("headerColor", headerColor).put("animation", animation)
-        .put("locked", locked).put("controlsOpacity", controlsOpacity.toDouble()).put("offsetMs", offsetMs)
+        .put("locked", locked).put("controlsOpacity", controlsOpacity.toDouble())
+        .put("glow", glow).put("glowColor", glowColor).put("glowStrength", glowStrength.toDouble()).put("glowBlur", glowBlur).put("offsetMs", offsetMs)
         .toString()
 
     /** The colours actually used: your own, or the Night / Day style's. */

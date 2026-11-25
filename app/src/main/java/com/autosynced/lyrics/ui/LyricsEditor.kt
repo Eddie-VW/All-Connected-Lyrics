@@ -49,6 +49,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.autosynced.lyrics.Line
 import com.autosynced.lyrics.LyricEdits
+import com.autosynced.lyrics.LyricFiles
+import com.autosynced.lyrics.trf
 import com.autosynced.lyrics.LyricsRepo
 import com.autosynced.lyrics.LyricsState
 import com.autosynced.lyrics.NowPlaying
@@ -92,6 +94,10 @@ fun LyricsEditorScreen(onBack: () -> Unit) {
         onBack()
     }
     val back: () -> Unit = { if (dirty) { askDiscard = true } else { onBack() } }
+    val files = rememberFileActions(
+        onImported = { lines -> change { rows.clear(); rows.addAll(lines.map { row(it) }) }; if (!LyricEdits.isSynced(lines)) tapAt = 0 },
+        toExport = { rows.map { Line(it.time, it.text, it.translation.ifBlank { null }) } },
+    )
     BackHandler(onBack = back)
 
     // the line playing now (by time), for highlighting
@@ -125,6 +131,8 @@ fun LyricsEditorScreen(onBack: () -> Unit) {
                 tapAt = if (tapAt != null) null else 0
             }
             Chip(tr("Paste lyrics", "粘贴歌词"), false, null) { pasting = true }
+            Chip(tr("Import file", "导入文件"), false, null) { files.importLyrics() }
+            for (type in LyricFiles.EXPORT_TYPES) Chip(trf("Export .{0}", "导出 .{0}", type), false, null) { files.exportLyrics(type) }
             Chip(tr("All 0.5 s earlier", "全部提前 0.5 秒"), false, null) {
                 change { val moved = LyricEdits.shift(rows.map { Line(it.time, "") }, -500); rows.indices.forEach { rows[it] = rows[it].copy(time = moved[it].timeMs) } }
             }

@@ -76,7 +76,7 @@ class TranslatorException(val status: Int, message: String) : Exception(message)
 
 /** Calls to the non-Claude services (plain HTTP; all answers parsed here so they're tested on a PC). */
 object Translators {
-    private const val UA = "Mozilla/5.0 (Linux; Android 14) AllConnectedLyrics/0.4"
+    private const val UA = "Mozilla/5.0 (Linux; Android 14) LyricsMaster/1.0"
 
     // ---- AI services with an OpenAI-style chat API ---------------------------------------
     /** Claude-style answer text ({"style":…,"lines":[{"n":…,"zh":…}]}) and tokens used. */

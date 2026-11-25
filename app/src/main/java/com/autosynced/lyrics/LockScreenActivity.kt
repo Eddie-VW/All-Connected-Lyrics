@@ -67,18 +67,21 @@ class LockScreenActivity : ComponentActivity() {
                 is LyricsState.Found -> if (synced == null) tr("These lyrics have no timing", "这份歌词没有时间轴") else null
                 else -> "♪"
             }
+            androidx.compose.runtime.CompositionLocalProvider(androidx.compose.ui.platform.LocalLayoutDirection provides
+                if (Lang.rtl) androidx.compose.ui.unit.LayoutDirection.Rtl else androidx.compose.ui.unit.LayoutDirection.Ltr) {
             LockScreen(
                 style = style,
                 content = LockContent(
                     title = track.title, artist = track.artist, art = playback.art, playing = playback.playing,
                     lines = synced?.lines ?: emptyList(), index = synced?.indexAt(now) ?: -1, message = message,
-                    positionMs = now, durationMs = track.durationMs, translate = translate,
+                    positionMs = now, durationMs = track.durationMs, translate = translate, album = track.album,
                 ),
                 onUnlock = { unlock() },
                 onPrevious = { NowPlaying.previous() },
                 onPlayPause = { NowPlaying.playPause() },
                 onNext = { NowPlaying.next() },
             )
+            }
             }
         }
     }

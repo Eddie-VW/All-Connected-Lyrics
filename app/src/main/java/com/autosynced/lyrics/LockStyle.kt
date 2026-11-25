@@ -36,6 +36,9 @@ data class LockStyle(
     val translationPct: Int = 70,            // % of the current line's size
     val boldCurrent: Boolean = true,
     val glow: Boolean = false,               // soft glow around the current line
+    val glowColor: Int = 0,                  // 0 = the line's own colour
+    val glowStrength: Float = 0.75f,
+    val glowBlur: Int = 14,                  // dp
     val lineSpacing: Int = 12,               // dp between lines
     val animation: String = "slide",         // none / fade / slide / zoom
     // colours (white with see-through others by default, which suits any background)
@@ -69,6 +72,7 @@ data class LockStyle(
         .put("showTitle", showTitle).put("align", align).put("linesBefore", linesBefore).put("linesAfter", linesAfter)
         .put("font", font).put("currentSize", currentSize).put("otherSize", otherSize)
         .put("translationPct", translationPct).put("boldCurrent", boldCurrent).put("glow", glow)
+        .put("glowColor", glowColor).put("glowStrength", glowStrength.toDouble()).put("glowBlur", glowBlur)
         .put("lineSpacing", lineSpacing).put("animation", animation).put("styleColors", styleColors)
         .put("currentColor", currentColor).put("otherColor", otherColor).put("translationColor", translationColor)
         .put("accentColor", accentColor).put("showControls", showControls).put("showProgress", showProgress)
@@ -107,6 +111,8 @@ data class LockStyle(
                 otherSize = i("otherSize", d.otherSize).coerceIn(10, 36),
                 translationPct = i("translationPct", d.translationPct).coerceIn(40, 120),
                 boldCurrent = b("boldCurrent", d.boldCurrent), glow = b("glow", d.glow),
+                glowColor = i("glowColor", d.glowColor), glowStrength = f("glowStrength", d.glowStrength).coerceIn(0.1f, 1f),
+                glowBlur = i("glowBlur", d.glowBlur).coerceIn(2, 40),
                 lineSpacing = i("lineSpacing", d.lineSpacing).coerceIn(0, 40),
                 animation = s("animation", d.animation, ANIMATIONS),
                 styleColors = b("styleColors", d.styleColors), currentColor = i("currentColor", d.currentColor),
