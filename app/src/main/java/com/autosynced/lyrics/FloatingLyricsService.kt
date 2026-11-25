@@ -25,7 +25,8 @@ import kotlin.math.abs
 
 /**
  * The floating lyrics window shown over other apps, styled by [FloatStyle] (settings → Floating lyrics).
- * Drag to move · tap to open the app · long-press to turn it off. When it's locked, touches go
+ * Drag to move · tap for buttons (play/pause, skip, 译, size, colour, settings, close) ·
+ * long-press to turn it off. When it's locked, touches go
  * through to the app underneath; unlock it from the notification or the settings.
  * Runs as a foreground service (with a small notification) so Android keeps it on screen.
  */
@@ -93,7 +94,7 @@ class FloatingLyricsService : Service() {
             .setSmallIcon(android.R.drawable.ic_media_play)
             .setContentTitle(if (locked) "Floating lyrics is on (locked)" else "Floating lyrics is on")
             .setContentText(if (locked) "Touches go through the lyrics. Tap Unlock to move them again."
-                else "Tap to open the app. Long-press the lyrics to turn them off.")
+                else "Tap the lyrics for buttons. Tap here to open the app.")
             .setContentIntent(open)
             .addAction(Notification.Action.Builder(
                 android.graphics.drawable.Icon.createWithResource(this, android.R.drawable.ic_lock_lock),
@@ -119,6 +120,7 @@ class FloatingLyricsService : Service() {
     private fun addOverlay() {
         val box = FloatingLyricsView(this)
         card = box
+        box.onAction = { act(it) }
         params = WindowManager.LayoutParams(
             box.widthPx(), WindowManager.LayoutParams.WRAP_CONTENT,
             WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY,
@@ -157,15 +159,40 @@ class FloatingLyricsService : Service() {
                 MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
                     handler.removeCallbacks(longPress)
                     if (moved) Prefs.setFloatPos(this, params.x, params.y)
-                    else if (e.actionMasked == MotionEvent.ACTION_UP) {
-                        startActivity(Intent(this, MainActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
-                    }
+                    else if (e.actionMasked == MotionEvent.ACTION_UP) box.showControls(!box.controlsShown)
                 }
             }
             true
         }
         applyStyle()
         wm.addView(box, params)
+    }
+
+    /** What the floating window's buttons do. */
+    private fun act(action: FloatingLyricsView.Action) {
+        val style = Prefs.floatStyle.value
+        val night = Prefs.style(this) != "day"
+        when (action) {
+            FloatingLyricsView.Action.PlayPause -> NowPlaying.playPause()
+            FloatingLyricsView.Action.Previous -> NowPlaying.previous()
+            FloatingLyricsView.Action.Next -> NowPlaying.next()
+            FloatingLyricsView.Action.Translate -> Prefs.setTranslate(this, !Prefs.translate.value)
+            FloatingLyricsView.Action.Bigger -> Prefs.setFloatStyle(this, style.resized(+1))
+            FloatingLyricsView.Action.Smaller -> Prefs.setFloatStyle(this, style.resized(-1))
+            is FloatingLyricsView.Action.Colour ->
+                Prefs.setFloatStyle(this, style.ownColors(night).copy(currentColor = action.color))
+            FloatingLyricsView.Action.Settings -> {
+                card?.showControls(false)
+                startActivity(Intent(this, MainActivity::class.java)
+                    .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP)
+                    .putExtra(MainActivity.EXTRA_PAGE, MainActivity.PAGE_FLOAT_SETTINGS))
+            }
+            FloatingLyricsView.Action.Close -> {
+                Prefs.setFloating(this, false)
+                Toast.makeText(this, "Floating lyrics turned off. Turn them on again in the app.", Toast.LENGTH_SHORT).show()
+                stopSelf()
+            }
+        }
     }
 
     /** Re-applies the settings when they (or the app's Night / Day style) change. */
@@ -212,6 +239,7 @@ class FloatingLyricsService : Service() {
             else -> listOf(Row("♪", Row.Kind.CURRENT))
         }
         val title = if (track.artist.isBlank()) track.title else "${track.title} — ${track.artist}"
+        box.setState(p.playing, Prefs.translate.value)
         box.show(title, rows)
     }
 }

@@ -110,6 +110,21 @@ data class FloatStyle(
     }
 
     data class Colors(val bg: Int, val current: Int, val translation: Int, val other: Int, val header: Int)
+
+    /** Switches to your own colours, starting from the ones showing now (so nothing else jumps). */
+    fun ownColors(night: Boolean): FloatStyle {
+        if (!styleColors) return this
+        val c = colors(night)
+        return copy(styleColors = false, bgColor = c.bg, currentColor = c.current, translationColor = c.translation,
+            otherColor = c.other, headerColor = c.header)
+    }
+
+    /** Text a step bigger ([step] > 0) or smaller, all sizes together. */
+    fun resized(step: Int): FloatStyle = copy(
+        currentSize = (currentSize + step).coerceIn(10, 48),
+        otherSize = (otherSize + step).coerceIn(8, 40),
+        headerSize = (headerSize + step).coerceIn(8, 30),
+    )
 }
 
 /** One row of text in the floating window. */

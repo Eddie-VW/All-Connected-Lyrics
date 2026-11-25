@@ -10,6 +10,7 @@ import android.text.TextUtils
 import android.util.TypedValue
 import android.view.Gravity
 import android.view.View
+import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import java.io.File
@@ -18,6 +19,7 @@ import java.io.File
  * The floating lyrics card: an optional "song — artist" header, then rows of lyrics
  * (earlier lines, the current one, its translation, coming lines), drawn as [FloatStyle] says.
  * Used by the floating window and by the live preview in its settings.
+ * In the floating window, a tap shows a bar of buttons ([showControls]) that reports taps to [onAction].
  */
 class FloatingLyricsView(context: Context) : LinearLayout(context) {
     private val header = OutlineTextView(context)
@@ -31,11 +33,140 @@ class FloatingLyricsView(context: Context) : LinearLayout(context) {
     private var typeface: Typeface = Typeface.DEFAULT
     private var boldTypeface: Typeface = Typeface.DEFAULT_BOLD
 
+    /** What a button in the control bar asks for. */
+    sealed class Action {
+        data object PlayPause : Action()
+        data object Previous : Action()
+        data object Next : Action()
+        data object Translate : Action()
+        data object Close : Action()
+        data object Settings : Action()
+        data object Bigger : Action()
+        data object Smaller : Action()
+        data class Colour(val color: Int) : Action()
+    }
+
+    var onAction: (Action) -> Unit = {}
+    private val controls = LinearLayout(context).apply { orientation = VERTICAL; visibility = View.GONE }
+    private val swatches = LinearLayout(context).apply { orientation = HORIZONTAL; gravity = Gravity.CENTER; visibility = View.GONE }
+    private val buttons = ArrayList<View>()            // tinted with the text colour
+    private lateinit var playButton: ImageView
+    private lateinit var translateButton: TextView
+    private lateinit var colourDot: View
+    private var playing = false
+    private var translateOn = false
+    private val hideControls = Runnable { showControls(false) }
+
     init {
         orientation = VERTICAL
         addView(header)
         addView(rowsBox)
+        buildControls()
+        addView(controls)
         apply(style, night, force = true)
+    }
+
+    // ---- the control bar ----------------------------------------------------------------
+    private fun buildControls() {
+        val size = dp(38f).toInt()
+        fun icon(res: Int, action: Action) = ImageView(context).apply {
+            setImageResource(res)
+            scaleType = ImageView.ScaleType.CENTER_INSIDE
+            setPadding(dp(7f).toInt(), dp(7f).toInt(), dp(7f).toInt(), dp(7f).toInt())
+            layoutParams = LayoutParams(size, size).apply { marginStart = dp(4f).toInt(); marginEnd = dp(4f).toInt() }
+            setOnClickListener { tapped(action) }
+            buttons.add(this)
+        }
+        fun text(label: String, action: Action) = TextView(context).apply {
+            text = label
+            gravity = Gravity.CENTER
+            setTextSize(TypedValue.COMPLEX_UNIT_SP, 15f)
+            typeface = Typeface.DEFAULT_BOLD
+            layoutParams = LayoutParams(size, size).apply { marginStart = dp(4f).toInt(); marginEnd = dp(4f).toInt() }
+            setOnClickListener { tapped(action) }
+            buttons.add(this)
+        }
+        fun row(vararg views: View) = LinearLayout(context).apply {
+            orientation = HORIZONTAL
+            gravity = Gravity.CENTER
+            setPadding(0, dp(4f).toInt(), 0, 0)
+            views.forEach { addView(it) }
+        }
+        playButton = icon(android.R.drawable.ic_media_play, Action.PlayPause)
+        translateButton = text("译", Action.Translate)
+        colourDot = View(context).apply {
+            layoutParams = LayoutParams(size, size).apply { marginStart = dp(4f).toInt(); marginEnd = dp(4f).toInt() }
+            setOnClickListener {
+                swatches.visibility = if (swatches.visibility == View.VISIBLE) View.GONE else View.VISIBLE
+                keepControls()
+            }
+        }
+        controls.addView(row(
+            icon(android.R.drawable.ic_media_previous, Action.Previous), playButton,
+            icon(android.R.drawable.ic_media_next, Action.Next), translateButton,
+            icon(android.R.drawable.ic_menu_close_clear_cancel, Action.Close)))
+        controls.addView(row(text("A−", Action.Smaller), text("A+", Action.Bigger), colourDot,
+            icon(android.R.drawable.ic_menu_preferences, Action.Settings)))
+        val dot = dp(26f).toInt()
+        for (c in QUICK_COLOURS) {
+            swatches.addView(View(context).apply {
+                layoutParams = LayoutParams(dot, dot).apply { marginStart = dp(4f).toInt(); marginEnd = dp(4f).toInt() }
+                background = GradientDrawable().apply {
+                    shape = GradientDrawable.OVAL; setColor(c); setStroke(dp(1f).toInt(), 0x66888888)
+                }
+                setOnClickListener { tapped(Action.Colour(c)) }
+            })
+        }
+        swatches.setPadding(0, dp(6f).toInt(), 0, dp(2f).toInt())
+        controls.addView(swatches)
+    }
+
+    private fun tapped(action: Action) {
+        keepControls()
+        onAction(action)
+    }
+
+    /** Keeps the bar open a few more seconds after each tap. */
+    private fun keepControls() {
+        removeCallbacks(hideControls)
+        postDelayed(hideControls, 6_000)
+    }
+
+    val controlsShown: Boolean get() = controls.visibility == View.VISIBLE
+
+    fun showControls(show: Boolean) {
+        removeCallbacks(hideControls)
+        controls.visibility = if (show) View.VISIBLE else View.GONE
+        if (!show) swatches.visibility = View.GONE
+        if (show) keepControls()
+    }
+
+    /** Play / pause icon and the 译 button's on/off look. */
+    fun setState(isPlaying: Boolean, translate: Boolean) {
+        if (isPlaying != playing) {
+            playing = isPlaying
+            playButton.setImageResource(if (playing) android.R.drawable.ic_media_pause else android.R.drawable.ic_media_play)
+        }
+        if (translate != translateOn) { translateOn = translate; tintControls() }
+    }
+
+    private fun tintControls() {
+        val c = style.colors(night)
+        for (b in buttons) {
+            when (b) {
+                is ImageView -> b.setColorFilter(c.current)
+                is TextView -> b.setTextColor(c.current)
+            }
+            b.background = null
+        }
+        // 译 shows whether translation is on: filled when on
+        translateButton.background = if (translateOn) GradientDrawable().apply {
+            shape = GradientDrawable.OVAL; setColor(withAlpha(c.current, 0.25f))
+        } else null
+        colourDot.background = GradientDrawable().apply {
+            shape = GradientDrawable.OVAL; setColor(c.current); setStroke(dp(2f).toInt(), withAlpha(c.other, 0.8f))
+        }
+        colourDot.scaleX = 0.6f; colourDot.scaleY = 0.6f
     }
 
     private fun dp(v: Float) = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, v, resources.displayMetrics)
@@ -65,6 +196,7 @@ class FloatingLyricsView(context: Context) : LinearLayout(context) {
         elevation = if (style.bgOpacity > 0.3f) dp(6f) else 0f
         dress(header, style.headerSize.toFloat(), c.header, bold = false, maxLines = 1)
         header.visibility = if (style.showHeader && header.text.isNotEmpty()) View.VISIBLE else View.GONE
+        tintControls()
         shownRows = emptyList()            // restyle the rows on the next show()
         show(header.text.toString(), lastRows, animate = false)
     }
@@ -131,6 +263,10 @@ class FloatingLyricsView(context: Context) : LinearLayout(context) {
     }
 
     companion object {
+        /** The colour dots in the floating window's quick colour row. */
+        val QUICK_COLOURS = listOf(0xFFFFFFFF, 0xFFFFD43B, 0xFF69DB7C, 0xFF4DABF7, 0xFFB197FC, 0xFFF783AC, 0xFFFF6B6B, 0xFF1D1D1F)
+            .map { it.toInt() }
+
         fun withAlpha(color: Int, alpha: Float): Int =
             Color.argb((alpha.coerceIn(0f, 1f) * 255).toInt(), Color.red(color), Color.green(color), Color.blue(color))
 

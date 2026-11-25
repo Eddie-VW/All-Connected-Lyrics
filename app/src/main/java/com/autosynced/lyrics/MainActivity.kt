@@ -20,6 +20,14 @@ import com.autosynced.lyrics.ui.NightPalette
 import com.autosynced.lyrics.ui.AppScreen
 
 class MainActivity : ComponentActivity() {
+    companion object {
+        /** Which page to open (sent by the floating window's ⚙ button). */
+        const val EXTRA_PAGE = "page"
+        const val PAGE_FLOAT_SETTINGS = "float_settings"
+    }
+
+    private var requestedPage by mutableStateOf<String?>(null)
+
     // Refreshed every time you come back to the app (e.g. after granting a permission).
     private var hasAccess by mutableStateOf(false)
     private var canDraw by mutableStateOf(false)
@@ -32,6 +40,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         style = Prefs.style(this)
+        requestedPage = intent?.getStringExtra(EXTRA_PAGE)
         setContent {
             CompositionLocalProvider(LocalPalette provides if (style == "day") DayPalette else NightPalette) {
                 AppScreen(
@@ -44,9 +53,16 @@ class MainActivity : ComponentActivity() {
                         Prefs.setStyle(this, style)
                     },
                     onToggleFloating = { toggleFloating() },
+                    requestedPage = requestedPage,
+                    onPageOpened = { requestedPage = null },
                 )
             }
         }
+    }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        intent.getStringExtra(EXTRA_PAGE)?.let { requestedPage = it }
     }
 
     override fun onResume() {

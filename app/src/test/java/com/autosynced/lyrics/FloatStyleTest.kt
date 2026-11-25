@@ -28,6 +28,16 @@ class FloatStyleTest {
         assertEquals(FloatStyle().currentSize, odd.currentSize)     // missing keys keep their defaults
     }
 
+    @Test fun quickButtonsChangeSizeAndColour() {
+        val s = FloatStyle(currentSize = 17, otherSize = 13, headerSize = 11)
+        assertEquals(listOf(18, 14, 12), s.resized(+1).let { listOf(it.currentSize, it.otherSize, it.headerSize) })
+        assertEquals(10, FloatStyle(currentSize = 10).resized(-1).currentSize)          // never below the minimum
+        // picking a colour while following Day style keeps Day's other colours
+        val own = FloatStyle().ownColors(night = false)
+        assertEquals(false, own.styleColors)
+        assertEquals(FloatStyle().colors(false), own.colors(false))
+    }
+
     @Test fun picksRowsAroundTheCurrentLine() {
         val style = FloatStyle(linesBefore = 1, linesAfter = 2)
         val rows = LyricRows.build(lines, 2, style, translate = true)

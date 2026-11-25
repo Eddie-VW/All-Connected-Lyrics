@@ -10,7 +10,9 @@ Simplified Chinese translation.
   access*; the app only reads what's playing, never your notifications).
 - **Synced lyrics** from [LRCLIB](https://lrclib.net), then NetEase Cloud Music, then Kugou.
   Versions much longer or shorter than the song are skipped.
-- **Floating window** over other apps: drag to move, tap to open the app, long-press to hide.
+- **Floating window** over other apps: drag to move, long-press to hide, and **tap for buttons**:
+  previous / play-pause / next, 译 on/off, close, text size A− / A+, a row of quick text
+  colours, and ⚙ straight to the window's settings.
   The sliders button next to *Floating* adjusts it, with a live preview: width, opacity,
   background, corners, how many lines before/after the current one, song title on top, font
   (built-in or your own .ttf/.otf), text sizes, bold, alignment, outline, your own colours,

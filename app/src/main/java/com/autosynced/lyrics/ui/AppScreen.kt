@@ -75,6 +75,8 @@ fun AppScreen(
     onGrantAccess: () -> Unit,
     onToggleStyle: () -> Unit,
     onToggleFloating: () -> Unit,
+    requestedPage: String? = null,
+    onPageOpened: () -> Unit = {},
 ) {
     val pal = LocalPalette.current
     val playback by NowPlaying.state.collectAsState()
@@ -82,6 +84,9 @@ fun AppScreen(
     val translateOn by Prefs.translate.collectAsState()
     var translationSettings by remember { mutableStateOf(false) }
     var floatSettings by remember { mutableStateOf(false) }
+    LaunchedEffect(requestedPage) {
+        if (requestedPage == com.autosynced.lyrics.MainActivity.PAGE_FLOAT_SETTINGS) { floatSettings = true; onPageOpened() }
+    }
     if (floatSettings) { FloatSettingsScreen { floatSettings = false }; return }
     if (translationSettings) { TranslationScreen { translationSettings = false }; return }
     val bgTop by animateColorAsState(

@@ -161,15 +161,15 @@ fun FloatSettingsScreen(onBack: () -> Unit) {
             }
 
             Section("Colours") {
+                val shown = style.colors(pal.night)
+                ColorRow("Current line (lyrics)", shown.current) { picking = ColorTarget.CURRENT }
+                ColorRow("Translation", shown.translation) { picking = ColorTarget.TRANSLATION }
+                ColorRow("Other lines", shown.other) { picking = ColorTarget.OTHER }
+                ColorRow("Title & artist", shown.header) { picking = ColorTarget.HEADER }
+                ColorRow("Background", shown.bg) { picking = ColorTarget.BG }
                 SwitchRow("Match the app's Night / Day style", style.styleColors,
-                    "Turn off to choose your own colours.") { set { s -> s.copy(styleColors = it) } }
-                if (!style.styleColors) {
-                    ColorRow("Background", style.bgColor) { picking = ColorTarget.BG }
-                    ColorRow("Current line", style.currentColor) { picking = ColorTarget.CURRENT }
-                    ColorRow("Translation", style.translationColor) { picking = ColorTarget.TRANSLATION }
-                    ColorRow("Other lines", style.otherColor) { picking = ColorTarget.OTHER }
-                    ColorRow("Title & artist", style.headerColor) { picking = ColorTarget.HEADER }
-                }
+                    "On: colours follow the app's look (picking any colour above turns this off).") {
+                    set { s -> if (it) s.copy(styleColors = true) else s.ownColors(pal.night) } }
             }
 
             Section("Behaviour") {
@@ -198,8 +198,8 @@ fun FloatSettingsScreen(onBack: () -> Unit) {
     }
 
     picking?.let { target ->
-        ColorPickerDialog(target.title, target.get(style), onDismiss = { picking = null }) { c ->
-            set { target.set(it, c) }
+        ColorPickerDialog(target.title, target.get(style.ownColors(pal.night)), onDismiss = { picking = null }) { c ->
+            set { target.set(it.ownColors(pal.night), c) }
             picking = null
         }
     }
