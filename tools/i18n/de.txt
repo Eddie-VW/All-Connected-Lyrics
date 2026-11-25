@@ -315,3 +315,18 @@
 326|Claude-Übersetzung bisher: US$
 327|Benutzerdefiniert
 328|Jeder Dienst mit einer OpenAI-kompatiblen Chat-API: Adresse und Modell eingeben.
+329|Hintergrundanimation
+330|Aus
+331|Mesh-Verlauf
+332|Fließendes Cover
+333|Sanftes Leuchten
+334|Polarlicht
+335|Der Hintergrund bleibt still.
+336|Aus dem Cover entnommene Farben fließen langsam ineinander, wie bei Apple Music.
+337|Das Cover selbst, stark weichgezeichnet und vergrößert, dreht sich langsam in zwei Ebenen.
+338|Sanft leuchtende Wolken in den Farben des Covers treiben hinter dem Text.
+339|Wogende Bänder in den Farben des Covers, wie Polarlichter.
+340|Das unscharfe Cover wird langsam größer und heller, wie beim Atmen.
+341|Bei pausierter Musik wird es fast ganz langsam.
+342|Animationstempo
+343|Animationsstärke

@@ -22,7 +22,10 @@ data class AppLyricsStyle(
     val glowStrength: Float = 0.75f,             // 0.1..1
     val glowBlur: Int = 14,                      // dp, 2..40
     val fullScreen: Boolean = false,             // the panel's background fills the whole screen (lock-screen style)
-    val lively: Boolean = true,                  // full screen: slowly moving glowing colours behind the lyrics
+    val lively: Boolean = true,                  // (1.0) moving background on/off; now [backdrop]
+    val backdrop: String = "mesh",               // full screen's moving background: none / mesh / fluid / glow / aurora / breathing
+    val backdropSpeed: Float = 1f,               // 0.25..3
+    val backdropStrength: Float = 0.8f,          // 0.1..1
 ) {
     data class Colors(val current: Int, val past: Int, val upcoming: Int, val translation: Int)
 
@@ -45,11 +48,13 @@ data class AppLyricsStyle(
         .put("panelOpacity", panelOpacity.toDouble()).put("panelBlur", panelBlur).put("softFocus", softFocus)
         .put("glow", glow).put("fullScreen", fullScreen)
         .put("glowColor", glowColor).put("glowStrength", glowStrength.toDouble()).put("glowBlur", glowBlur)
-        .put("lively", lively)
+        .put("lively", lively).put("backdrop", backdrop).put("backdropSpeed", backdropSpeed.toDouble())
+        .put("backdropStrength", backdropStrength.toDouble())
         .toString()
 
     companion object {
         val PANELS = listOf("glass", "album", "colour", "none")
+        val BACKDROPS = listOf("none", "mesh", "fluid", "glow", "aurora", "breathing")
 
         fun withAlpha(color: Int, alpha: Float): Int = ((alpha.coerceIn(0f, 1f) * 255).toInt() shl 24) or (color and 0xFFFFFF)
 
@@ -71,6 +76,11 @@ data class AppLyricsStyle(
                 glowStrength = (if (j.has("glowStrength")) j.optDouble("glowStrength", 0.75).toFloat() else d.glowStrength).coerceIn(0.1f, 1f),
                 glowBlur = i("glowBlur", d.glowBlur).coerceIn(2, 40),
                 lively = j.optBoolean("lively", d.lively),
+                // 1.0 had only "lively" on / off: off stays off; on becomes the 1.0 glow it was
+                backdrop = j.optString("backdrop", "").takeIf { it in BACKDROPS }
+                    ?: if (!j.has("lively")) d.backdrop else if (j.optBoolean("lively", true)) "glow" else "none",
+                backdropSpeed = (if (j.has("backdropSpeed")) j.optDouble("backdropSpeed", 1.0).toFloat() else d.backdropSpeed).coerceIn(0.25f, 3f),
+                backdropStrength = (if (j.has("backdropStrength")) j.optDouble("backdropStrength", 0.8).toFloat() else d.backdropStrength).coerceIn(0.1f, 1f),
                 fullScreen = j.optBoolean("fullScreen", d.fullScreen),
             )
         }

@@ -315,3 +315,18 @@
 326|Tradução com Claude até agora: US$
 327|Personalizado
 328|Qualquer serviço com uma API de chat compatível com OpenAI: informe o endereço e o modelo.
+329|Animação de fundo
+330|Desligada
+331|Gradiente em malha
+332|Capa fluida
+333|Brilho suave
+334|Aurora
+335|O fundo fica parado.
+336|Cores tiradas da capa fluem devagar umas nas outras, como no Apple Music.
+337|A própria capa, bem desfocada e ampliada, girando devagar em duas camadas.
+338|Nuvens suaves e luminosas nas cores da capa flutuam atrás da letra.
+339|Faixas ondulantes nas cores da capa, como a aurora boreal.
+340|A capa desfocada cresce e clareia devagar, como se respirasse.
+341|Quase para enquanto a música está pausada.
+342|Velocidade da animação
+343|Intensidade da animação

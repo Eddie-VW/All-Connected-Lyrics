@@ -315,3 +315,18 @@
 326|Chi phí dịch bằng Claude đến nay: US$
 327|Tùy chỉnh
 328|Bất kỳ dịch vụ nào có API chat tương thích OpenAI: nhập địa chỉ và mô hình.
+329|Hiệu ứng nền
+330|Tắt
+331|Chuyển màu lưới
+332|Ảnh bìa chuyển động
+333|Ánh sáng dịu
+334|Cực quang
+335|Nền đứng yên.
+336|Các màu lấy từ ảnh bìa chậm rãi hòa vào nhau, giống Apple Music.
+337|Chính ảnh bìa, được làm mờ mạnh và phóng to, xoay chậm theo hai lớp.
+338|Những đám sáng dịu mang màu ảnh bìa trôi phía sau lời.
+339|Những dải màu từ ảnh bìa uốn lượn như cực quang.
+340|Ảnh bìa mờ chậm rãi phình ra và sáng lên, như đang thở.
+341|Gần như dừng lại khi nhạc tạm dừng.
+342|Tốc độ hiệu ứng
+343|Cường độ hiệu ứng

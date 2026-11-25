@@ -18,3 +18,6 @@ python3 tools/i18n/build.py app/src/main/assets/i18n
 
 Note: `extract.py` appends in the order it finds texts, so re-running it after edits can renumber
 lines; check the diff of `keys.json` and adjust the `.txt` files with it.
+
+Texts added after 1.0 are listed in `keys_added.json` (their numbers continue after `keys.json`'s
+and the two built-in ones); add new ones at its end so existing numbers never shift.

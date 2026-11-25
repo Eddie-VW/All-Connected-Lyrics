@@ -315,5 +315,20 @@
  "Saved ✓": "저장됨 ✓",
  "Claude translation so far: US$": "지금까지 Claude 번역 비용: US$",
  "Custom": "사용자 지정",
- "Any service with an OpenAI-compatible chat API: enter its address and model.": "OpenAI 호환 채팅 API가 있는 모든 서비스: 주소와 모델을 입력하세요."
+ "Any service with an OpenAI-compatible chat API: enter its address and model.": "OpenAI 호환 채팅 API가 있는 모든 서비스: 주소와 모델을 입력하세요.",
+ "Background animation": "배경 애니메이션",
+ "Off": "끄기",
+ "Mesh gradient": "메시 그라데이션",
+ "Fluid artwork": "흐르는 아트워크",
+ "Soft glow": "부드러운 빛",
+ "Aurora": "오로라",
+ "The background stays still.": "배경이 움직이지 않습니다.",
+ "Colours sampled from the cover flow slowly into each other, like Apple Music.": "커버에서 뽑은 색들이 천천히 섞이며 흐릅니다(Apple Music처럼).",
+ "The cover itself, heavily blurred and enlarged, slowly turning in two layers.": "커버 자체를 강하게 흐리고 확대해 두 겹으로 천천히 회전합니다.",
+ "Soft glowing clouds in the cover's colours drift behind the lyrics.": "커버 색의 부드러운 빛 구름이 가사 뒤를 떠다닙니다.",
+ "Waving bands of the cover's colours, like northern lights.": "커버 색의 띠가 오로라처럼 일렁입니다.",
+ "The blurred cover slowly swells and brightens, like breathing.": "흐린 커버가 숨쉬듯 천천히 커지고 밝아집니다.",
+ "It slows almost to a stop while the music is paused.": "음악이 일시정지되면 거의 멈춥니다.",
+ "Animation speed": "애니메이션 속도",
+ "Animation intensity": "애니메이션 강도"
 }

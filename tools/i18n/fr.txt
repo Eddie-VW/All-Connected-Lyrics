@@ -315,3 +315,18 @@
 326|Traduction Claude jusqu’ici : US$
 327|Personnalisé
 328|Tout service doté d’une API de chat compatible OpenAI : saisissez son adresse et son modèle.
+329|Animation du fond
+330|Désactivée
+331|Dégradé maillé
+332|Pochette fluide
+333|Lueur douce
+334|Aurore
+335|Le fond reste immobile.
+336|Des couleurs prises dans la pochette se fondent lentement les unes dans les autres, comme sur Apple Music.
+337|La pochette elle-même, très floutée et agrandie, tourne lentement en deux couches.
+338|De douces nuées lumineuses aux couleurs de la pochette dérivent derrière les paroles.
+339|Des bandes ondulantes aux couleurs de la pochette, comme une aurore boréale.
+340|La pochette floutée gonfle et s’éclaire lentement, comme une respiration.
+341|Elle ralentit presque jusqu’à l’arrêt quand la musique est en pause.
+342|Vitesse de l’animation
+343|Intensité de l’animation

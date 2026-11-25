@@ -145,7 +145,8 @@ private fun MainScreen(
     Box(Modifier.fillMaxSize().background(pal.bg)) {
         if (full) {
             LyricsPanel(appLyrics, playback.art, Modifier.fillMaxSize(), corner = 0.dp) {}
-            if (appLyrics.lively) LivelyGlow(playback.art, playback.playing, Modifier.fillMaxSize())
+            Backdrop(appLyrics.backdrop, playback.art, playback.playing, appLyrics.backdropSpeed, appLyrics.backdropStrength,
+                Modifier.fillMaxSize())
         }
         Column(
             Modifier

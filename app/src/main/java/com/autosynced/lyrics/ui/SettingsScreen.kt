@@ -213,9 +213,22 @@ fun MainScreenSettings(onBack: () -> Unit) {
                 SwitchRow(tr("Full screen", "全屏"), style.fullScreen,
                     tr("The panel's background fills the whole screen, like the lock screen. Also: the ⤢ button above the lyrics.",
                         "面板背景铺满整个屏幕，像锁屏一样。也可以用歌词上方的 ⤢ 按钮切换。")) { on -> set { it.copy(fullScreen = on) } }
-                if (style.fullScreen) SwitchRow(tr("Lively glowing background", "灵动光影背景"), style.lively,
-                    tr("Soft glowing colours from the cover drift slowly behind the lyrics in full screen.",
-                        "全屏时，封面配色的柔和光影在歌词后面缓缓流动。")) { on -> set { it.copy(lively = on) } }
+                if (style.fullScreen) {
+                    Label(tr("Background animation", "背景动画"))
+                    ValueChips(AppLyricsStyle.BACKDROPS, style.backdrop, ::backdropLabel) { v -> set { it.copy(backdrop = v) } }
+                    Hint(backdropHint(style.backdrop))
+                    // a live sample of the chosen animation, on the song playing (or sample colours)
+                    LyricsPanel(style, playback.art, Modifier.fillMaxWidth().height(120.dp)) {
+                        Backdrop(style.backdrop, playback.art, playing = true, speed = style.backdropSpeed,
+                            strength = style.backdropStrength, modifier = Modifier.fillMaxSize())
+                    }
+                    if (style.backdrop != "none") {
+                        SliderRow(tr("Animation speed", "动画速度"), "${(style.backdropSpeed * 100).roundToInt()}%",
+                            style.backdropSpeed, 0.25f..3f, 10) { v -> set { it.copy(backdropSpeed = v) } }
+                        SliderRow(tr("Animation intensity", "动画强度"), "${(style.backdropStrength * 100).roundToInt()}%",
+                            style.backdropStrength, 0.1f..1f, 17) { v -> set { it.copy(backdropStrength = v) } }
+                    }
+                }
                 SwitchRow(tr("Soft-focus lyrics", "柔焦歌词"), style.softFocus,
                     tr("Lines other than the current one are slightly blurred (Android 12 and newer).",
                         "当前行以外的歌词略微模糊（安卓 12 及以上）。")) { on -> set { it.copy(softFocus = on) } }
@@ -300,3 +313,25 @@ private fun ThisSong() {
             else tr("This song has no album name, so the picture is used for this song only.", "这首歌没有专辑名，图片只用于这首歌。"))
     }
 }
+
+private fun backdropLabel(v: String): String = when (v) {
+    "none" -> tr("Off", "关闭")
+    "mesh" -> tr("Mesh gradient", "网格渐变")
+    "fluid" -> tr("Fluid artwork", "流动封面")
+    "glow" -> tr("Soft glow", "柔光")
+    "aurora" -> tr("Aurora", "极光")
+    "breathing" -> tr("Breathing", "呼吸")
+    else -> v
+}
+
+private fun backdropHint(v: String): String = when (v) {
+    "none" -> tr("The background stays still.", "背景保持静止。")
+    "mesh" -> tr("Colours sampled from the cover flow slowly into each other, like Apple Music.",
+        "从封面取色，颜色缓缓交融流动，类似 Apple Music。")
+    "fluid" -> tr("The cover itself, heavily blurred and enlarged, slowly turning in two layers.",
+        "封面本身被强烈模糊并放大，分两层缓缓旋转。")
+    "glow" -> tr("Soft glowing clouds in the cover's colours drift behind the lyrics.", "封面配色的柔和光团在歌词后面漂移。")
+    "aurora" -> tr("Waving bands of the cover's colours, like northern lights.", "封面配色的光带如极光般摆动。")
+    "breathing" -> tr("The blurred cover slowly swells and brightens, like breathing.", "模糊的封面缓缓放大、变亮，像在呼吸。")
+    else -> ""
+} + " " + tr("It slows almost to a stop while the music is paused.", "音乐暂停时，动画几乎停下。")

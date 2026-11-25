@@ -2,7 +2,8 @@
 import json, os, sys
 here = os.path.dirname(os.path.abspath(__file__))
 keys = json.load(open(os.path.join(here, 'keys.json'))) + [
-    "Custom", "Any service with an OpenAI-compatible chat API: enter its address and model."]
+    "Custom", "Any service with an OpenAI-compatible chat API: enter its address and model."] + json.load(
+    open(os.path.join(here, 'keys_added.json')))
 out_dir = sys.argv[1]
 os.makedirs(out_dir, exist_ok=True)
 for code in ["zh-Hant", "ja", "ko", "es", "fr", "de", "pt", "ru", "id", "th", "vi", "ar"]:

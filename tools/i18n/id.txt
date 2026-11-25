@@ -315,3 +315,18 @@
 326|Biaya terjemahan Claude sejauh ini: US$
 327|Kustom
 328|Layanan apa pun dengan API chat yang kompatibel dengan OpenAI: masukkan alamat dan modelnya.
+329|Animasi latar
+330|Mati
+331|Gradasi mesh
+332|Sampul mengalir
+333|Cahaya lembut
+334|Aurora
+335|Latar tetap diam.
+336|Warna-warna dari sampul perlahan mengalir saling berbaur, seperti Apple Music.
+337|Sampul itu sendiri, sangat buram dan diperbesar, berputar perlahan dalam dua lapisan.
+338|Awan cahaya lembut berwarna sampul melayang di belakang lirik.
+339|Pita bergelombang berwarna sampul, seperti aurora.
+340|Sampul buram perlahan membesar dan makin terang, seperti bernapas.
+341|Hampir berhenti saat musik dijeda.
+342|Kecepatan animasi
+343|Intensitas animasi

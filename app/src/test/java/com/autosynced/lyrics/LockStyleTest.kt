@@ -39,6 +39,15 @@ class LockStyleTest {
         assertEquals(emptyList<Pair<Int, Int>>(), LockRows.window(0, 0, 1, 1))
     }
 
+    @Test fun fullScreenBackgroundChoices() {
+        val s = AppLyricsStyle(backdrop = "aurora", backdropSpeed = 2f, backdropStrength = 0.4f)
+        assertEquals(s, AppLyricsStyle.fromJson(s.toJson()))
+        assertEquals("mesh", AppLyricsStyle.fromJson("{}").backdrop)                     // new installs
+        assertEquals("glow", AppLyricsStyle.fromJson("""{"lively":true}""").backdrop)     // 1.0 users keep their look
+        assertEquals("none", AppLyricsStyle.fromJson("""{"lively":false}""").backdrop)    // … and "off" stays off
+        assertEquals(3f, AppLyricsStyle.fromJson("""{"backdrop":"mesh","backdropSpeed":9}""").backdropSpeed)
+    }
+
     @Test fun mainScreenColoursRoundTrip() {
         val s = AppLyricsStyle(styleColors = false, current = 0xFFFFD43B.toInt(), past = 0x40FFFFFF,
             upcoming = 0x30FFFFFF, translation = 0xCC4DABF7.toInt(), panel = "colour", panelColor = 0xFF102030.toInt(),
