@@ -83,6 +83,7 @@ fun AppScreen(
     var translationSettings by remember { mutableStateOf(false) }
     var floatSettings by remember { mutableStateOf(false) }
     if (floatSettings) { FloatSettingsScreen { floatSettings = false }; return }
+    if (translationSettings) { TranslationScreen { translationSettings = false }; return }
     val bgTop by animateColorAsState(
         if (pal.night) (tint ?: Color(0xFF3A3A3A)) else (tint?.copy(alpha = .22f) ?: Color(0x22FA2D48)),
         tween(600), label = "tint")
@@ -101,7 +102,6 @@ fun AppScreen(
             NowPlayingScreen(tint, translateOn)
         }
     }
-    if (translationSettings) TranslationSettings { translationSettings = false }
 }
 
 // ---- top bar --------------------------------------------------------------------------------

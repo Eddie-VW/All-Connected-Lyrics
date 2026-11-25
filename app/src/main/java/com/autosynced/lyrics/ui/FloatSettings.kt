@@ -240,7 +240,7 @@ private fun Preview(style: FloatStyle, translateOn: Boolean) {
 
 // ---- little building blocks ------------------------------------------------------------------
 @Composable
-private fun Section(title: String, content: @Composable ColumnScope.() -> Unit) {
+internal fun Section(title: String, content: @Composable ColumnScope.() -> Unit) {
     val pal = LocalPalette.current
     Spacer(Modifier.height(18.dp))
     Text(title.uppercase(), color = pal.accent, fontSize = 12.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.sp)
@@ -249,12 +249,12 @@ private fun Section(title: String, content: @Composable ColumnScope.() -> Unit) 
 }
 
 @Composable
-private fun Label(text: String) {
+internal fun Label(text: String) {
     Text(text, color = LocalPalette.current.text, fontSize = 15.sp, modifier = Modifier.padding(top = 4.dp))
 }
 
 @Composable
-private fun Hint(text: String) {
+internal fun Hint(text: String) {
     Text(text, color = LocalPalette.current.faint, fontSize = 12.sp, lineHeight = 16.sp)
 }
 
@@ -274,7 +274,7 @@ private fun SliderRow(label: String, value: String, current: Float, range: Close
 }
 
 @Composable
-private fun SwitchRow(label: String, on: Boolean, detail: String? = null, onChange: (Boolean) -> Unit) {
+internal fun SwitchRow(label: String, on: Boolean, detail: String? = null, onChange: (Boolean) -> Unit) {
     val pal = LocalPalette.current
     Row(Modifier.fillMaxWidth().clickable { onChange(!on) }.padding(vertical = 4.dp), verticalAlignment = Alignment.CenterVertically) {
         Column(Modifier.weight(1f)) {
@@ -288,7 +288,7 @@ private fun SwitchRow(label: String, on: Boolean, detail: String? = null, onChan
 }
 
 @Composable
-private fun Chip(label: String, selected: Boolean, typeface: Typeface?, onClick: () -> Unit) {
+internal fun Chip(label: String, selected: Boolean, typeface: Typeface?, onClick: () -> Unit) {
     val pal = LocalPalette.current
     Box(
         Modifier.height(36.dp).clip(RoundedCornerShape(50)).background(if (selected) pal.accent else pal.surface2)

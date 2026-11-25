@@ -11,7 +11,8 @@ import javax.crypto.SecretKey
 import javax.crypto.spec.GCMParameterSpec
 
 /**
- * The user's Claude API key (from console.anthropic.com), for AI translation.
+ * The user's API keys for the translation services (Claude's from console.anthropic.com, and one
+ * per other service, each in its own [slot]).
  * Stored encrypted with a key that lives in Android's Keystore and never leaves this phone
  * (like the PC app's DPAPI-protected api_key.bin). A copied or restored backup can't decrypt
  * it, so after moving phones the key just has to be entered again.
@@ -34,10 +35,13 @@ object ApiKeyStore {
         return gen.generateKey()
     }
 
-    fun has(c: Context): Boolean = prefs(c).contains(ENTRY)
+    /** The slot a service's key is kept in (Claude's is the original "api_key"). */
+    fun slot(p: Provider): String = if (p == Provider.CLAUDE) ENTRY else "key_${p.id}"
 
-    fun get(c: Context): String? {
-        val stored = prefs(c).getString(ENTRY, null) ?: return null
+    fun has(c: Context, slot: String = ENTRY): Boolean = prefs(c).contains(slot)
+
+    fun get(c: Context, slot: String = ENTRY): String? {
+        val stored = prefs(c).getString(slot, null) ?: return null
         return try {
             val raw = Base64.decode(stored, Base64.NO_WRAP)
             val cipher = Cipher.getInstance("AES/GCM/NoPadding")
@@ -49,12 +53,12 @@ object ApiKeyStore {
     }
 
     /** Saves [key]; blank removes it. */
-    fun set(c: Context, key: String?) {
+    fun set(c: Context, key: String?, slot: String = ENTRY) {
         val k = key?.trim().orEmpty()
-        if (k.isEmpty()) { prefs(c).edit().remove(ENTRY).apply(); return }
+        if (k.isEmpty()) { prefs(c).edit().remove(slot).apply(); return }
         val cipher = Cipher.getInstance("AES/GCM/NoPadding")
         cipher.init(Cipher.ENCRYPT_MODE, secretKey())
         val out = cipher.iv + cipher.doFinal(k.toByteArray(Charsets.UTF_8))
-        prefs(c).edit().putString(ENTRY, Base64.encodeToString(out, Base64.NO_WRAP)).apply()
+        prefs(c).edit().putString(slot, Base64.encodeToString(out, Base64.NO_WRAP)).apply()
     }
 }

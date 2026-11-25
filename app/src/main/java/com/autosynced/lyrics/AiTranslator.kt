@@ -16,8 +16,10 @@ import java.util.Date
 import java.util.Locale
 
 /**
- * Chinese translations, written by Claude, for lyric lines no music site has translated
- * (like the PC app's ai_translate.py).
+ * Chinese translations for lyric lines no music site has translated (like the PC app's
+ * ai_translate.py), from the service chosen in the 译 page: Claude, another AI, or a classic
+ * machine translator (see [Provider]). What follows describes Claude; the other AIs get the same
+ * instructions, and every service's results are remembered the same way.
  *
  * - Only lines without a human translation are sent; the whole song goes along as context,
  *   with the human translations around them so the wording matches.
@@ -95,22 +97,25 @@ class AiTranslator(private val dir: File) {
     private val usageFile = File(dir, "ai_usage.json")
     private val lock = Any()
 
-    private fun songKey(title: String, artist: String) = "${title.trim().lowercase()}\n${artist.trim().lowercase()}"
+    /** Where a song's translations are kept: by song, and by service (Claude's had no tag at first). */
+    private fun songKey(title: String, artist: String, tag: String) =
+        "${title.trim().lowercase()}\n${artist.trim().lowercase()}" + (if (tag == Provider.CLAUDE.id) "" else "\n$tag")
 
-    /** {original line: translation} made earlier for this song. */
-    fun known(title: String, artist: String): Map<String, String> = synchronized(lock) {
-        val song = readJson(storeFile).optJSONObject(songKey(title, artist)) ?: return emptyMap()
+    /** {original line: translation} made earlier for this song by the service tagged [tag]. */
+    fun known(title: String, artist: String, tag: String = Provider.CLAUDE.id): Map<String, String> = synchronized(lock) {
+        val song = readJson(storeFile).optJSONObject(songKey(title, artist, tag)) ?: return emptyMap()
         song.keys().asSequence().associateWith { TextRules.tidy(song.getString(it)) }
     }
 
-    private fun remember(title: String, artist: String, pairs: Map<String, String>) = synchronized(lock) {
+    private fun remember(title: String, artist: String, tag: String, pairs: Map<String, String>) = synchronized(lock) {
         val all = readJson(storeFile)
-        val song = all.optJSONObject(songKey(title, artist)) ?: JSONObject().also { all.put(songKey(title, artist), it) }
-        pairs.forEach { (k, v) -> song.put(k, v) }
+        val k = songKey(title, artist, tag)
+        val song = all.optJSONObject(k) ?: JSONObject().also { all.put(k, it) }
+        pairs.forEach { (line, zh) -> song.put(line, zh) }
         writeAtomically(storeFile, all.toString())
     }
 
-    /** Total spent on AI translation so far (US$) and the number of requests. */
+    /** Total spent on Claude so far (US$, other services' prices aren't known) and the number of requests. */
     fun spent(): Pair<Double, Int> = synchronized(lock) {
         val log = readArray(usageFile)
         (0 until log.length()).sumOf { log.getJSONObject(it).optDouble("cost", 0.0) } to log.length()
@@ -123,29 +128,75 @@ class AiTranslator(private val dir: File) {
     }
 
     /**
-     * [lines] with AI translations added to the lines worth translating that have none.
+     * [lines] with translations from [cfg]'s service added to the lines worth translating that have none.
      * Throws on network / key / API errors, for the caller to report.
      */
-    fun fill(title: String, artist: String, lines: List<Line>, apiKey: String): List<Line> {
+    fun fill(title: String, artist: String, lines: List<Line>, cfg: ProviderConfig): List<Line> {
         val japanese = TextRules.hasKana(lines)
         val lyric = lines.indices.filter { TextRules.worthTranslating(lines[it].text, japanese) }
         val want = lyric.filter { lines[it].translation == null }
         if (want.isEmpty()) return lines
 
-        val done = known(title, artist)
+        val done = known(title, artist, cfg.storeTag)
         val out = lines.toMutableList()
         for (i in want) done[lines[i].text]?.let { out[i] = out[i].copy(translation = it, aiTranslated = true) }
         val todo = want.filter { out[it].translation == null }
         if (todo.isEmpty()) return out
 
-        val model = chooseModel(todo.size, lyric.size)
+        val got: Map<Int, String> = when (cfg.provider) {
+            Provider.CLAUDE -> askClaude(title, artist, lines, lyric, todo, cfg.key.orEmpty())
+            Provider.OPENAI -> askOtherAi(title, artist, lines, lyric, todo, cfg)
+            else -> askTranslator(title, artist, lines, todo, cfg)
+        }
+        for ((n, zh) in got) out[n] = out[n].copy(translation = zh, aiTranslated = true)
+        if (got.isNotEmpty()) remember(title, artist, cfg.storeTag, got.mapKeys { lines[it.key].text })
+        return out
+    }
+
+    /** The whole song, numbered, with the human translations there are, and which lines to do. */
+    private fun ask(title: String, artist: String, lines: List<Line>, lyric: List<Int>, todo: List<Int>): String {
         val song = lyric.joinToString("\n") { i ->
             "$i. ${lines[i].text}" + (lines[i].translation?.let { "    [human translation: $it]" } ?: "")
         }
-        val ask = "Song: $title - $artist\n\nLyrics (numbered):\n$song\n\n" +
+        return "Song: $title - $artist\n\nLyrics (numbered):\n$song\n\n" +
             "Translate these line numbers, which have no translation yet: ${todo.joinToString(", ")}.\n" +
             "Return one entry per line number."
+    }
 
+    private fun askOtherAi(title: String, artist: String, lines: List<Line>, lyric: List<Int>, todo: List<Int>,
+                           cfg: ProviderConfig): Map<Int, String> {
+        val system = SYSTEM + "\n\nAnswer with only a JSON object, no other text: " +
+            "{\"style\": \"<the song's genre and mood, and the Chinese tone chosen>\", " +
+            "\"lines\": [{\"n\": <line number>, \"zh\": \"<translation>\"}, ...]}"
+        val (text, tokens) = Translators.openAiChat(cfg, system, ask(title, artist, lines, lyric, todo))
+        logUsage(JSONObject()
+            .put("time", SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.US).format(Date()))
+            .put("title", title).put("artist", artist).put("model", cfg.model).put("lines", todo.size)
+            .put("tokens", tokens).put("cost", 0.0))
+        return parse(Translators.jsonIn(text), todo.toSet())
+    }
+
+    /** Classic translators: each line on its own (in batches), plain style. */
+    private fun askTranslator(title: String, artist: String, lines: List<Line>, todo: List<Int>,
+                              cfg: ProviderConfig): Map<Int, String> {
+        val got = LinkedHashMap<Int, String>()
+        for (batch in todo.chunked(40)) {
+            val result = Translators.translate(cfg, batch.map { lines[it].text })
+            batch.forEachIndexed { k, n ->
+                result.getOrNull(k)?.let { zh -> if (TextRules.squash(zh) != TextRules.squash(lines[n].text)) got[n] = TextRules.tidy(zh) }
+            }
+        }
+        logUsage(JSONObject()
+            .put("time", SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.US).format(Date()))
+            .put("title", title).put("artist", artist).put("model", cfg.provider.id).put("lines", todo.size)
+            .put("chars", todo.sumOf { lines[it].text.length }).put("cost", 0.0))
+        return got
+    }
+
+    private fun askClaude(title: String, artist: String, lines: List<Line>, lyric: List<Int>, todo: List<Int>,
+                          apiKey: String): Map<Int, String> {
+        val model = chooseModel(todo.size, lyric.size)
+        val ask = ask(title, artist, lines, lyric, todo)
         val format = JsonOutputFormat.builder().schema(
             JsonOutputFormat.Schema.builder().apply { SCHEMA.forEach { (k, v) -> putAdditionalProperty(k, JsonValue.from(v)) } }.build()
         ).build()
@@ -179,10 +230,7 @@ class AiTranslator(private val dir: File) {
             throw IllegalStateException("Claude declined to translate this song")
         }
         val text = response.content().mapNotNull { b -> b.text().orElse(null)?.text() }.joinToString("")
-        val got = parse(text, todo.toSet())
-        for ((n, zh) in got) out[n] = out[n].copy(translation = zh, aiTranslated = true)
-        if (got.isNotEmpty()) remember(title, artist, got.mapKeys { lines[it.key].text })
-        return out
+        return parse(text, todo.toSet())
     }
 
     /** {line number: translation} from Claude's JSON answer, only for the numbers asked for. */

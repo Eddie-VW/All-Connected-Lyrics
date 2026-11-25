@@ -81,6 +81,8 @@ object LyricsRepo {
         // Switching translation on fetches it for the song that's playing.
         scope.launch { Prefs.translate.drop(1).collect { if (it) retranslate() } }
         scope.launch { Prefs.aiTranslate.drop(1).collect { if (it) retranslate() } }
+        // A different service: its own go at the lines the previous one translated.
+        scope.launch { Prefs.provider.drop(1).collect { retranslate(dropAi = true) } }
     }
 
     private fun show(track: Track, lyrics: Lyrics) {
@@ -89,7 +91,10 @@ object LyricsRepo {
     }
 
     /** Look for translations again for the current song (e.g. after an API key was added). */
-    fun retranslate() {
+    fun retranslate(dropAi: Boolean = false) {
+        if (dropAi) for ((k, l) in translated.entries.toList()) {
+            translated[k] = l.copy(lines = l.lines.map { if (it.aiTranslated) it.copy(translation = null, aiTranslated = false) else it })
+        }
         val track = NowPlaying.state.value.track ?: return
         val raw = cache[track.key] ?: return
         translate(track, raw)
@@ -123,14 +128,14 @@ object LyricsRepo {
             // 2. Claude for the lines still missing, if the user allows it and has a key.
             var note: String? = null
             if (needsTranslation(lines) && Prefs.aiTranslate.value) {
-                val key = withContext(Dispatchers.IO) { ApiKeyStore.get(appContext) }
-                if (key == null) {
-                    note = "Some lines have no translation yet. Add a Claude API key in 译 settings to fill them in."
+                val cfg = withContext(Dispatchers.IO) { Prefs.providerConfig(appContext) }
+                if (!cfg.ready) {
+                    note = "Some lines have no translation yet. Add a ${cfg.provider.label} key in 译 settings to fill them in."
                 } else {
                     try {
                         val before = lines
                         lines = TranslationMatcher.share(withContext(Dispatchers.IO) {
-                            ai.fill(track.title, track.artist, before, key)
+                            ai.fill(track.title, track.artist, before, cfg)
                         })
                         translated[track.key] = raw.copy(lines = lines)
                     } catch (e: CancellationException) { throw e } catch (e: Exception) {
@@ -149,7 +154,14 @@ object LyricsRepo {
         is RateLimitException -> "too many requests right now. Try again in a minute."
         is OverloadedException -> "Claude is busy right now. Try again in a minute."
         is AnthropicServiceException -> "Claude's server answered with error ${e.statusCode()}."
-        is AnthropicIoException, is IOException -> "no internet connection."
+        is TranslatorException -> when (e.status) {
+            401, 403, 52003 -> "the key wasn't accepted. Check it in 译 settings."
+            429, 54003 -> "too many requests right now. Try again in a minute."
+            456, 402, 54004 -> "the service's free allowance or credit is used up."
+            else -> e.message ?: "the service answered with error ${e.status}."
+        }
+        is AnthropicIoException, is IOException ->
+            "couldn't reach the service (no internet, or it's blocked where you are)."
         else -> e.message ?: "unknown error."
     }
 

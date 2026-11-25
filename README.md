@@ -18,10 +18,15 @@ Simplified Chinese translation.
 - **译 Chinese translation** (off until you turn it on):
   1. Human translations from NetEase, QQ Music and Kugou, matched to the lyrics line by line,
      even when a site's copy is timed a little differently.
-  2. Lines none of them translated can be filled in by Claude, using your own API key from
-     [console.anthropic.com](https://console.anthropic.com). The translation's tone follows
-     the song's genre (punchy for rap, plain-spoken for ballads, ...). The key is stored
-     encrypted on the phone, and each line is only paid for once.
+  2. Lines none of them translated are filled in by the service you choose on the 译 page:
+     - **AI, matching the song's genre** (punchy for rap, plain-spoken for ballads, ...):
+       Claude, or another AI with an OpenAI-style API (presets for DeepSeek, SiliconFlow
+       硅基流动, Gemini, Groq, OpenRouter, or any custom one).
+     - **Classic translators, plain style:** DeepL, Microsoft Translator, Baidu 百度翻译, or
+       Google Translate with no key at all.
+
+     Keys are your own, stored encrypted on the phone (one per service), and each line is only
+     translated once per service.
 
 ## Getting the app
 
@@ -40,11 +45,12 @@ one as an update.
 | `Lyrics.kt` | LRC parsing and the lyric sources |
 | `LyricsRepo.kt` | Loads lyrics, then translations, when the song changes |
 | `Translations.kt` | Site translations and matching them to our lines; which lines need one |
-| `AiTranslator.kt` | Claude translation of the lines left over, its cache and cost log |
-| `ApiKeyStore.kt` | The Claude API key, encrypted with Android's Keystore |
+| `AiTranslator.kt` | Translating the lines left over (Claude, or via `Translators.kt`), its cache and log |
+| `Translators.kt` | The other services: OpenAI-style AIs, DeepL, Microsoft, Baidu, Google |
+| `ApiKeyStore.kt` | The services' API keys, encrypted with Android's Keystore |
 | `FloatingLyricsService.kt` | The floating lyrics window |
 | `FloatStyle.kt` / `FloatingLyricsView.kt` | Its settings, which lines it shows, and how it draws them |
-| `ui/` | The main screen and the 译 settings panel |
+| `ui/` | The main screen, the 译 page and the floating window's settings |
 
 Tests (`app/src/test`) run on a PC: `./gradlew testDebugUnitTest`.
 
