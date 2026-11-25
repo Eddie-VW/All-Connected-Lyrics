@@ -53,6 +53,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
+import com.autosynced.lyrics.tr
 import com.autosynced.lyrics.FloatStyle
 import com.autosynced.lyrics.FloatingLyricsView
 import com.autosynced.lyrics.Line
@@ -91,107 +92,110 @@ fun FloatSettingsScreen(onBack: () -> Unit) {
             Typeface.createFromFile(file) != null
         } catch (_: Exception) { false }
         if (ok) set { it.copy(font = FloatStyle.CUSTOM_FONT + ":" + System.currentTimeMillis()) }
-        else Toast.makeText(context, "That file isn't a font Android can use (pick a .ttf or .otf file)", Toast.LENGTH_LONG).show()
+        else Toast.makeText(context, tr("That file isn't a font Android can use (pick a .ttf or .otf file)", "这个文件不是安卓可用的字体（请选择 .ttf 或 .otf 文件）"), Toast.LENGTH_LONG).show()
     }
 
     Column(Modifier.fillMaxSize().background(pal.bg).systemBarsPadding()) {
         // top bar
         Row(Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 6.dp), verticalAlignment = Alignment.CenterVertically) {
-            TextButton(onClick = onBack) { Text("‹ Back", color = pal.accent, fontSize = 16.sp) }
-            Text("Floating lyrics", color = pal.text, fontSize = 18.sp, fontWeight = FontWeight.Bold,
+            TextButton(onClick = onBack) { Text(tr("‹ Back", "‹ 返回"), color = pal.accent, fontSize = 16.sp) }
+            Text(tr("Floating lyrics", "悬浮歌词"), color = pal.text, fontSize = 18.sp, fontWeight = FontWeight.Bold,
                 modifier = Modifier.weight(1f))
-            TextButton(onClick = { set { FloatStyle() } }) { Text("Reset", color = pal.sub) }
+            TextButton(onClick = { set { FloatStyle() } }) { Text(tr("Reset", "重置"), color = pal.sub) }
         }
         Preview(style, translateOn)
 
         Column(Modifier.weight(1f).verticalScroll(rememberScrollState()).padding(horizontal = 18.dp)) {
-            Section("Size") {
-                SliderRow("Window width", "${style.widthPct}%", style.widthPct.toFloat(), 40f..100f, 11) {
+            Section(tr("Size", "大小")) {
+                SliderRow(tr("Window width", "窗口宽度"), "${style.widthPct}%", style.widthPct.toFloat(), 40f..100f, 11) {
                     set { s -> s.copy(widthPct = it.roundToInt()) } }
-                SliderRow("Opacity", "${(style.opacity * 100).roundToInt()}%", style.opacity, 0.2f..1f, 15) {
+                SliderRow(tr("Opacity", "不透明度"), "${(style.opacity * 100).roundToInt()}%", style.opacity, 0.2f..1f, 15) {
                     set { s -> s.copy(opacity = it) } }
-                SliderRow("Background", if (style.bgOpacity < 0.01f) "none" else "${(style.bgOpacity * 100).roundToInt()}%",
+                SliderRow(tr("Background", "背景"), if (style.bgOpacity < 0.01f) tr("none", "无") else "${(style.bgOpacity * 100).roundToInt()}%",
                     style.bgOpacity, 0f..1f, 19) { set { s -> s.copy(bgOpacity = it) } }
-                SliderRow("Rounded corners", "${style.cornerDp}", style.cornerDp.toFloat(), 0f..32f, 15) {
+                SliderRow(tr("Rounded corners", "圆角"), "${style.cornerDp}", style.cornerDp.toFloat(), 0f..32f, 15) {
                     set { s -> s.copy(cornerDp = it.roundToInt()) } }
             }
 
-            Section("Lines") {
-                SliderRow("Lines before the current one", "${style.linesBefore}", style.linesBefore.toFloat(),
+            Section(tr("Lines", "歌词行")) {
+                SliderRow(tr("Lines before the current one", "当前行之前的行数"), "${style.linesBefore}", style.linesBefore.toFloat(),
                     0f..FloatStyle.MAX_AROUND.toFloat(), FloatStyle.MAX_AROUND - 1) { set { s -> s.copy(linesBefore = it.roundToInt()) } }
-                SliderRow("Lines after the current one", "${style.linesAfter}", style.linesAfter.toFloat(),
+                SliderRow(tr("Lines after the current one", "当前行之后的行数"), "${style.linesAfter}", style.linesAfter.toFloat(),
                     0f..FloatStyle.MAX_AROUND.toFloat(), FloatStyle.MAX_AROUND - 1) { set { s -> s.copy(linesAfter = it.roundToInt()) } }
-                SwitchRow("Song title & artist on top", style.showHeader) { set { s -> s.copy(showHeader = it) } }
-                SwitchRow("Chinese translation under the current line", translateOn) { Prefs.setTranslate(context, it) }
+                SwitchRow(tr("Song title & artist on top", "顶部显示歌名和歌手"), style.showHeader) { set { s -> s.copy(showHeader = it) } }
+                SwitchRow(tr("Chinese translation under the current line", "在当前行下显示中文翻译"), translateOn) { Prefs.setTranslate(context, it) }
             }
 
-            Section("Text") {
-                Label("Font")
+            Section(tr("Text", "文字")) {
+                Label(tr("Font", "字体"))
                 Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    for ((label, family) in FloatStyle.FONTS) {
-                        Chip(label, style.font == family, Typeface.create(family, Typeface.NORMAL)) {
+                    for (family in FloatStyle.FONTS) {
+                        Chip(optionLabel(family), style.font == family, Typeface.create(family, Typeface.NORMAL)) {
                             set { s -> s.copy(font = family) } }
                     }
-                    Chip(if (style.font.startsWith(FloatStyle.CUSTOM_FONT)) "Your font ✓" else "Your font…",
+                    Chip(if (style.font.startsWith(FloatStyle.CUSTOM_FONT)) tr("Your font ✓", "我的字体 ✓") else tr("Your font…", "我的字体…"),
                         style.font.startsWith(FloatStyle.CUSTOM_FONT), null) { fontPicker.launch(arrayOf("*/*")) }
                 }
-                Hint("“Your font…” picks a .ttf or .otf file from your phone, e.g. a Chinese font you downloaded.")
-                SliderRow("Current line size", "${style.currentSize}", style.currentSize.toFloat(), 12f..36f, 23) {
+                Hint(tr("“Your font…” picks a .ttf or .otf file from your phone, e.g. a font you downloaded.",
+                    "“我的字体…”可选择手机里的 .ttf 或 .otf 字体文件，比如你下载的中文字体。"))
+                SliderRow(tr("Current line size", "当前行字号"), "${style.currentSize}", style.currentSize.toFloat(), 12f..36f, 23) {
                     set { s -> s.copy(currentSize = it.roundToInt()) } }
-                SwitchRow("Bold current line", style.boldCurrent) { set { s -> s.copy(boldCurrent = it) } }
-                SliderRow("Translation size", "${style.translationPct}%", style.translationPct.toFloat(), 50f..110f, 11) {
+                SwitchRow(tr("Bold current line", "当前行加粗"), style.boldCurrent) { set { s -> s.copy(boldCurrent = it) } }
+                SliderRow(tr("Translation size", "翻译字号"), "${style.translationPct}%", style.translationPct.toFloat(), 50f..110f, 11) {
                     set { s -> s.copy(translationPct = it.roundToInt()) } }
-                SliderRow("Other lines size", "${style.otherSize}", style.otherSize.toFloat(), 10f..28f, 17) {
+                SliderRow(tr("Other lines size", "其他行字号"), "${style.otherSize}", style.otherSize.toFloat(), 10f..28f, 17) {
                     set { s -> s.copy(otherSize = it.roundToInt()) } }
-                if (style.showHeader) SliderRow("Title size", "${style.headerSize}", style.headerSize.toFloat(), 9f..20f, 10) {
+                if (style.showHeader) SliderRow(tr("Title size", "标题字号"), "${style.headerSize}", style.headerSize.toFloat(), 9f..20f, 10) {
                     set { s -> s.copy(headerSize = it.roundToInt()) } }
-                Label("Alignment")
+                Label(tr("Alignment", "对齐"))
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    Chip("Centre", style.align == "center", null) { set { s -> s.copy(align = "center") } }
-                    Chip("Left", style.align == "left", null) { set { s -> s.copy(align = "left") } }
+                    Chip(optionLabel("center"), style.align == "center", null) { set { s -> s.copy(align = "center") } }
+                    Chip(optionLabel("left"), style.align == "left", null) { set { s -> s.copy(align = "left") } }
                 }
-                SwitchRow("Outline around the letters", style.outline,
-                    "Keeps the words readable over any background, e.g. with no background box.") {
+                SwitchRow(tr("Outline around the letters", "文字描边"), style.outline,
+                    tr("Keeps the words readable over any background, e.g. with no background box.", "在任何背景上都清晰可读，比如没有背景框时。")) {
                     set { s -> s.copy(outline = it) } }
                 if (style.outline) {
-                    SliderRow("Outline thickness", "${style.outlineWidth}", style.outlineWidth.toFloat(), 1f..5f, 3) {
+                    SliderRow(tr("Outline thickness", "描边粗细"), "${style.outlineWidth}", style.outlineWidth.toFloat(), 1f..5f, 3) {
                         set { s -> s.copy(outlineWidth = it.roundToInt()) } }
-                    ColorRow("Outline colour", style.outlineColor) { picking = ColorTarget.OUTLINE }
+                    ColorRow(tr("Outline colour", "描边颜色"), style.outlineColor) { picking = ColorTarget.OUTLINE }
                 }
             }
 
-            Section("Colours") {
+            Section(tr("Colours", "颜色")) {
                 val shown = style.colors(pal.night)
-                ColorRow("Current line (lyrics)", shown.current) { picking = ColorTarget.CURRENT }
-                ColorRow("Translation", shown.translation) { picking = ColorTarget.TRANSLATION }
-                ColorRow("Other lines", shown.other) { picking = ColorTarget.OTHER }
-                ColorRow("Title & artist", shown.header) { picking = ColorTarget.HEADER }
-                ColorRow("Background", shown.bg) { picking = ColorTarget.BG }
-                SwitchRow("Match the app's Night / Day style", style.styleColors,
-                    "On: colours follow the app's look (picking any colour above turns this off).") {
+                ColorRow(tr("Current line (lyrics)", "当前行（歌词）"), shown.current) { picking = ColorTarget.CURRENT }
+                ColorRow(tr("Translation", "翻译"), shown.translation) { picking = ColorTarget.TRANSLATION }
+                ColorRow(tr("Other lines", "其他行"), shown.other) { picking = ColorTarget.OTHER }
+                ColorRow(tr("Title & artist", "歌名和歌手"), shown.header) { picking = ColorTarget.HEADER }
+                ColorRow(tr("Background", "背景"), shown.bg) { picking = ColorTarget.BG }
+                SwitchRow(tr("Match the app's Night / Day style", "跟随应用的夜间 / 日间风格"), style.styleColors,
+                    tr("On: colours follow the app's look (picking any colour above turns this off).", "开启时颜色跟随应用外观（选择上面任一颜色会自动关闭）。")) {
                     set { s -> if (it) s.copy(styleColors = true) else s.ownColors(pal.night) } }
             }
 
-            Section("Behaviour") {
-                Label("When the line changes")
+            Section(tr("Behaviour", "行为")) {
+                Label(tr("When the line changes", "换行效果"))
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    for ((label, value) in listOf("No effect" to "none", "Fade" to "fade", "Slide up" to "slide")) {
-                        Chip(label, style.animation == value, null) { set { s -> s.copy(animation = value) } }
+                    for (value in listOf("none", "fade", "slide")) {
+                        Chip(if (value == "none") tr("No effect", "无效果") else optionLabel(value), style.animation == value, null) {
+                            set { s -> s.copy(animation = value) } }
                     }
                 }
-                SwitchRow("Lock the window", style.locked,
-                    "Touches go through it to the app underneath, and it can't be moved. Unlock from the " +
-                        "notification or here. (Android keeps a locked window a little see-through.)") {
+                SwitchRow(tr("Lock the window", "锁定窗口"), style.locked,
+                    tr("Touches go through it to the app underneath, and it can't be moved. Unlock from the " +
+                        "notification or here. (Android keeps a locked window a little see-through.)",
+                        "触摸会穿透到下面的应用，窗口也不能移动。可在通知或这里解锁。（安卓会让锁定的窗口略微透明。）")) {
                     set { s -> s.copy(locked = it) } }
                 val secs = style.offsetMs / 1000.0
-                SliderRow("Timing",
+                SliderRow(tr("Timing", "时间偏移"),
                     when {
-                        style.offsetMs == 0L -> "as is"
-                        style.offsetMs > 0 -> String.format(Locale.US, "%.1f s earlier", secs)
-                        else -> String.format(Locale.US, "%.1f s later", -secs)
+                        style.offsetMs == 0L -> tr("as is", "不调整")
+                        style.offsetMs > 0 -> String.format(Locale.US, tr("%.1f s earlier", "提前 %.1f 秒"), secs)
+                        else -> String.format(Locale.US, tr("%.1f s later", "延后 %.1f 秒"), -secs)
                     },
                     style.offsetMs / 1000f, -3f..3f, 59) { set { s -> s.copy(offsetMs = (it * 10).roundToInt() * 100L) } }
-                Hint("If the lyrics come too late (e.g. with Bluetooth headphones), move this to the right.")
+                Hint(tr("If the lyrics come too late (e.g. with Bluetooth headphones), move this to the right.", "如果歌词出现得太晚（比如用蓝牙耳机时），往右拖。"))
             }
             Spacer(Modifier.height(24.dp))
         }
@@ -205,13 +209,14 @@ fun FloatSettingsScreen(onBack: () -> Unit) {
     }
 }
 
-private enum class ColorTarget(val title: String, val get: (FloatStyle) -> Int, val set: (FloatStyle, Int) -> FloatStyle) {
-    BG("Background", { it.bgColor }, { s, c -> s.copy(bgColor = c) }),
-    CURRENT("Current line", { it.currentColor }, { s, c -> s.copy(currentColor = c) }),
-    TRANSLATION("Translation", { it.translationColor }, { s, c -> s.copy(translationColor = c) }),
-    OTHER("Other lines", { it.otherColor }, { s, c -> s.copy(otherColor = c) }),
-    HEADER("Title & artist", { it.headerColor }, { s, c -> s.copy(headerColor = c) }),
-    OUTLINE("Outline", { it.outlineColor }, { s, c -> s.copy(outlineColor = c) }),
+private enum class ColorTarget(val en: String, val zh: String, val get: (FloatStyle) -> Int, val set: (FloatStyle, Int) -> FloatStyle) {
+    BG("Background", "背景", { it.bgColor }, { s, c -> s.copy(bgColor = c) }),
+    CURRENT("Current line", "当前行", { it.currentColor }, { s, c -> s.copy(currentColor = c) }),
+    TRANSLATION("Translation", "翻译", { it.translationColor }, { s, c -> s.copy(translationColor = c) }),
+    OTHER("Other lines", "其他行", { it.otherColor }, { s, c -> s.copy(otherColor = c) }),
+    HEADER("Title & artist", "歌名和歌手", { it.headerColor }, { s, c -> s.copy(headerColor = c) }),
+    OUTLINE("Outline", "描边", { it.outlineColor }, { s, c -> s.copy(outlineColor = c) });
+    val title: String get() = tr(en, zh)
 }
 
 /** The real floating card, on a stand-in background, stepping through the sample lines. */
@@ -231,7 +236,7 @@ private fun Preview(style: FloatStyle, translateOn: Boolean) {
             update = { v ->
                 v.apply(style, pal.night)
                 v.alpha = style.opacity
-                v.show("Preview Song — Sample Artist", LyricRows.build(SAMPLE, index, style, translateOn))
+                v.show(tr("Preview Song — Sample Artist", "预览歌曲 — 示例歌手"), LyricRows.build(SAMPLE, index, style, translateOn))
             },
             modifier = Modifier.width((screenDp * style.widthPct / 100f).dp),
         )
@@ -343,17 +348,17 @@ internal fun ColorPickerDialog(title: String, initial: Int, onDismiss: () -> Uni
                 }
                 Box(Modifier.fillMaxWidth().height(34.dp).clip(RoundedCornerShape(10.dp)).background(Color(chosen))
                     .border(1.dp, pal.line, RoundedCornerShape(10.dp)))
-                HsvSlider("Colour", h, 0f..360f, Brush.horizontalGradient(
+                HsvSlider(tr("Colour", "色相"), h, 0f..360f, Brush.horizontalGradient(
                     (0..6).map { Color(android.graphics.Color.HSVToColor(floatArrayOf(it * 60f, 1f, 1f))) })) { h = it }
-                HsvSlider("Strength", s, 0f..1f, Brush.horizontalGradient(listOf(
+                HsvSlider(tr("Strength", "饱和度"), s, 0f..1f, Brush.horizontalGradient(listOf(
                     Color(android.graphics.Color.HSVToColor(floatArrayOf(h, 0f, v))),
                     Color(android.graphics.Color.HSVToColor(floatArrayOf(h, 1f, v)))))) { s = it }
-                HsvSlider("Brightness", v, 0f..1f, Brush.horizontalGradient(listOf(Color.Black,
+                HsvSlider(tr("Brightness", "亮度"), v, 0f..1f, Brush.horizontalGradient(listOf(Color.Black,
                     Color(android.graphics.Color.HSVToColor(floatArrayOf(h, s, 1f)))))) { v = it }
             }
         },
-        confirmButton = { TextButton(onClick = { onPick(chosen) }) { Text("Use this colour", color = pal.accent) } },
-        dismissButton = { TextButton(onClick = onDismiss) { Text("Cancel", color = pal.sub) } },
+        confirmButton = { TextButton(onClick = { onPick(chosen) }) { Text(tr("Use this colour", "使用这个颜色"), color = pal.accent) } },
+        dismissButton = { TextButton(onClick = onDismiss) { Text(tr("Cancel", "取消"), color = pal.sub) } },
     )
 }
 

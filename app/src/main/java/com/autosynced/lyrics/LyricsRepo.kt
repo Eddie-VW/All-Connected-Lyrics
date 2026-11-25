@@ -130,7 +130,8 @@ object LyricsRepo {
             if (needsTranslation(lines) && Prefs.aiTranslate.value) {
                 val cfg = withContext(Dispatchers.IO) { Prefs.providerConfig(appContext) }
                 if (!cfg.ready) {
-                    note = "Some lines have no translation yet. Add a ${cfg.provider.label} key in 译 settings to fill them in."
+                    note = tr("Some lines have no translation yet. Add a ${cfg.provider.labelEn} key in Translation settings to fill them in.",
+                        "部分歌词还没有翻译。在翻译设置中添加 ${cfg.provider.labelZh} 的密钥即可补全。")
                 } else {
                     try {
                         val before = lines
@@ -139,7 +140,7 @@ object LyricsRepo {
                         })
                         translated[track.key] = raw.copy(lines = lines)
                     } catch (e: CancellationException) { throw e } catch (e: Exception) {
-                        note = "AI translation didn't work: ${reason(e)}"
+                        note = tr("AI translation didn't work: ", "AI 翻译失败：") + reason(e)
                     }
                 }
             }
@@ -148,21 +149,21 @@ object LyricsRepo {
     }
 
     private fun reason(e: Exception): String = when (e) {
-        is UnauthorizedException -> "the API key wasn't accepted. Check it in 译 settings."
-        is PermissionDeniedException -> "this API key isn't allowed to use Claude."
-        is PaymentRequiredException -> "the Claude account is out of credit."
-        is RateLimitException -> "too many requests right now. Try again in a minute."
-        is OverloadedException -> "Claude is busy right now. Try again in a minute."
-        is AnthropicServiceException -> "Claude's server answered with error ${e.statusCode()}."
+        is UnauthorizedException -> tr("the API key wasn't accepted. Check it in Translation settings.", "API 密钥无效，请在翻译设置中检查。")
+        is PermissionDeniedException -> tr("this API key isn't allowed to use Claude.", "此 API 密钥无权使用 Claude。")
+        is PaymentRequiredException -> tr("the Claude account is out of credit.", "Claude 账户余额不足。")
+        is RateLimitException -> tr("too many requests right now. Try again in a minute.", "请求太频繁，请一分钟后再试。")
+        is OverloadedException -> tr("Claude is busy right now. Try again in a minute.", "Claude 当前繁忙，请一分钟后再试。")
+        is AnthropicServiceException -> tr("Claude's server answered with error ${e.statusCode()}.", "Claude 服务器返回错误 ${e.statusCode()}。")
         is TranslatorException -> when (e.status) {
-            401, 403, 52003 -> "the key wasn't accepted. Check it in 译 settings."
-            429, 54003 -> "too many requests right now. Try again in a minute."
-            456, 402, 54004 -> "the service's free allowance or credit is used up."
-            else -> e.message ?: "the service answered with error ${e.status}."
+            401, 403, 52003 -> tr("the key wasn't accepted. Check it in Translation settings.", "密钥无效，请在翻译设置中检查。")
+            429, 54003 -> tr("too many requests right now. Try again in a minute.", "请求太频繁，请一分钟后再试。")
+            456, 402, 54004 -> tr("the service's free allowance or credit is used up.", "该服务的免费额度或余额已用完。")
+            else -> e.message ?: tr("the service answered with error ${e.status}.", "服务返回错误 ${e.status}。")
         }
         is AnthropicIoException, is IOException ->
-            "couldn't reach the service (no internet, or it's blocked where you are)."
-        else -> e.message ?: "unknown error."
+            tr("couldn't reach the service (no internet, or it's blocked where you are).", "无法连接该服务（没有网络，或在你所在地区被屏蔽）。")
+        else -> e.message ?: tr("unknown error.", "未知错误。")
     }
 
     /** Total spent on AI translation (US$) and number of requests, for the settings screen. */

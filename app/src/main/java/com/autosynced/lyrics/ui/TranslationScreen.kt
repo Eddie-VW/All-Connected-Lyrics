@@ -43,6 +43,7 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.autosynced.lyrics.tr
 import com.autosynced.lyrics.AI_PRESETS
 import com.autosynced.lyrics.ApiKeyStore
 import com.autosynced.lyrics.LyricsRepo
@@ -54,18 +55,29 @@ import java.util.Locale
 
 /** What each service is like, where its key comes from, and whether it works in mainland China. */
 private fun about(p: Provider): String = when (p) {
-    Provider.CLAUDE -> "Best at matching each song's genre and tone. Key from console.anthropic.com → API Keys. " +
-        "A Max plan includes monthly API credit; otherwise about a cent or a few per song."
-    Provider.OPENAI -> "DeepSeek, SiliconFlow 硅基流动, Gemini, Groq, OpenRouter and others. Gets the same " +
-        "genre-style instructions as Claude. Pick a service below, then paste a key from its website."
-    Provider.DEEPL -> "Plain, literal style. DeepL API Free: 500,000 characters a month (hundreds of songs). " +
-        "Key from deepl.com → API (free keys end in “:fx”). Usually works in mainland China."
-    Provider.MICROSOFT -> "Plain style. Azure Translator's free tier: about 2 million characters a month. Create a " +
-        "Translator resource at portal.azure.com; copy its key and its region. Usually works in mainland China."
-    Provider.BAIDU -> "Plain style, strong on Chinese. Free monthly allowance once your account is verified at " +
-        "fanyi-api.baidu.com; 管理控制台 → 开发者信息 shows the APP ID and 密钥 (the key). Works in mainland China."
-    Provider.GOOGLE -> "Plain style, nothing to set up. Uses Google Translate's free web access, which isn't an " +
-        "official service and could stop working. Not reachable from mainland China without a VPN."
+    Provider.CLAUDE -> tr("Best at matching each song's genre and tone. Key from console.anthropic.com → API Keys. " +
+        "A Max plan includes monthly API credit; otherwise about a cent or a few per song.",
+        "最能贴合每首歌的曲风和语气。密钥在 console.anthropic.com → API Keys 获取。Max 套餐每月含 API 额度，" +
+            "否则每首歌约几美分。")
+    Provider.OPENAI -> tr("DeepSeek, SiliconFlow, Gemini, Groq, OpenRouter and others. Gets the same genre-style " +
+        "instructions as Claude. Pick a service below, then paste a key from its website.",
+        "DeepSeek、硅基流动、Gemini、Groq、OpenRouter 等。与 Claude 使用相同的曲风翻译要求。在下面选择服务，" +
+            "再粘贴从它网站获取的密钥。")
+    Provider.DEEPL -> tr("Plain, literal style. DeepL API Free: 500,000 characters a month (hundreds of songs). " +
+        "Key from deepl.com → API (free keys end in “:fx”). Usually works in mainland China.",
+        "直译风格。DeepL API 免费版每月 50 万字符（几百首歌）。密钥在 deepl.com → API 获取（免费密钥以“:fx”结尾）。" +
+            "中国大陆通常可用。")
+    Provider.MICROSOFT -> tr("Plain style. Azure Translator's free tier: about 2 million characters a month. Create a " +
+        "Translator resource at portal.azure.com; copy its key and its region. Usually works in mainland China.",
+        "直译风格。Azure 翻译免费层每月约 200 万字符。在 portal.azure.com 创建“翻译”资源，复制它的密钥和区域。" +
+            "中国大陆通常可用。")
+    Provider.BAIDU -> tr("Plain style, strong on Chinese. Free monthly allowance once your account is verified at " +
+        "fanyi-api.baidu.com; the developer info page shows the App ID and the key. Works in mainland China.",
+        "直译风格，中文表现好。在 fanyi-api.baidu.com 完成认证后每月有免费额度；管理控制台 → 开发者信息 里有 APP ID 和密钥。" +
+            "中国大陆可用。")
+    Provider.GOOGLE -> tr("Plain style, nothing to set up. Uses Google Translate's free web access, which isn't an " +
+        "official service and could stop working. Not reachable from mainland China without a VPN.",
+        "直译风格，无需设置。使用谷歌翻译的免费网页接口，并非官方服务，随时可能失效。中国大陆需要 VPN 才能使用。")
 }
 
 /** The 译 page: translation on/off, and which service fills in lines no music site translated. */
@@ -80,22 +92,23 @@ fun TranslationScreen(onBack: () -> Unit) {
 
     Column(Modifier.fillMaxSize().background(pal.bg).systemBarsPadding()) {
         Row(Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 6.dp), verticalAlignment = Alignment.CenterVertically) {
-            TextButton(onClick = onBack) { Text("‹ Back", color = pal.accent, fontSize = 16.sp) }
-            Text("Chinese translation 中文翻译", color = pal.text, fontSize = 18.sp, fontWeight = FontWeight.Bold)
+            TextButton(onClick = onBack) { Text(tr("‹ Back", "‹ 返回"), color = pal.accent, fontSize = 16.sp) }
+            Text(tr("Chinese translation", "中文翻译"), color = pal.text, fontSize = 18.sp, fontWeight = FontWeight.Bold)
         }
         Column(Modifier.weight(1f).verticalScroll(rememberScrollState()).padding(horizontal = 18.dp)) {
-            Section("Translation") {
-                SwitchRow("Show translation", translateOn,
-                    "Simplified Chinese under each line, in the app and the floating lyrics. Human translations " +
-                        "from NetEase, QQ Music and Kugou are always used first.") { Prefs.setTranslate(context, it) }
-                SwitchRow("Fill in lines no music site translated", aiOn,
-                    "Using the service you choose below.") { Prefs.setAiTranslate(context, it) }
+            Section(tr("Translation", "翻译")) {
+                SwitchRow(tr("Show translation", "显示翻译"), translateOn,
+                    tr("Simplified Chinese under each line, in the app and the floating lyrics. Human translations " +
+                        "from NetEase, QQ Music and Kugou are always used first.",
+                        "在应用和悬浮歌词中，每行下面显示简体中文。总是优先使用网易云、QQ 音乐和酷狗的人工翻译。")) { Prefs.setTranslate(context, it) }
+                SwitchRow(tr("Fill in lines no music site translated", "补全音乐网站没有翻译的歌词"), aiOn,
+                    tr("Using the service you choose below.", "使用下面选择的服务。")) { Prefs.setAiTranslate(context, it) }
             }
             if (aiOn) {
-                Section("Service") {
+                Section(tr("Service", "服务")) {
                     for (p in Provider.entries) ProviderRow(p, p == provider) { Prefs.setProvider(context, p) }
                 }
-                Section(provider.label) { ProviderSetup(provider) }
+                Section(tr(provider.labelEn, provider.labelZh)) { ProviderSetup(provider) }
             }
             Spacer(Modifier.height(28.dp))
         }
@@ -114,8 +127,8 @@ private fun ProviderRow(p: Provider, selected: Boolean, onClick: () -> Unit) {
         }
         Spacer(Modifier.width(12.dp))
         Column(Modifier.weight(1f)) {
-            Text(p.label, color = pal.text, fontSize = 15.sp, fontWeight = FontWeight.SemiBold)
-            Text(if (p.styleAware) "AI · matches the song's style" else "Translator · plain style",
+            Text(tr(p.labelEn, p.labelZh), color = pal.text, fontSize = 15.sp, fontWeight = FontWeight.SemiBold)
+            Text(if (p.styleAware) tr("AI · matches the song's style", "AI · 贴合歌曲风格") else tr("Translator · plain style", "翻译引擎 · 直译风格"),
                 color = if (p.styleAware) pal.accent else pal.faint, fontSize = 12.sp)
         }
     }
@@ -140,27 +153,27 @@ private fun ProviderSetup(p: Provider) {
     Hint(about(p))
 
     if (p == Provider.OPENAI) {
-        Label("AI service")
+        Label(tr("AI service", "AI 服务"))
         Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            for (a in AI_PRESETS) Chip(a.name, preset == a.name, null) {
+            for (a in AI_PRESETS) Chip(tr(a.name, a.nameZh), preset == a.name, null) {
                 preset = a.name; saved = false
                 if (a.baseUrl.isNotEmpty()) { baseUrl = a.baseUrl; model = a.model }
             }
         }
         AI_PRESETS.firstOrNull { it.name == preset }?.let { a ->
-            Hint(a.note + (if (a.keyFrom.isNotEmpty()) " Key from ${a.keyFrom}." else ""))
+            Hint(tr(a.noteEn, a.noteZh) + (if (a.keyFrom.isNotEmpty()) tr(" Key from ${a.keyFrom}.", "密钥在 ${a.keyFrom} 获取。") else ""))
         }
-        Field("Address (base URL)", baseUrl, "https://…/v1") { baseUrl = it; saved = false }
-        Field("Model", model, "model name") { model = it; saved = false }
-        Hint("Model names change now and then. If the service says the model doesn't exist, copy a current " +
-            "name from its website into this box.")
+        Field(tr("Address (base URL)", "地址（Base URL）"), baseUrl, "https://…/v1") { baseUrl = it; saved = false }
+        Field(tr("Model", "模型"), model, tr("model name", "模型名")) { model = it; saved = false }
+        Hint(tr("Model names change now and then. If the service says the model doesn't exist, copy a current " +
+            "name from its website into this box.", "模型名称偶尔会变。如果服务提示模型不存在，请从它的网站复制当前的模型名填到这里。"))
     }
 
-    p.extraLabel?.let { label -> Field(label, extra, "") { extra = it; saved = false } }
+    if (p.extraEn != null) Field(tr(p.extraEn, p.extraZh ?: p.extraEn), extra, "") { extra = it; saved = false }
 
     if (p.needsKey) {
-        Field(if (p == Provider.BAIDU) "密钥 (secret key)" else "API key", key,
-            if (hasKey) "••••••••  (saved; paste to replace)" else "paste your key here", secret = true) {
+        Field(if (p == Provider.BAIDU) tr("Secret key", "密钥") else tr("API key", "API 密钥"), key,
+            if (hasKey) tr("••••••••  (saved; paste to replace)", "••••••••（已保存；粘贴新密钥可替换）") else tr("paste your key here", "在这里粘贴密钥"), secret = true) {
             key = it.trim(); saved = false
         }
     }
@@ -168,20 +181,20 @@ private fun ProviderSetup(p: Provider) {
     Row(verticalAlignment = Alignment.CenterVertically) {
         TextButton(onClick = {
             if (p.needsKey && key.isNotEmpty()) { ApiKeyStore.set(context, key, slot); key = ""; hasKey = true }
-            if (p.extraLabel != null) Prefs.setProviderExtra(context, p, extra)
+            if (p.extraEn != null) Prefs.setProviderExtra(context, p, extra)
             if (p == Provider.OPENAI) Prefs.setAi(context, preset, baseUrl, model)
             saved = true
             LyricsRepo.retranslate()
-        }) { Text("Save", color = pal.accent, fontWeight = FontWeight.Bold) }
+        }) { Text(tr("Save", "保存"), color = pal.accent, fontWeight = FontWeight.Bold) }
         if (p.needsKey && hasKey) TextButton(onClick = { ApiKeyStore.set(context, null, slot); hasKey = false }) {
-            Text("Remove key", color = pal.sub)
+            Text(tr("Remove key", "删除密钥"), color = pal.sub)
         }
-        if (saved) Text("Saved ✓", color = pal.sub, fontSize = 13.sp)
+        if (saved) Text(tr("Saved ✓", "已保存 ✓"), color = pal.sub, fontSize = 13.sp)
     }
 
     val dollars = spent?.first ?: 0.0
     if (p == Provider.CLAUDE && dollars > 0) {
-        Text("Claude translation so far: US$" + String.format(Locale.US, "%.4f", dollars), fontSize = 12.sp, color = pal.faint)
+        Text(tr("Claude translation so far: US$", "Claude 翻译累计花费：US$") + String.format(Locale.US, "%.4f", dollars), fontSize = 12.sp, color = pal.faint)
     }
 }
 

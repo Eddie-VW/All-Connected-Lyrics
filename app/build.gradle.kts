@@ -14,7 +14,7 @@ android {
         targetSdk = 35
         // On GitHub, every build counts up (so Android sees each one as newer); locally it's 2.
         versionCode = System.getenv("GITHUB_RUN_NUMBER")?.toIntOrNull()?.plus(1) ?: 2
-        versionName = "0.6"
+        versionName = "0.7"
     }
 
     // One fixed signing key (debug.keystore, committed on purpose) so every build from GitHub

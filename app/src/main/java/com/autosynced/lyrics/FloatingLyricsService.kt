@@ -133,14 +133,15 @@ class FloatingLyricsService : Service() {
             Intent(this, FloatingLyricsService::class.java).setAction(ACTION_TOGGLE_LOCK),
             PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT)
         val title = when {
-            floating && lockScreen -> if (locked) "Floating (locked) and lock-screen lyrics are on" else "Floating and lock-screen lyrics are on"
-            floating -> if (locked) "Floating lyrics is on (locked)" else "Floating lyrics is on"
-            else -> "Lock-screen lyrics are on"
+            floating && lockScreen -> if (locked) tr("Floating (locked) and lock-screen lyrics are on", "悬浮歌词（已锁定）和锁屏歌词已开启")
+                else tr("Floating and lock-screen lyrics are on", "悬浮歌词和锁屏歌词已开启")
+            floating -> if (locked) tr("Floating lyrics is on (locked)", "悬浮歌词已开启（已锁定）") else tr("Floating lyrics is on", "悬浮歌词已开启")
+            else -> tr("Lock-screen lyrics are on", "锁屏歌词已开启")
         }
         val text = when {
-            locked -> "Touches go through the lyrics. Tap Unlock to move them again."
-            floating -> "Tap the lyrics for buttons. Tap here to open the app."
-            else -> "Lyrics show on the lock screen while music plays. Tap here to open the app."
+            locked -> tr("Touches go through the lyrics. Tap Unlock to move them again.", "触摸会穿透歌词。点“解锁”即可再次移动。")
+            floating -> tr("Tap the lyrics for buttons. Tap here to open the app.", "点歌词显示按钮。点这里打开应用。")
+            else -> tr("Lyrics show on the lock screen while music plays. Tap here to open the app.", "播放音乐时在锁屏上显示歌词。点这里打开应用。")
         }
         val b = Notification.Builder(this, CHANNEL)
             .setSmallIcon(android.R.drawable.ic_media_play)
@@ -150,14 +151,14 @@ class FloatingLyricsService : Service() {
             .setOngoing(true)
         if (floating) b.addAction(Notification.Action.Builder(
             android.graphics.drawable.Icon.createWithResource(this, android.R.drawable.ic_lock_lock),
-            if (locked) "Unlock" else "Lock", lock).build())
+            if (locked) tr("Unlock", "解锁") else tr("Lock", "锁定"), lock).build())
         return b.build()
     }
 
     private fun startAsForeground() {
         val nm = getSystemService(NotificationManager::class.java)
         if (Build.VERSION.SDK_INT >= 26 && nm.getNotificationChannel(CHANNEL) == null) {
-            nm.createNotificationChannel(NotificationChannel(CHANNEL, "Floating & lock-screen lyrics", NotificationManager.IMPORTANCE_MIN))
+            nm.createNotificationChannel(NotificationChannel(CHANNEL, tr("Floating & lock-screen lyrics", "悬浮歌词与锁屏歌词"), NotificationManager.IMPORTANCE_MIN))
         }
         val n = notification(Prefs.floatStyle.value.locked)
         if (Build.VERSION.SDK_INT >= 34) {
@@ -188,7 +189,7 @@ class FloatingLyricsService : Service() {
         var downX = 0f; var downY = 0f; var startX = 0; var startY = 0; var moved = false
         val longPress = Runnable {
             Prefs.setFloating(this, false)
-            Toast.makeText(this, "Floating lyrics turned off", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, tr("Floating lyrics turned off", "已关闭悬浮歌词"), Toast.LENGTH_SHORT).show()
             refreshParts()
         }
         box.setOnTouchListener { _, e ->
@@ -233,8 +234,8 @@ class FloatingLyricsService : Service() {
             FloatingLyricsView.Action.Lock -> {
                 card?.showControls(false)
                 Prefs.setFloatStyle(this, style.copy(locked = true))
-                Toast.makeText(this, "Lyrics locked: touches now go through them. Unlock from the notification " +
-                    "or the app's settings.", Toast.LENGTH_LONG).show()
+                Toast.makeText(this, tr("Lyrics locked: touches now go through them. Unlock from the notification " +
+                    "or the app's settings.", "歌词已锁定：触摸会穿透歌词。可在通知或应用设置中解锁。"), Toast.LENGTH_LONG).show()
             }
             is FloatingLyricsView.Action.Colour ->
                 Prefs.setFloatStyle(this, style.ownColors(night).copy(currentColor = action.color))
@@ -246,7 +247,7 @@ class FloatingLyricsService : Service() {
             }
             FloatingLyricsView.Action.Close -> {
                 Prefs.setFloating(this, false)
-                Toast.makeText(this, "Floating lyrics turned off. Turn them on again in the app.", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, tr("Floating lyrics turned off. Turn them on again in the app.", "已关闭悬浮歌词，可在应用中重新开启。"), Toast.LENGTH_SHORT).show()
                 refreshParts()
             }
         }
@@ -286,11 +287,11 @@ class FloatingLyricsService : Service() {
         box.visibility = View.VISIBLE
         val style = Prefs.floatStyle.value
         val rows = when (val s = LyricsRepo.state.value) {
-            is LyricsState.Loading -> LyricRows.message(track.title, "Loading lyrics…")
-            is LyricsState.NotFound -> LyricRows.message(track.title, "No synced lyrics for this song")
-            is LyricsState.NetworkError -> LyricRows.message(track.title, "Network error, unable to fetch lyrics")
+            is LyricsState.Loading -> LyricRows.message(track.title, tr("Loading lyrics…", "正在加载歌词…"))
+            is LyricsState.NotFound -> LyricRows.message(track.title, tr("No synced lyrics for this song", "这首歌没有同步歌词"))
+            is LyricsState.NetworkError -> LyricRows.message(track.title, tr("Network error, unable to fetch lyrics", "网络错误，无法获取歌词"))
             is LyricsState.Found ->
-                if (!s.lyrics.synced) LyricRows.message(track.title, "These lyrics have no timing")
+                if (!s.lyrics.synced) LyricRows.message(track.title, tr("These lyrics have no timing", "这份歌词没有时间轴"))
                 else LyricRows.build(s.lyrics.lines, s.lyrics.indexAt(p.position() + style.offsetMs), style,
                     Prefs.translate.value)
             else -> listOf(Row("♪", Row.Kind.CURRENT))

@@ -12,8 +12,11 @@ data class AppLyricsStyle(
     val past: Int = 0x8CFFFFFF.toInt(),          // lines already sung
     val upcoming: Int = 0x61FFFFFF,              // lines still to come
     val translation: Int = 0xD9FFFFFF.toInt(),
-    val panel: String = "album",                 // album (tinted by the cover) / colour / none
+    val panel: String = "glass",                 // glass (frosted, cover blurred behind) / album (tinted by the cover) / colour / none
     val panelColor: Int = 0xFF2A2A2A.toInt(),
+    val panelOpacity: Float = 0.85f,             // how solid the panel is, 0 = see-through
+    val panelBlur: Int = 70,                     // 0..100, for "glass"
+    val softFocus: Boolean = false,              // lines other than the current one slightly blurred (as on the PC in Day)
 ) {
     data class Colors(val current: Int, val past: Int, val upcoming: Int, val translation: Int)
 
@@ -33,10 +36,11 @@ data class AppLyricsStyle(
 
     fun toJson(): String = JSONObject().put("styleColors", styleColors).put("current", current).put("past", past)
         .put("upcoming", upcoming).put("translation", translation).put("panel", panel).put("panelColor", panelColor)
+        .put("panelOpacity", panelOpacity.toDouble()).put("panelBlur", panelBlur).put("softFocus", softFocus)
         .toString()
 
     companion object {
-        val PANELS = listOf("Album colour" to "album", "Your colour" to "colour", "None" to "none")
+        val PANELS = listOf("glass", "album", "colour", "none")
 
         fun withAlpha(color: Int, alpha: Float): Int = ((alpha.coerceIn(0f, 1f) * 255).toInt() shl 24) or (color and 0xFFFFFF)
 
@@ -48,8 +52,11 @@ data class AppLyricsStyle(
                 styleColors = j.optBoolean("styleColors", d.styleColors),
                 current = i("current", d.current), past = i("past", d.past), upcoming = i("upcoming", d.upcoming),
                 translation = i("translation", d.translation),
-                panel = j.optString("panel", d.panel).takeIf { p -> PANELS.any { it.second == p } } ?: d.panel,
+                panel = j.optString("panel", d.panel).takeIf { it in PANELS } ?: d.panel,
                 panelColor = i("panelColor", d.panelColor),
+                panelOpacity = (if (j.has("panelOpacity")) j.optDouble("panelOpacity", 0.85).toFloat() else d.panelOpacity).coerceIn(0f, 1f),
+                panelBlur = i("panelBlur", d.panelBlur).coerceIn(0, 100),
+                softFocus = j.optBoolean("softFocus", d.softFocus),
             )
         }
     }

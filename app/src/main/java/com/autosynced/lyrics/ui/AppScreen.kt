@@ -62,6 +62,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.autosynced.lyrics.tr
+import com.autosynced.lyrics.CoverStyle
 import com.autosynced.lyrics.LyricsRepo
 import com.autosynced.lyrics.LyricsState
 import com.autosynced.lyrics.NowPlaying
@@ -94,7 +96,7 @@ fun AppScreen(
         Page.HUB -> { SettingsHub(onBack = { page = null }) { page = it; fromHub = true }; return }
         Page.FLOAT -> { FloatSettingsScreen(back); return }
         Page.LOCK -> { LockSettingsScreen(back); return }
-        Page.MAIN_LYRICS -> { MainLyricsSettings(back); return }
+        Page.MAIN -> { MainScreenSettings(back); return }
         Page.TRANSLATION -> { TranslationScreen(back); return }
         null -> {}
     }
@@ -129,12 +131,12 @@ private fun TopBar(
         Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Text("Autosynced Lyrics", color = pal.text, fontSize = 18.sp, fontWeight = FontWeight.Bold,
+        Text(tr("Autosynced Lyrics", "同步歌词"), color = pal.text, fontSize = 18.sp, fontWeight = FontWeight.Bold,
             maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f))
         // Chinese translation: on/off and AI settings
-        Pill("译", translateOn, onTranslation)
+        Pill(tr("Trans", "译"), translateOn, onTranslation)
         Spacer(Modifier.width(8.dp))
-        Pill(if (floatingOn) "Floating on" else "Floating off", floatingOn, onToggleFloating)
+        Pill(if (floatingOn) tr("Floating on", "悬浮：开") else tr("Floating off", "悬浮：关"), floatingOn, onToggleFloating)
         // floating window settings (size, colours, font, lines…)
         Box(
             Modifier.size(44.dp).clip(CircleShape).clickable(onClick = onFloatSettings),
@@ -171,11 +173,13 @@ private fun Pill(text: String, on: Boolean, onClick: () -> Unit) {
 private fun AccessCard(onGrantAccess: () -> Unit) {
     val pal = LocalPalette.current
     Column(Modifier.fillMaxSize().padding(24.dp), verticalArrangement = Arrangement.Center) {
-        Text("One step to start", color = pal.text, fontSize = 26.sp, fontWeight = FontWeight.ExtraBold)
+        Text(tr("One step to start", "开始前还差一步"), color = pal.text, fontSize = 26.sp, fontWeight = FontWeight.ExtraBold)
         Spacer(Modifier.height(12.dp))
-        Text("To see which song is playing in Spotify, YouTube Music, NetEase, QQ Music or any other " +
-            "music app, Android needs you to turn on notification access for Autosynced Lyrics.\n\n" +
+        Text(tr("To see which song is playing in Spotify, YouTube Music, NetEase, QQ Music or any other " +
+            "music app, Android needs you to turn on notification access for this app.\n\n" +
             "The app only reads what's playing; it never reads your notifications.",
+            "为了知道 Spotify、YouTube Music、网易云音乐、QQ 音乐或其他音乐应用正在播放什么，安卓需要你为本应用开启通知使用权。\n\n" +
+            "本应用只读取正在播放的歌曲，从不读取你的通知内容。"),
             color = pal.sub, fontSize = 15.sp, lineHeight = 22.sp)
         Spacer(Modifier.height(24.dp))
         Box(
@@ -183,10 +187,10 @@ private fun AccessCard(onGrantAccess: () -> Unit) {
                 .clickable(onClick = onGrantAccess),
             contentAlignment = Alignment.Center,
         ) {
-            Text("Turn on notification access", color = pal.accentInk, fontSize = 16.sp, fontWeight = FontWeight.Bold)
+            Text(tr("Turn on notification access", "开启通知使用权"), color = pal.accentInk, fontSize = 16.sp, fontWeight = FontWeight.Bold)
         }
         Spacer(Modifier.height(12.dp))
-        Text("In the list that opens, find Autosynced Lyrics, switch it on, then come back.",
+        Text(tr("In the list that opens, find Autosynced Lyrics, switch it on, then come back.", "在打开的列表中找到本应用并开启，然后返回。"),
             color = pal.faint, fontSize = 13.sp)
     }
 }
@@ -204,16 +208,31 @@ private fun ColumnScope.NowPlayingScreen(tint: Color?, translateOn: Boolean) {
     }
     val track = playback.track
 
-    // header: spinning record + title
-    Row(Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp), verticalAlignment = Alignment.CenterVertically) {
-        SpinningRecord(playback.art, playback.playing, 72.dp)
-        Spacer(Modifier.width(14.dp))
-        Column(Modifier.weight(1f)) {
-            Text(track?.title ?: "Nothing playing", color = pal.text, fontSize = 20.sp, fontWeight = FontWeight.Bold,
-                maxLines = 2, overflow = TextOverflow.Ellipsis)
-            Text(track?.artist ?: "Play a song in any music app", color = if (pal.night) pal.sub else pal.accent,
+    // header: the album cover (as set in Settings → Main screen) + title; a large cover sits above the title
+    val cover by Prefs.cover.collectAsState()
+    val titleBlock: @Composable (Boolean) -> Unit = { centered ->
+        Column(horizontalAlignment = if (centered) Alignment.CenterHorizontally else Alignment.Start) {
+            Text(track?.title ?: tr("Nothing playing", "没有正在播放的歌曲"), color = pal.text, fontSize = 20.sp, fontWeight = FontWeight.Bold,
+                maxLines = 2, overflow = TextOverflow.Ellipsis, textAlign = if (centered) TextAlign.Center else TextAlign.Start)
+            Text(track?.artist ?: tr("Play a song in any music app", "在任意音乐应用中播放一首歌"), color = if (pal.night) pal.sub else pal.accent,
                 fontSize = 15.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
-            if (track != null) Text("on ${track.player}", color = pal.faint, fontSize = 12.sp)
+            if (track != null) Text(tr("on ${track.player}", "来自 ${track.player}"), color = pal.faint, fontSize = 12.sp)
+        }
+    }
+    val coverShown = cover.source != "none"
+    if (coverShown && cover.size >= CoverStyle.LARGE) {
+        Column(Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 6.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+            AlbumCover(cover, playback.art, playback.playing, cover.size.dp, track?.title ?: "", track?.title ?: "")
+            Spacer(Modifier.height(8.dp))
+            titleBlock(true)
+        }
+    } else {
+        Row(Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp), verticalAlignment = Alignment.CenterVertically) {
+            if (coverShown) {
+                AlbumCover(cover, playback.art, playback.playing, cover.size.dp, track?.title ?: "", track?.title ?: "")
+                Spacer(Modifier.width(14.dp))
+            }
+            Box(Modifier.weight(1f)) { titleBlock(false) }
         }
     }
 
@@ -221,7 +240,7 @@ private fun ColumnScope.NowPlayingScreen(tint: Color?, translateOn: Boolean) {
     val found = lyricsState as? LyricsState.Found
     val status = when {
         !translateOn || found == null -> null
-        found.translating -> "Finding Chinese translations…"
+        found.translating -> tr("Finding Chinese translations…", "正在查找中文翻译…")
         else -> found.note
     }
     if (status != null) {
@@ -230,21 +249,13 @@ private fun ColumnScope.NowPlayingScreen(tint: Color?, translateOn: Boolean) {
     }
 
     // lyrics
-    Box(
-        Modifier.weight(1f).fillMaxWidth().padding(horizontal = 12.dp, vertical = 6.dp)
-            .clip(RoundedCornerShape(16.dp))
-            .background(when (appLyrics.panel) {
-                "none" -> Color.Transparent
-                "colour" -> Color(appLyrics.panelColor)
-                else -> if (pal.night) (tint ?: Color(0xFF2A2A2A)).copy(alpha = .9f) else Color.Transparent
-            })
-    ) {
+    LyricsPanel(appLyrics, playback.art, Modifier.weight(1f).fillMaxWidth().padding(horizontal = 12.dp, vertical = 6.dp)) {
         when (val s = lyricsState) {
             is LyricsState.Found -> LyricsList(s.lyrics, now, playback.canSeek, translateOn)
-            is LyricsState.Loading -> Message("Loading lyrics…")
-            is LyricsState.NotFound -> Message("No synced lyrics found for this song yet")
-            is LyricsState.NetworkError -> Message("Network error, unable to fetch lyrics")
-            is LyricsState.Idle -> Message("Play a song and its lyrics will appear here, line by line.")
+            is LyricsState.Loading -> Message(tr("Loading lyrics…", "正在加载歌词…"))
+            is LyricsState.NotFound -> Message(tr("No synced lyrics found for this song yet", "暂时没有找到这首歌的同步歌词"))
+            is LyricsState.NetworkError -> Message(tr("Network error, unable to fetch lyrics", "网络错误，无法获取歌词"))
+            is LyricsState.Idle -> Message(tr("Play a song and its lyrics will appear here, line by line.", "播放一首歌，歌词会在这里逐行显示。"))
         }
     }
 
@@ -288,23 +299,25 @@ private fun LyricsList(lyrics: com.autosynced.lyrics.Lyrics, now: Long, canSeek:
                 val scale by animateFloatAsState(if (isNow) 1f else .96f, tween(300), label = "scale")
                 Column(Modifier.fillMaxWidth()
                     .clickable(enabled = lyrics.synced && canSeek) { NowPlaying.seekTo(line.timeMs) }) {
+                    val soft = appLyrics.softFocus && lyrics.synced && !isNow
                     Text(
                         line.text.ifBlank { "♪" },
                         color = color,
                         fontSize = (if (lyrics.synced) 24 else 18).sp * scale,
                         fontWeight = if (lyrics.synced) FontWeight.ExtraBold else FontWeight.SemiBold,
                         lineHeight = 30.sp,
+                        modifier = Modifier.softFocus(soft),
                     )
-                    val tr = line.translation
-                    if (translateOn && tr != null) {
+                    val lineTr = line.translation
+                    if (translateOn && lineTr != null) {
                         Text(
-                            tr,
+                            lineTr,
                             color = if (isNow || !lyrics.synced) Color(c.translation)
                                 else Color(c.translation).copy(alpha = color.alpha * .85f),
                             fontSize = 17.sp * scale,
                             fontWeight = FontWeight.SemiBold,
                             lineHeight = 23.sp,
-                            modifier = Modifier.padding(top = 2.dp),
+                            modifier = Modifier.padding(top = 2.dp).softFocus(soft),
                         )
                     }
                 }

@@ -42,12 +42,9 @@ data class FloatStyle(
     companion object {
         const val CUSTOM_FONT = "custom"
 
-        /** Font choices offered in settings: (label, Android font family). */
-        val FONTS = listOf(
-            "Default" to "sans-serif", "Medium" to "sans-serif-medium", "Light" to "sans-serif-light",
-            "Condensed" to "sans-serif-condensed", "Serif" to "serif", "Mono" to "monospace",
-            "Casual" to "casual", "Handwriting" to "cursive",
-        )
+        /** Font choices offered in settings (Android font families; their names are in the UI's labels). */
+        val FONTS = listOf("sans-serif", "sans-serif-medium", "sans-serif-light", "sans-serif-condensed", "serif",
+            "monospace", "casual", "cursive")
 
         fun fromJson(text: String?): FloatStyle {
             val d = FloatStyle()

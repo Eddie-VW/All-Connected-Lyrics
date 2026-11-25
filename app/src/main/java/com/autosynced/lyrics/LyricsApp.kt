@@ -57,7 +57,21 @@ object Prefs {
     val lockStyle: StateFlow<LockStyle> = _lockStyle
     fun setLockStyle(c: Context, v: LockStyle) { _lockStyle.value = v; p(c).edit().putString("lock_style", v.toJson()).apply() }
 
+    private val _cover = MutableStateFlow(CoverStyle())
+    val cover: StateFlow<CoverStyle> = _cover
+    fun setCover(c: Context, v: CoverStyle) { _cover.value = v; p(c).edit().putString("cover", v.toJson()).apply() }
+
+    private val _language = MutableStateFlow(Lang.EN)
+    val language: StateFlow<String> = _language
+    fun setLanguage(c: Context, v: String) {
+        _language.value = v; Lang.current = v; p(c).edit().putString("language", v).apply()
+        FloatingLyricsService.refresh(c)      // its notification, in the new language
+    }
+
     fun load(c: Context) {
+        _language.value = p(c).getString("language", null) ?: Lang.systemDefault()
+        Lang.current = _language.value
+        _cover.value = CoverStyle.fromJson(p(c).getString("cover", null))
         _appLyrics.value = AppLyricsStyle.fromJson(p(c).getString("app_lyrics", null))
         _lockStyle.value = LockStyle.fromJson(p(c).getString("lock_style", null))
         _provider.value = Provider.of(p(c).getString("provider", null))

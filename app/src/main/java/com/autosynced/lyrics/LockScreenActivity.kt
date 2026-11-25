@@ -61,10 +61,10 @@ class LockScreenActivity : ComponentActivity() {
             val found = lyricsState as? LyricsState.Found
             val synced = found?.lyrics?.takeIf { it.synced }
             val message = when (lyricsState) {
-                is LyricsState.Loading -> "Loading lyrics…"
-                is LyricsState.NotFound -> "No synced lyrics for this song"
-                is LyricsState.NetworkError -> "Couldn't fetch the lyrics"
-                is LyricsState.Found -> if (synced == null) "These lyrics have no timing" else null
+                is LyricsState.Loading -> tr("Loading lyrics…", "正在加载歌词…")
+                is LyricsState.NotFound -> tr("No synced lyrics for this song", "这首歌没有同步歌词")
+                is LyricsState.NetworkError -> tr("Couldn't fetch the lyrics", "无法获取歌词")
+                is LyricsState.Found -> if (synced == null) tr("These lyrics have no timing", "这份歌词没有时间轴") else null
                 else -> "♪"
             }
             LockScreen(

@@ -43,7 +43,7 @@ class LockStyleTest {
         val s = AppLyricsStyle(styleColors = false, current = 0xFFFFD43B.toInt(), past = 0x40FFFFFF,
             upcoming = 0x30FFFFFF, translation = 0xCC4DABF7.toInt(), panel = "colour", panelColor = 0xFF102030.toInt())
         assertEquals(s, AppLyricsStyle.fromJson(s.toJson()))
-        assertEquals("album", AppLyricsStyle.fromJson("""{"panel":"glitter"}""").panel)
+        assertEquals("glass", AppLyricsStyle.fromJson("""{"panel":"glitter"}""").panel)
         // Day style: the style's text colour, with the others see-through
         val day = AppLyricsStyle().colors(night = false, text = 0xFF1D1D1F.toInt())
         assertEquals(0xFF1D1D1F.toInt(), day.current)

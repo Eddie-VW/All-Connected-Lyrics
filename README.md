@@ -23,8 +23,12 @@ Simplified Chinese translation.
   transparency, clock and date, cover shape (incl. spinning vinyl) and size, lines before/after,
   font, sizes, spacing, bold, glow, alignment, line-change effect, colours, buttons and progress.
   Needs "Display over other apps"; some phones also need 锁屏显示 / 后台弹出界面 allowed.
-- **Main screen lyrics colours** (Settings → Main screen lyrics): current, sung, coming and
-  translation colours, their see-through, and the panel behind them.
+- **Main screen** (Settings → Main screen): the album cover's look like the PC app (presets Vinyl,
+  Spinning picture, CD, Polaroid, Floating, Breathing, Mirror, Classic, or any shape × movement,
+  speed, tonearm, glow, mirror reflection, size); the lyrics panel in Night and Day (frosted glass
+  with the cover blurred behind, cover colour, your colour, none; opacity, blur, soft-focus lines);
+  lyric colours and their see-through.
+- **English or Simplified Chinese** (Settings → Language), never mixed; follows the phone at first.
 - **译 Chinese translation** (off until you turn it on):
   1. Human translations from NetEase, QQ Music and Kugou, matched to the lyrics line by line,
      even when a site's copy is timed a little differently.

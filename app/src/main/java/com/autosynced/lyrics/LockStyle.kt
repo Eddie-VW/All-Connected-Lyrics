@@ -23,7 +23,7 @@ data class LockStyle(
     val clockBold: Boolean = false,
     val showDate: Boolean = true,
     // song
-    val cover: String = "rounded",           // none / square / rounded / circle / vinyl (spins)
+    val cover: String = "rounded",           // none / square / rounded / circle / vinyl / cd (both spin) / polaroid
     val coverSize: Int = 96,                 // dp
     val showTitle: Boolean = true,
     // lyrics
@@ -76,11 +76,9 @@ data class LockStyle(
 
     companion object {
         const val MAX_AROUND = 5
-        val BACKGROUNDS = listOf("Blurred cover" to "blur", "Cover colours" to "album", "Your colour" to "solid",
-            "Wallpaper" to "wallpaper")
-        val COVERS = listOf("None" to "none", "Square" to "square", "Rounded" to "rounded", "Circle" to "circle",
-            "Vinyl" to "vinyl")
-        val ANIMATIONS = listOf("No effect" to "none", "Fade" to "fade", "Slide up" to "slide", "Zoom" to "zoom")
+        val BACKGROUNDS = listOf("blur", "album", "solid", "wallpaper")
+        val COVERS = listOf("none", "square", "rounded", "circle", "vinyl", "cd", "polaroid")
+        val ANIMATIONS = listOf("none", "fade", "slide", "zoom")
 
         fun fromJson(text: String?): LockStyle {
             val d = LockStyle()
@@ -88,9 +86,9 @@ data class LockStyle(
             fun i(k: String, v: Int) = if (j.has(k)) j.optInt(k, v) else v
             fun f(k: String, v: Float) = if (j.has(k)) j.optDouble(k, v.toDouble()).toFloat() else v
             fun b(k: String, v: Boolean) = if (j.has(k)) j.optBoolean(k, v) else v
-            fun s(k: String, v: String, allowed: List<Pair<String, String>>? = null): String {
+            fun s(k: String, v: String, allowed: List<String>? = null): String {
                 val got = if (j.has(k)) j.optString(k, v) else v
-                return if (allowed == null || allowed.any { it.second == got }) got else v
+                return if (allowed == null || got in allowed) got else v
             }
             return LockStyle(
                 enabled = b("enabled", d.enabled), onlyWhenPlaying = b("onlyWhenPlaying", d.onlyWhenPlaying),
@@ -102,7 +100,7 @@ data class LockStyle(
                 clockBold = b("clockBold", d.clockBold), showDate = b("showDate", d.showDate),
                 cover = s("cover", d.cover, COVERS), coverSize = i("coverSize", d.coverSize).coerceIn(48, 280),
                 showTitle = b("showTitle", d.showTitle),
-                align = s("align", d.align, listOf("" to "center", "" to "left")),
+                align = s("align", d.align, listOf("center", "left")),
                 linesBefore = i("linesBefore", d.linesBefore).coerceIn(0, MAX_AROUND),
                 linesAfter = i("linesAfter", d.linesAfter).coerceIn(0, MAX_AROUND),
                 font = s("font", d.font), currentSize = i("currentSize", d.currentSize).coerceIn(14, 48),

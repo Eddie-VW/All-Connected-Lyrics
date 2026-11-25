@@ -102,7 +102,7 @@ class FloatingLyricsView(context: Context) : LinearLayout(context) {
             }, LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT))
         }
         playButton = icon(android.R.drawable.ic_media_play, Action.PlayPause)
-        translateButton = text("译", Action.Translate)
+        translateButton = text(tr("Tr", "译"), Action.Translate)
         colourDot = View(context).apply {
             layoutParams = LayoutParams(size, size).apply { marginStart = gap; marginEnd = gap }
             setOnClickListener {
@@ -153,6 +153,7 @@ class FloatingLyricsView(context: Context) : LinearLayout(context) {
 
     /** Play / pause icon and the 译 button's on/off look. */
     fun setState(isPlaying: Boolean, translate: Boolean) {
+        tr("Tr", "译").let { if (translateButton.text != it) translateButton.text = it }   // the app's language may change
         if (isPlaying != playing) {
             playing = isPlaying
             playButton.setImageResource(if (playing) android.R.drawable.ic_media_pause else android.R.drawable.ic_media_play)

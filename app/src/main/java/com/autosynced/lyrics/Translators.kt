@@ -14,18 +14,20 @@ import java.security.MessageDigest
  */
 enum class Provider(
     val id: String,
-    val label: String,
+    val labelEn: String,
+    val labelZh: String,
     val styleAware: Boolean,
     val needsKey: Boolean,
-    /** Label of the second field this service needs (Microsoft's region, Baidu's App ID), if any. */
-    val extraLabel: String? = null,
+    /** The second field this service needs (Microsoft's region, Baidu's App ID), if any: (English, Chinese). */
+    val extraEn: String? = null,
+    val extraZh: String? = null,
 ) {
-    CLAUDE("claude", "Claude", true, true),
-    OPENAI("openai", "Other AI", true, true),
-    DEEPL("deepl", "DeepL", false, true),
-    MICROSOFT("microsoft", "Microsoft", false, true, extraLabel = "Region (e.g. eastasia, global)"),
-    BAIDU("baidu", "百度翻译 Baidu", false, true, extraLabel = "APP ID"),
-    GOOGLE("google", "Google (no key)", false, false);
+    CLAUDE("claude", "Claude", "Claude", true, true),
+    OPENAI("openai", "Other AI", "其他 AI", true, true),
+    DEEPL("deepl", "DeepL", "DeepL", false, true),
+    MICROSOFT("microsoft", "Microsoft", "微软翻译", false, true, "Region (e.g. eastasia, global)", "区域（如 eastasia、global）"),
+    BAIDU("baidu", "Baidu Translate", "百度翻译", false, true, "App ID", "APP ID"),
+    GOOGLE("google", "Google (no key)", "谷歌（免密钥）", false, false);
 
     companion object {
         fun of(id: String?): Provider = entries.firstOrNull { it.id == id } ?: CLAUDE
@@ -33,20 +35,27 @@ enum class Provider(
 }
 
 /** Ready-made settings for AI services that speak the common "OpenAI-style" chat format. */
-data class AiPreset(val name: String, val baseUrl: String, val model: String, val keyFrom: String, val note: String)
+data class AiPreset(val name: String, val nameZh: String, val baseUrl: String, val model: String, val keyFrom: String,
+                    val noteEn: String, val noteZh: String)
 
 val AI_PRESETS = listOf(
-    AiPreset("DeepSeek", "https://api.deepseek.com/v1", "deepseek-chat", "platform.deepseek.com",
-        "Works in mainland China. Very cheap, often with free credit for new accounts."),
-    AiPreset("SiliconFlow 硅基流动", "https://api.siliconflow.cn/v1", "Qwen/Qwen3-8B", "cloud.siliconflow.cn",
-        "Works in mainland China. Several Qwen models are free to use."),
-    AiPreset("Gemini", "https://generativelanguage.googleapis.com/v1beta/openai", "gemini-flash-latest", "aistudio.google.com",
-        "Free tier with daily limits. Not reachable from mainland China without a VPN."),
-    AiPreset("Groq", "https://api.groq.com/openai/v1", "llama-3.3-70b-versatile", "console.groq.com",
-        "Free tier, very fast. Not reachable from mainland China without a VPN."),
-    AiPreset("OpenRouter", "https://openrouter.ai/api/v1", "deepseek/deepseek-chat-v3-0324:free", "openrouter.ai",
-        "Many models; the ones ending in “:free” cost nothing (with daily limits)."),
-    AiPreset("Custom", "", "", "", "Any service with an OpenAI-compatible chat API: enter its address and model."),
+    AiPreset("DeepSeek", "DeepSeek", "https://api.deepseek.com/v1", "deepseek-chat", "platform.deepseek.com",
+        "Works in mainland China. Very cheap, often with free credit for new accounts.",
+        "中国大陆可用。价格很低，新账户常有免费额度。"),
+    AiPreset("SiliconFlow", "硅基流动", "https://api.siliconflow.cn/v1", "Qwen/Qwen3-8B", "cloud.siliconflow.cn",
+        "Works in mainland China. Several Qwen models are free to use.",
+        "中国大陆可用。多个通义千问（Qwen）模型可免费使用。"),
+    AiPreset("Gemini", "Gemini", "https://generativelanguage.googleapis.com/v1beta/openai", "gemini-flash-latest", "aistudio.google.com",
+        "Free tier with daily limits. Not reachable from mainland China without a VPN.",
+        "有每日限额的免费额度。中国大陆需要 VPN 才能使用。"),
+    AiPreset("Groq", "Groq", "https://api.groq.com/openai/v1", "llama-3.3-70b-versatile", "console.groq.com",
+        "Free tier, very fast. Not reachable from mainland China without a VPN.",
+        "有免费额度，速度很快。中国大陆需要 VPN 才能使用。"),
+    AiPreset("OpenRouter", "OpenRouter", "https://openrouter.ai/api/v1", "deepseek/deepseek-chat-v3-0324:free", "openrouter.ai",
+        "Many models; the ones ending in “:free” cost nothing (with daily limits).",
+        "模型很多；名称以“:free”结尾的免费（有每日限额）。"),
+    AiPreset("Custom", "自定义", "", "", "", "Any service with an OpenAI-compatible chat API: enter its address and model.",
+        "任何兼容 OpenAI 聊天接口的服务：填写它的地址和模型名。"),
 )
 
 /** Everything needed to call one service: the chosen [provider], its key and extra settings. */

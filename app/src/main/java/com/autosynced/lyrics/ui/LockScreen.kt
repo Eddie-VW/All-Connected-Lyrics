@@ -61,6 +61,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.autosynced.lyrics.tr
 import com.autosynced.lyrics.FloatingLyricsView
 import com.autosynced.lyrics.Line
 import com.autosynced.lyrics.LockRows
@@ -139,7 +140,7 @@ fun LockScreen(
                 }
                 Spacer(Modifier.height(10.dp))
             }
-            Text("︿  Swipe up to unlock", color = accent.copy(alpha = 0.6f), fontSize = 12.sp,
+            Text("︿  " + tr("Swipe up to unlock", "上滑解锁"), color = accent.copy(alpha = 0.6f), fontSize = 12.sp,
                 modifier = Modifier.fillMaxWidth(), textAlign = TextAlign.Center)
         }
     }
@@ -183,7 +184,7 @@ private fun Clock(style: LockStyle, color: Color, family: FontFamily) {
     var now by remember { mutableLongStateOf(System.currentTimeMillis()) }
     LaunchedEffect(Unit) { while (true) { delay(1000); now = System.currentTimeMillis() } }
     val time = DateFormat.format(if (DateFormat.is24HourFormat(context)) "HH:mm" else "h:mm", Date(now)).toString()
-    val date = DateFormat.format("EEEE, d MMMM", Date(now)).toString()
+    val date = DateFormat.format(tr("EEEE, d MMMM", "M月d日 EEEE"), Date(now)).toString()
     Text(time, color = color, fontSize = style.clockSize.sp, fontFamily = family,
         fontWeight = if (style.clockBold) FontWeight.Bold else FontWeight.Light, lineHeight = (style.clockSize * 1.1f).sp)
     if (style.showDate) Text(date, color = color.copy(alpha = 0.75f), fontSize = 15.sp, fontFamily = family)
@@ -193,7 +194,11 @@ private fun Clock(style: LockStyle, color: Color, family: FontFamily) {
 @Composable
 private fun SongInfo(style: LockStyle, c: LockContent, accent: Color, family: FontFamily) {
     val center = style.align == "center"
-    val cover: @Composable () -> Unit = { Cover(style.cover, c.art, c.playing, style.coverSize.dp) }
+    // the same cover as the main screen draws, in the shape chosen here (vinyl and CD spin, polaroid sways)
+    val coverStyle = com.autosynced.lyrics.CoverStyle(shape = style.cover,
+        motion = when (style.cover) { "vinyl", "cd" -> "spin"; "polaroid" -> "sway"; else -> "still" },
+        speed = if (style.cover == "cd") 4 else 8, arm = false)
+    val cover: @Composable () -> Unit = { AlbumCover(coverStyle, c.art, c.playing, style.coverSize.dp, c.title, c.title) }
     val text: @Composable () -> Unit = {
         if (style.showTitle) Column(horizontalAlignment = if (center) Alignment.CenterHorizontally else Alignment.Start) {
             Text(c.title, color = accent, fontSize = 17.sp, fontWeight = FontWeight.Bold, fontFamily = family,
@@ -215,19 +220,6 @@ private fun SongInfo(style: LockStyle, c: LockContent, accent: Color, family: Fo
     }
 }
 
-@Composable
-private fun Cover(shape: String, art: Bitmap?, playing: Boolean, size: Dp) {
-    if (shape == "vinyl") { SpinningRecord(art, playing, size); return }
-    val clip = when (shape) {
-        "circle" -> CircleShape
-        "square" -> RoundedCornerShape(3.dp)
-        else -> RoundedCornerShape(size * 0.14f)
-    }
-    Box(Modifier.size(size).clip(clip).background(Color.White.copy(alpha = 0.12f)), contentAlignment = Alignment.Center) {
-        if (art != null) Image(art.asImageBitmap(), null, Modifier.fillMaxSize(), contentScale = ContentScale.Crop)
-        else Text("♪", color = Color.White.copy(alpha = 0.7f), fontSize = (size.value * 0.4f).sp)
-    }
-}
 
 // ---- lyrics ------------------------------------------------------------------------------------------
 @Composable
