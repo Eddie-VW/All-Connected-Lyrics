@@ -46,6 +46,7 @@ object LyricsRepo {
     private var started = false
     private lateinit var appContext: Context
     private val ai by lazy { AiTranslator(File(appContext.filesDir, "ai")) }
+    private val mine by lazy { MyLyrics(File(appContext.filesDir, "my_lyrics")) }
 
     fun start(context: Context) {
         if (started) return
@@ -65,7 +66,9 @@ object LyricsRepo {
                 job = launch {
                     val result = withContext(Dispatchers.IO) {
                         try {
-                            Result.success(LyricsSources.fetch(track.title, track.artist, track.album, track.durationMs / 1000.0))
+                            // your own edited lyrics always win over the online ones
+                            Result.success(mine.load(track.title, track.artist)
+                                ?: LyricsSources.fetch(track.title, track.artist, track.album, track.durationMs / 1000.0))
                         } catch (e: Exception) {
                             Result.failure(e)
                         }
@@ -164,6 +167,38 @@ object LyricsRepo {
         is AnthropicIoException, is IOException ->
             tr("couldn't reach the service (no internet, or it's blocked where you are).", "无法连接该服务（没有网络，或在你所在地区被屏蔽）。")
         else -> e.message ?: tr("unknown error.", "未知错误。")
+    }
+
+    /** Your edited lyrics for the song playing: kept for good, and shown right away. */
+    fun saveMine(lines: List<Line>) {
+        val track = NowPlaying.state.value.track ?: return
+        val clean = LyricEdits.sorted(lines.map { it.copy(text = it.text.trim(), translation = it.translation?.trim()?.ifEmpty { null }) })
+        mine.save(track.title, track.artist, clean)
+        val lyrics = Lyrics(clean, LyricEdits.isSynced(clean), MyLyrics.SOURCE)
+        cache[track.key] = lyrics
+        translated.remove(track.key)
+        show(track, lyrics)
+    }
+
+    /** Whether the song playing uses your own lyrics. */
+    fun hasMine(): Boolean = NowPlaying.state.value.track?.let { mine.has(it.title, it.artist) } ?: false
+
+    /** Forget your edits for the song playing and look the lyrics up online again. */
+    fun useOnline() {
+        val track = NowPlaying.state.value.track ?: return
+        mine.delete(track.title, track.artist)
+        cache.remove(track.key)
+        translated.remove(track.key)
+        job?.cancel(); translateJob?.cancel()
+        _state.value = LyricsState.Loading
+        job = scope.launch {
+            val found = withContext(Dispatchers.IO) {
+                try { LyricsSources.fetch(track.title, track.artist, track.album, track.durationMs / 1000.0) } catch (_: Exception) { null }
+            }
+            if (NowPlaying.state.value.track?.key != track.key) return@launch
+            cache[track.key] = found
+            if (found != null) show(track, found) else _state.value = LyricsState.NotFound
+        }
     }
 
     /** Total spent on AI translation (US$) and number of requests, for the settings screen. */

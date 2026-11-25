@@ -28,6 +28,10 @@ Simplified Chinese translation.
   speed, tonearm, glow, mirror reflection, size); the lyrics panel in Night and Day (frosted glass
   with the cover blurred behind, cover colour, your colour, none; opacity, blur, soft-focus lines);
   lyric colours and their see-through.
+- **Lyrics editor** (✎ Edit lyrics on the main screen): fix words and translations, nudge a line's
+  time or set it to "now", add / delete lines, shift the whole song, paste plain lyrics and
+  tap-sync them. Saved lyrics stay on the phone and always win over the online ones
+  ("Use online lyrics" goes back).
 - **English or Simplified Chinese** (Settings → Language), never mixed; follows the phone at first.
 - **译 Chinese translation** (off until you turn it on):
   1. Human translations from NetEase, QQ Music and Kugou, matched to the lyrics line by line,
@@ -65,6 +69,7 @@ one as an update.
 | `FloatingLyricsService.kt` | The floating lyrics window |
 | `FloatStyle.kt` / `FloatingLyricsView.kt` | Its settings, which lines it shows, and how it draws them |
 | `LockStyle.kt` / `LockScreenActivity.kt` | Lock-screen lyrics: their settings, and the screen over the lock screen |
+| `MyLyrics.kt` | Your edited lyrics (kept per song) and the editor's changes |
 | `AppLyricsStyle.kt` | Colours of the main screen's lyrics |
 | `ui/` | The main screen, the lock screen design, and the settings pages |
 

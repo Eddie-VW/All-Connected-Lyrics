@@ -98,6 +98,7 @@ fun AppScreen(
         Page.LOCK -> { LockSettingsScreen(back); return }
         Page.MAIN -> { MainScreenSettings(back); return }
         Page.TRANSLATION -> { TranslationScreen(back); return }
+        Page.EDITOR -> { LyricsEditorScreen(back); return }
         null -> {}
     }
     val bgTop by animateColorAsState(
@@ -115,7 +116,7 @@ fun AppScreen(
         if (!hasAccess) {
             AccessCard(onGrantAccess)
         } else {
-            NowPlayingScreen(tint, translateOn)
+            NowPlayingScreen(tint, translateOn, onEdit = { page = Page.EDITOR; fromHub = false })
         }
     }
 }
@@ -197,7 +198,7 @@ private fun AccessCard(onGrantAccess: () -> Unit) {
 
 // ---- now playing ----------------------------------------------------------------------------
 @Composable
-private fun ColumnScope.NowPlayingScreen(tint: Color?, translateOn: Boolean) {
+private fun ColumnScope.NowPlayingScreen(tint: Color?, translateOn: Boolean, onEdit: () -> Unit) {
     val pal = LocalPalette.current
     val appLyrics by Prefs.appLyrics.collectAsState()
     val playback by NowPlaying.state.collectAsState()
@@ -243,9 +244,17 @@ private fun ColumnScope.NowPlayingScreen(tint: Color?, translateOn: Boolean) {
         found.translating -> tr("Finding Chinese translations…", "正在查找中文翻译…")
         else -> found.note
     }
-    if (status != null) {
-        Text(status, color = pal.sub, fontSize = 12.sp, lineHeight = 16.sp,
-            modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp, vertical = 2.dp))
+    // translation status on the left; edit (or add) the lyrics on the right
+    if (track != null || status != null) {
+        Row(Modifier.fillMaxWidth().padding(start = 20.dp, end = 8.dp), verticalAlignment = Alignment.CenterVertically) {
+            Text(status ?: "", color = pal.sub, fontSize = 12.sp, lineHeight = 16.sp, modifier = Modifier.weight(1f))
+            if (track != null && lyricsState !is LyricsState.Loading) {
+                val has = lyricsState is LyricsState.Found
+                Text(if (has) tr("✎ Edit lyrics", "✎ 编辑歌词") else tr("＋ Add lyrics", "＋ 添加歌词"), color = pal.accent,
+                    fontSize = 13.sp, fontWeight = FontWeight.SemiBold,
+                    modifier = Modifier.clip(RoundedCornerShape(50)).clickable(onClick = onEdit).padding(horizontal = 10.dp, vertical = 6.dp))
+            }
+        }
     }
 
     // lyrics

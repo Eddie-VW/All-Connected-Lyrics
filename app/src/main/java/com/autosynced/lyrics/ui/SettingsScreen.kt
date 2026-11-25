@@ -46,7 +46,7 @@ import kotlinx.coroutines.delay
 import kotlin.math.roundToInt
 
 /** The settings pages, opened from the main screen's top bar (or straight from the floating window). */
-enum class Page { HUB, FLOAT, LOCK, MAIN, TRANSLATION }
+enum class Page { HUB, FLOAT, LOCK, MAIN, TRANSLATION, EDITOR }
 
 /** Settings: the language, then one row leading to each page. */
 @Composable
