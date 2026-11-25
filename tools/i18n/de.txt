@@ -1,0 +1,317 @@
+0|Schwebender Songtext (gesperrt) und Sperrbildschirm-Songtext sind an
+1|Schwebender Songtext und Sperrbildschirm-Songtext sind an
+2|Schwebender Songtext ist an (gesperrt)
+3|Schwebender Songtext ist an
+4|Sperrbildschirm-Songtext ist an
+5|Berührungen gehen durch den Text hindurch. Tippe auf „Entsperren“, um ihn wieder zu verschieben.
+6|Tippe auf den Text für die Tasten. Tippe hier, um die App zu öffnen.
+7|Zeigt den Songtext auf dem Sperrbildschirm, während Musik läuft. Tippe hier, um die App zu öffnen.
+8|Entsperren
+9|Sperren
+10|Schwebender und Sperrbildschirm-Songtext
+11|Schwebenden Songtext entsperren
+12|Schwebender Songtext entsperrt
+13|Songtext gesperrt: Berührungen gehen hindurch. Zum Entsperren die obere rechte Ecke zweimal antippen; zum Verschieben dort lange drücken und ziehen.
+14|Schwebender Songtext ausgeschaltet. Du kannst ihn in der App wieder einschalten.
+15|Songtext wird geladen…
+16|Kein synchronisierter Songtext für diesen Titel
+17|Netzwerkfehler, Songtext kann nicht geladen werden
+18|Dieser Songtext hat keine Zeitangaben
+20|Songtext konnte nicht geladen werden
+21|Einige Zeilen sind noch nicht übersetzt. Füge in den Übersetzungs-Einstellungen einen {0}-Schlüssel hinzu, um sie zu ergänzen.
+22|KI-Übersetzung fehlgeschlagen: 
+23|der API-Schlüssel wurde nicht akzeptiert. Prüfe ihn in den Übersetzungs-Einstellungen.
+24|dieser API-Schlüssel darf Claude nicht nutzen.
+25|das Claude-Konto hat kein Guthaben mehr.
+26|gerade zu viele Anfragen. Versuche es in einer Minute erneut.
+27|Claude ist gerade ausgelastet. Versuche es in einer Minute erneut.
+28|Claudes Server antwortete mit Fehler {0}.
+29|der Schlüssel wurde nicht akzeptiert. Prüfe ihn in den Übersetzungs-Einstellungen.
+30|das kostenlose Kontingent oder Guthaben des Dienstes ist aufgebraucht.
+31|der Dienst antwortete mit Fehler {0}.
+32|Dienst nicht erreichbar (kein Internet, oder dort gesperrt, wo du bist).
+33|unbekannter Fehler.
+35|Andere KI
+38|Baidu Übersetzer
+39|Google (ohne Schlüssel)
+40|Region (z. B. eastasia, global)
+43|Funktioniert in Festlandchina. Sehr günstig, oft mit Gratisguthaben für neue Konten.
+45|Funktioniert in Festlandchina. Mehrere Qwen-Modelle sind kostenlos.
+47|Kostenloser Tarif mit Tageslimits. Aus Festlandchina ohne VPN nicht erreichbar.
+49|Kostenloser Tarif, sehr schnell. Aus Festlandchina ohne VPN nicht erreichbar.
+51|Viele Modelle; die mit „:free“ am Ende kosten nichts (mit Tageslimits).
+52|Über
+54|Version {0} (Build {1})
+55|Wird geprüft…
+56|Nach Updates suchen
+57|Du hast die neueste Version.
+58|Version {0} ist da. Tippe oben, um sie herunterzuladen.
+59|Konnte nicht nach Updates suchen (kein Internet, oder die Downloadseite ist nicht öffentlich).
+60|Entwickler
+61|Die Songtexte stammen von LRCLIB, NetEase Cloud Music, QQ Music und Kugou. Sie sind urheberrechtlich geschützt; diese App zeigt sie für deinen persönlichen Gebrauch.
+62|⤡ Vollbild beenden
+63|Schwebend: an
+64|Schwebend: aus
+65|Noch ein Schritt
+66|Damit die App erkennt, was in Spotify, YouTube Music, NetEase, QQ Music oder einer anderen Musik-App läuft, musst du für diese App den Benachrichtigungszugriff einschalten.\n\nDie App liest nur, was gerade läuft – nie deine Benachrichtigungen.
+67|Benachrichtigungszugriff einschalten
+68|Suche in der Liste Lyrics Master, schalte es ein und komm zurück.
+69|Es läuft nichts
+70|Spiele einen Titel in einer Musik-App ab
+71|in {0}
+72|Übersetzungen werden gesucht…
+73|⤢ Vollbild
+74|✎ Songtext bearbeiten
+75|＋ Songtext hinzufügen
+76|Noch kein synchronisierter Songtext für diesen Titel gefunden
+77|Spiele einen Titel ab, dann erscheint sein Text hier Zeile für Zeile.
+78|In dieser Datei wurde kein Songtext gefunden (versuche .lrc, .srt, .vtt, .ass oder .txt)
+79|{0} Zeilen importiert
+80|Songtext gespeichert
+81|Datei konnte nicht gespeichert werden
+82|Cover geändert
+83|Diese Datei ist kein Bild
+84|Diese Datei ist keine Schrift, die Android nutzen kann (wähle eine .ttf- oder .otf-Datei)
+85|‹ Zurück
+86|Schwebender Songtext
+87|Zurücksetzen
+88|Größe
+89|Fensterbreite
+90|Deckkraft
+91|Hintergrund
+92|keiner
+93|Hintergrund, wenn Tasten angezeigt werden
+94|Tippe auf den schwebenden Text, um die Tasten zu zeigen; das Feld dahinter macht sie gut sichtbar.
+95|Abgerundete Ecken
+96|Zeilen
+97|Zeilen vor der aktuellen
+98|Zeilen nach der aktuellen
+99|Titel und Interpret oben
+100|Übersetzung unter der aktuellen Zeile
+101|Text
+102|Schriftart
+103|Eigene Schrift ✓
+104|Eigene Schrift…
+105|„Eigene Schrift…“ wählt eine .ttf- oder .otf-Datei vom Handy, z. B. eine heruntergeladene Schrift.
+106|Größe der aktuellen Zeile
+107|Aktuelle Zeile fett
+108|Größe der Übersetzung
+109|Größe der anderen Zeilen
+110|Titelgröße
+111|Ausrichtung
+112|Umriss um die Buchstaben
+113|Hält den Text auf jedem Hintergrund lesbar, z. B. ohne Hintergrundfeld.
+114|Umrissstärke
+115|Umrissfarbe
+116|Farben
+117|Aktuelle Zeile (Songtext)
+118|Übersetzung
+119|Andere Zeilen
+120|Titel und Interpret
+121|Dem Nacht-/Tag-Stil der App folgen
+122|An: Die Farben folgen dem Aussehen der App (eine Farbe oben zu wählen schaltet dies aus).
+123|Verhalten
+124|Beim Zeilenwechsel
+125|Kein Effekt
+126|Fenster sperren
+127|Berührungen gehen zur App darunter durch. In der oberen rechten Ecke liegt ein unsichtbarer Sperrpunkt: zweimal tippen zum Entsperren, lange drücken und ziehen zum Verschieben. Die Benachrichtigung und dieser Schalter entsperren es auch. (Android lässt ein gesperrtes Fenster leicht durchscheinen.)
+128|Timing
+129|unverändert
+130|%.1f s früher
+131|%.1f s später
+132|Kommt der Text zu spät (z. B. mit Bluetooth-Kopfhörern), schiebe dies nach rechts.
+133|Beispieltitel — Beispielinterpret
+134|Farbton
+135|Sättigung
+136|Helligkeit
+137|Diese Farbe verwenden
+138|Abbrechen
+139|Leuchten um die aktuelle Zeile
+140|Leuchtfarbe
+141|Wie die Zeile
+142|Leuchtstärke
+143|Leuchtunschärfe
+144|Standard
+145|Medium
+146|Leicht
+147|Schmal
+148|Serif
+149|Mono
+150|Locker
+151|Handschrift
+152|Unscharfes Cover
+153|Cover-Farben
+154|Eigene Farbe
+155|Hintergrundbild
+156|Milchglas
+157|Keiner
+158|Farbmischung
+159|Quadrat
+160|Abgerundet
+161|Kreis
+162|Vinyl
+164|Polaroid
+165|Still
+166|Drehen
+167|Schweben
+168|Schwingen
+169|Pulsieren
+170|Kippen (ziehen)
+171|Drehendes Bild
+172|Schwebend
+173|Atmend
+174|Spiegel
+175|Klassisch
+176|Überblenden
+177|Nach oben schieben
+178|Zoom
+179|Mitte
+180|Links
+181|Zum Entsperren nach oben wischen
+182|EEEE, d. MMMM
+183|Beispieltitel
+184|Beispielinterpret
+185|Sperrbildschirm-Songtext
+186|Songtext auf dem Sperrbildschirm zeigen
+187|Geht der Bildschirm aus, während Musik läuft, wartet der Text beim Aufwecken auf dem Sperrbildschirm. Zum Entsperren nach oben wischen.
+188|⚠ Benötigt „Über anderen Apps einblenden“ (Android lässt die App den Text nur damit öffnen). Erlaube es auf dem geöffneten Bildschirm und komm zurück.
+189|Manche Handys (Xiaomi, OPPO, vivo, Huawei…) brauchen für diese App zusätzlich „Auf dem Sperrbildschirm anzeigen“ und „Neue Fenster im Hintergrund öffnen“.
+190|Berechtigungen dieser App öffnen
+191|Nur während Musik läuft
+192|Aus: auch wenn der Titel pausiert ist.
+193|Bildschirm eingeschaltet lassen
+194|Verhindert, dass der Bildschirm dunkel wird, solange der Text angezeigt wird (braucht mehr Akku).
+195|Unschärfe
+196|Hintergrundfarbe
+197|Zeigt das Hintergrundbild des Handys hinter dem Text.
+198|Hintergrund abdunkeln
+199|Transparenz
+200|Uhr, Cover, Text und Tasten
+201|Uhr
+202|Uhr anzeigen
+203|Uhrgröße
+204|Uhr fett
+205|Datum anzeigen
+206|Titel
+207|Cover
+208|Covergröße
+209|Titel und Interpret
+210|Songtext
+211|Eigene Schrift
+212|„Eigene Schrift“ erscheint hier, nachdem du in den Einstellungen des schwebenden Textes eine Schriftdatei gewählt hast.
+213|Zeilenabstand
+214|Aktuelle Zeile
+215|Uhr, Titel und Tasten
+216|Klassisches Weiß
+217|Weißer Text, der auf jedem Hintergrund gut lesbar ist (eine Farbe oben zu wählen schaltet dies aus).
+218|Extras
+219|Tasten für Wiedergabe/Pause und Springen
+220|Fortschrittslinie des Titels
+221|Songtext bearbeiten
+222|Speichern
+223|Tipp-Sync beenden
+224|Tipp-Sync
+225|Songtext einfügen
+226|Datei importieren
+227|Als .{0} exportieren
+228|Alles 0,5 s früher
+229|Alles 0,5 s später
+230|Online-Songtext verwenden
+231|Alle Zeilen haben Zeiten. Prüfe sie, dann Speichern.
+232|Spiele den Titel von Anfang an und tippe, wenn diese Zeile beginnt:
+233|Beginnt jetzt
+234|Eine zurück
+235|Noch kein Songtext. Füge ihn ein (von einer beliebigen Website) und synchronisiere ihn dann per Tippen.
+236|Jetzt
+237|Textzeile
+238|＋ Zeile am Ende hinzufügen
+239|Änderungen speichern?
+240|Du hast diesen Songtext geändert.
+241|Verwerfen
+242|Eine Zeile pro Textzeile. Ersetzt die Zeilen im Editor; synchronisiere sie danach per Tippen.
+243|Diesen Songtext verwenden
+244|Einstellungen
+245|Sprache
+246|Hauptbildschirm
+247|Aussehen des Covers, Textfarben und das Feld dahinter
+248|Größe, Zeilen, Schrift, Farben, Umriss, Tasten, Sperre, Timing
+249|An · Hintergrund, Uhr, Cover, Text, Farben
+250|Aus · Songtext auf dem Sperrbildschirm zeigen
+251|An · nach {0} · Dienste und Schlüssel
+252|Aus · Sprache, Dienste und Schlüssel
+253|Version {0} · Updates · Entwickler
+254|Kein Cover
+255|Albumcover
+256|Voreinstellungen
+257|Bild
+258|Albumbild
+259|Form
+260|Bewegung beim Abspielen
+261|Tempo (Sekunden pro Bewegung)
+262|{0} s
+263|Tonarm
+264|Liegt beim Abspielen auf der Platte.
+265|Leuchten
+266|Ein sanftes Leuchten in der Farbe des Albums.
+267|Spiegelung
+268|Das Cover darunter gespiegelt, wie auf einer glänzenden Fläche.
+269|Größe auf dem Hauptbildschirm
+270|Ab {0} steht das Cover über dem Titel.
+271|Feld hinter dem Songtext
+272|Milchglas: das Cover unscharf hinter einem hellen (Tag) oder dunklen (Nacht) Schleier.
+273|In der Hauptfarbe des Covers getönt.
+274|Feldfarbe
+275|Deckkraft des Felds
+276|Vollbild
+277|Der Hintergrund des Felds füllt den ganzen Bildschirm, wie der Sperrbildschirm. Auch über die Taste ⤢ über dem Text.
+278|Lebendig leuchtender Hintergrund
+279|Im Vollbild treiben sanft leuchtende Farben aus dem Cover langsam hinter dem Text.
+280|Weichgezeichneter Text
+281|Zeilen außer der aktuellen werden leicht unscharf (Android 12 und neuer).
+282|Textfarben
+283|Bereits gesungene Zeilen
+284|Kommende Zeilen
+285|Eine Farbe oben zu wählen schaltet dies aus.
+286|Bereits gesungene Zeilen: Deckkraft
+287|Kommende Zeilen: Deckkraft
+288|Dieser Titel
+289|Spiele einen Titel ab, um seinen Text zu importieren oder sein Cover zu ändern.
+290|Songtext-Datei
+291|Importieren…
+292|Importiere .lrc, .srt, .vtt, .ass oder .txt: Das wird der Text dieses Titels (auf diesem Handy gespeichert, jederzeit bearbeitbar).
+293|Coverbild
+294|Bild auswählen…
+295|Original verwenden
+296|Wird für alle Titel des Albums „{0}“ verwendet.
+297|Dieser Titel hat keinen Albumnamen, daher gilt das Bild nur für ihn.
+298|Am besten darin, Genre und Ton jedes Titels zu treffen. Schlüssel unter console.anthropic.com → API Keys. Der Max-Tarif enthält monatliches API-Guthaben; sonst etwa ein paar Cent pro Titel.
+299|DeepSeek, SiliconFlow, Gemini, Groq, OpenRouter und andere. Erhalten dieselben genrebezogenen Stilvorgaben wie Claude. Wähle unten einen Dienst und füge einen Schlüssel von dessen Website ein.
+300|Wörtlicher Stil. DeepL API Free: 500.000 Zeichen im Monat (Hunderte Titel). Schlüssel unter deepl.com → API (kostenlose Schlüssel enden auf „:fx“). Funktioniert meist in Festlandchina.
+301|Wörtlicher Stil. Kostenloser Tarif von Azure Translator: etwa 2 Millionen Zeichen im Monat. Erstelle eine Translator-Ressource auf portal.azure.com und kopiere Schlüssel und Region. Funktioniert meist in Festlandchina.
+302|Wörtlicher Stil, stark bei Chinesisch. Monatliches Gratiskontingent nach Kontoprüfung auf fanyi-api.baidu.com; die Entwicklerinfo-Seite zeigt App ID und Schlüssel. Funktioniert in Festlandchina.
+303|Wörtlicher Stil, nichts einzurichten. Nutzt den kostenlosen Webzugang von Google Übersetzer, der kein offizieller Dienst ist und aufhören könnte zu funktionieren. Aus Festlandchina ohne VPN nicht erreichbar.
+304|Übersetzung anzeigen
+305|Eine Übersetzung unter jeder Zeile – in der App, im schwebenden Text und auf dem Sperrbildschirm.
+306|Übersetzen in
+307|Menschliche Übersetzungen von NetEase, QQ Music und Kugou zuerst; der Dienst unten ergänzt den Rest.
+308|Musikseiten haben nur Übersetzungen ins vereinfachte Chinesisch, daher übersetzt der Dienst unten jede Zeile.
+309|Mit einem Dienst übersetzen
+310|Zeilen ohne menschliche Übersetzung übersetzt der unten gewählte Dienst.
+311|Dienst
+312|KI · passt sich dem Stil des Titels an
+313|Übersetzer · wörtlicher Stil
+314|KI-Dienst
+315| Schlüssel unter {0}.
+316|Adresse (Basis-URL)
+317|Modell
+318|Modellname
+319|Modellnamen ändern sich ab und zu. Meldet der Dienst, das Modell gebe es nicht, kopiere einen aktuellen Namen von seiner Website hierher.
+320|Geheimer Schlüssel
+321|API-Schlüssel
+322|••••••••  (gespeichert; zum Ersetzen einfügen)
+323|Schlüssel hier einfügen
+324|Schlüssel entfernen
+325|Gespeichert ✓
+326|Claude-Übersetzung bisher: US$
+327|Benutzerdefiniert
+328|Jeder Dienst mit einer OpenAI-kompatiblen Chat-API: Adresse und Modell eingeben.

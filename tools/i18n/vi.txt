@@ -1,0 +1,317 @@
+0|Lời bài hát nổi (đã khóa) và lời trên màn hình khóa đang bật
+1|Lời bài hát nổi và lời trên màn hình khóa đang bật
+2|Lời bài hát nổi đang bật (đã khóa)
+3|Lời bài hát nổi đang bật
+4|Lời trên màn hình khóa đang bật
+5|Thao tác chạm xuyên qua lời. Nhấn Mở khóa để di chuyển lại.
+6|Nhấn vào lời để hiện nút. Nhấn vào đây để mở ứng dụng.
+7|Hiện lời trên màn hình khóa khi đang phát nhạc. Nhấn vào đây để mở ứng dụng.
+8|Mở khóa
+9|Khóa
+10|Lời nổi và lời trên màn hình khóa
+11|Mở khóa lời bài hát nổi
+12|Đã mở khóa lời bài hát nổi
+13|Đã khóa lời: thao tác chạm xuyên qua. Để mở khóa, nhấn đúp vào góc trên bên phải; để di chuyển, nhấn giữ ở đó rồi kéo.
+14|Đã tắt lời bài hát nổi. Bật lại trong ứng dụng.
+15|Đang tải lời…
+16|Bài này không có lời đồng bộ
+17|Lỗi mạng, không lấy được lời
+18|Lời này không có mốc thời gian
+20|Không lấy được lời
+21|Một số dòng chưa có bản dịch. Thêm khóa {0} trong cài đặt Dịch để bổ sung.
+22|Dịch bằng AI thất bại: 
+23|khóa API không được chấp nhận. Kiểm tra trong cài đặt Dịch.
+24|khóa API này không được phép dùng Claude.
+25|tài khoản Claude đã hết tín dụng.
+26|quá nhiều yêu cầu lúc này. Thử lại sau một phút.
+27|Claude đang bận. Thử lại sau một phút.
+28|Máy chủ Claude trả về lỗi {0}.
+29|khóa không được chấp nhận. Kiểm tra trong cài đặt Dịch.
+30|đã dùng hết hạn mức miễn phí hoặc tín dụng của dịch vụ.
+31|dịch vụ trả về lỗi {0}.
+32|không kết nối được dịch vụ (không có mạng, hoặc bị chặn ở nơi bạn ở).
+33|lỗi không xác định.
+35|AI khác
+38|Baidu Dịch
+39|Google (không cần khóa)
+40|Vùng (vd. eastasia, global)
+43|Dùng được ở Trung Quốc đại lục. Rất rẻ, tài khoản mới thường có tín dụng miễn phí.
+45|Dùng được ở Trung Quốc đại lục. Một số mô hình Qwen miễn phí.
+47|Gói miễn phí có giới hạn mỗi ngày. Không dùng được ở Trung Quốc đại lục nếu không có VPN.
+49|Gói miễn phí, rất nhanh. Không dùng được ở Trung Quốc đại lục nếu không có VPN.
+51|Nhiều mô hình; mô hình kết thúc bằng “:free” thì miễn phí (có giới hạn mỗi ngày).
+52|Giới thiệu
+54|Phiên bản {0} (bản dựng {1})
+55|Đang kiểm tra…
+56|Kiểm tra cập nhật
+57|Bạn đang dùng phiên bản mới nhất.
+58|Đã có phiên bản {0}. Nhấn phía trên để tải về.
+59|Không kiểm tra được cập nhật (không có mạng, hoặc trang tải về không công khai).
+60|Nhà phát triển
+61|Lời bài hát lấy từ LRCLIB, NetEase Cloud Music, QQ Music và Kugou. Bản quyền lời thuộc về chủ sở hữu; ứng dụng chỉ hiển thị cho mục đích cá nhân của bạn.
+62|⤡ Thoát toàn màn hình
+63|Nổi: bật
+64|Nổi: tắt
+65|Còn một bước nữa
+66|Để biết bài nào đang phát trong Spotify, YouTube Music, NetEase, QQ Music hay ứng dụng nhạc khác, Android cần bạn bật quyền truy cập thông báo cho ứng dụng này.\n\nỨng dụng chỉ đọc bài đang phát; không bao giờ đọc thông báo của bạn.
+67|Bật quyền truy cập thông báo
+68|Trong danh sách mở ra, tìm Lyrics Master, bật lên rồi quay lại.
+69|Không có bài nào đang phát
+70|Phát một bài trong bất kỳ ứng dụng nhạc nào
+71|trên {0}
+72|Đang tìm bản dịch…
+73|⤢ Toàn màn hình
+74|✎ Sửa lời
+75|＋ Thêm lời
+76|Chưa tìm thấy lời đồng bộ cho bài này
+77|Phát một bài, lời sẽ hiện ở đây từng dòng.
+78|Không tìm thấy lời trong tệp đó (thử .lrc, .srt, .vtt, .ass hoặc .txt)
+79|Đã nhập {0} dòng
+80|Đã lưu lời
+81|Không lưu được tệp
+82|Đã đổi ảnh bìa
+83|Tệp đó không phải hình ảnh
+84|Tệp đó không phải phông chữ Android dùng được (chọn tệp .ttf hoặc .otf)
+85|‹ Quay lại
+86|Lời bài hát nổi
+87|Đặt lại
+88|Kích thước
+89|Độ rộng cửa sổ
+90|Độ mờ đục
+91|Nền
+92|không có
+93|Nền khi hiện nút
+94|Nhấn vào lời nổi để hiện nút; ô nền phía sau giúp nút dễ nhìn.
+95|Bo góc
+96|Dòng
+97|Số dòng trước dòng hiện tại
+98|Số dòng sau dòng hiện tại
+99|Tên bài & nghệ sĩ ở trên
+100|Bản dịch dưới dòng hiện tại
+101|Chữ
+102|Phông chữ
+103|Phông của bạn ✓
+104|Phông của bạn…
+105|“Phông của bạn…” chọn tệp .ttf hoặc .otf trên điện thoại, vd. phông bạn đã tải về.
+106|Cỡ dòng hiện tại
+107|In đậm dòng hiện tại
+108|Cỡ bản dịch
+109|Cỡ các dòng khác
+110|Cỡ tiêu đề
+111|Căn lề
+112|Viền quanh chữ
+113|Giữ chữ dễ đọc trên mọi nền, vd. khi không có ô nền.
+114|Độ dày viền
+115|Màu viền
+116|Màu sắc
+117|Dòng hiện tại (lời)
+118|Bản dịch
+119|Các dòng khác
+120|Tên bài & nghệ sĩ
+121|Theo kiểu Đêm / Ngày của ứng dụng
+122|Bật: màu theo giao diện ứng dụng (chọn một màu phía trên sẽ tắt mục này).
+123|Hoạt động
+124|Khi đổi dòng
+125|Không hiệu ứng
+126|Khóa cửa sổ
+127|Thao tác chạm đi xuyên xuống ứng dụng bên dưới. Góc trên bên phải có một điểm khóa ẩn: nhấn đúp để mở khóa, hoặc nhấn giữ rồi kéo để di chuyển cửa sổ. Thông báo và công tắc này cũng mở khóa được. (Android để cửa sổ bị khóa hơi trong suốt.)
+128|Thời gian
+129|giữ nguyên
+130|sớm hơn %.1f giây
+131|muộn hơn %.1f giây
+132|Nếu lời đến trễ (vd. dùng tai nghe Bluetooth), kéo sang phải.
+133|Bài mẫu — Nghệ sĩ mẫu
+134|Sắc độ
+135|Độ đậm
+136|Độ sáng
+137|Dùng màu này
+138|Hủy
+139|Phát sáng quanh dòng hiện tại
+140|Màu phát sáng
+141|Giống màu dòng
+142|Độ mạnh phát sáng
+143|Độ nhòe phát sáng
+144|Mặc định
+145|Vừa
+146|Mảnh
+147|Hẹp
+148|Có chân
+149|Đơn cách
+150|Thoải mái
+151|Viết tay
+152|Bìa làm mờ
+153|Màu của bìa
+154|Màu của bạn
+155|Hình nền
+156|Kính mờ
+157|Không có
+158|Trộn màu
+159|Vuông
+160|Bo tròn
+161|Tròn
+162|Đĩa than
+164|Polaroid
+165|Đứng yên
+166|Xoay
+167|Trôi nổi
+168|Đung đưa
+169|Nhịp đập
+170|Nghiêng (kéo)
+171|Ảnh xoay
+172|Trôi nổi
+173|Hơi thở
+174|Gương
+175|Cổ điển
+176|Mờ dần
+177|Trượt lên
+178|Phóng to
+179|Giữa
+180|Trái
+181|Vuốt lên để mở khóa
+182|EEEE, d MMMM
+183|Bài mẫu
+184|Nghệ sĩ mẫu
+185|Lời trên màn hình khóa
+186|Hiện lời trên màn hình khóa
+187|Khi màn hình tắt lúc đang phát nhạc, lời sẽ chờ sẵn trên màn hình khóa khi bạn bật điện thoại. Vuốt lên để mở khóa.
+188|⚠ Cần quyền “Hiển thị trên ứng dụng khác” (Android chỉ cho ứng dụng mở lời khi có quyền này). Cho phép ở màn hình vừa mở, rồi quay lại.
+189|Một số điện thoại (Xiaomi, OPPO, vivo, Huawei…) còn cần cho phép “Hiển thị trên màn hình khóa” và “Mở cửa sổ mới khi chạy nền” cho ứng dụng này.
+190|Mở quyền của ứng dụng này
+191|Chỉ khi đang phát nhạc
+192|Tắt: hiện cả khi bài hát tạm dừng.
+193|Giữ màn hình luôn sáng
+194|Không để màn hình tối đi khi đang hiện lời (tốn pin hơn).
+195|Độ mờ
+196|Màu nền
+197|Hiện hình nền điện thoại phía sau lời.
+198|Làm tối nền
+199|Độ trong suốt
+200|Đồng hồ, bìa, lời & nút
+201|Đồng hồ
+202|Hiện đồng hồ
+203|Cỡ đồng hồ
+204|Đồng hồ in đậm
+205|Hiện ngày
+206|Bài hát
+207|Bìa
+208|Cỡ bìa
+209|Tên bài & nghệ sĩ
+210|Lời bài hát
+211|Phông của bạn
+212|“Phông của bạn” xuất hiện ở đây sau khi bạn chọn tệp phông trong cài đặt lời nổi.
+213|Khoảng cách dòng
+214|Dòng hiện tại
+215|Đồng hồ, tên bài & nút
+216|Trắng cổ điển
+217|Chữ trắng dễ đọc trên mọi nền (chọn một màu phía trên sẽ tắt mục này).
+218|Thêm
+219|Nút phát / tạm dừng và chuyển bài
+220|Thanh tiến trình bài hát
+221|Sửa lời
+222|Lưu
+223|Dừng đồng bộ bằng chạm
+224|Đồng bộ bằng chạm
+225|Dán lời
+226|Nhập tệp
+227|Xuất .{0}
+228|Tất cả sớm hơn 0,5 giây
+229|Tất cả muộn hơn 0,5 giây
+230|Dùng lời trực tuyến
+231|Mọi dòng đã có thời gian. Kiểm tra rồi Lưu.
+232|Phát bài từ đầu và nhấn khi dòng này bắt đầu:
+233|Bắt đầu ngay
+234|Lùi một dòng
+235|Chưa có lời. Dán lời (từ trang bất kỳ) rồi đồng bộ bằng chạm.
+236|Bây giờ
+237|Dòng lời
+238|＋ Thêm một dòng ở cuối
+239|Lưu thay đổi?
+240|Bạn đã sửa lời này.
+241|Bỏ
+242|Mỗi dòng là một câu lời. Sẽ thay các dòng trong trình sửa; sau đó đồng bộ bằng chạm.
+243|Dùng lời này
+244|Cài đặt
+245|Ngôn ngữ
+246|Màn hình chính
+247|Kiểu bìa album, màu lời và bảng phía sau
+248|Kích thước, dòng, phông, màu, viền, nút, khóa, thời gian
+249|Bật · nền, đồng hồ, bìa, lời, màu
+250|Tắt · hiện lời trên màn hình khóa
+251|Bật · sang {0} · dịch vụ và khóa
+252|Tắt · ngôn ngữ, dịch vụ và khóa
+253|Phiên bản {0} · cập nhật · nhà phát triển
+254|Không có bìa
+255|Bìa album
+256|Mẫu có sẵn
+257|Hình
+258|Ảnh bìa album
+259|Hình dạng
+260|Chuyển động khi phát
+261|Tốc độ (giây mỗi chuyển động)
+262|{0} giây
+263|Cần đĩa
+264|Đặt trên đĩa khi đang phát.
+265|Phát sáng
+266|Ánh sáng dịu theo màu album.
+267|Phản chiếu gương
+268|Bìa phản chiếu bên dưới, như trên mặt bóng loáng.
+269|Kích thước trên màn hình chính
+270|Từ {0} trở lên, bìa nằm phía trên tên bài.
+271|Bảng phía sau lời
+272|Kính mờ: bìa album làm mờ sau lớp màn sáng (Ngày) hoặc tối (Đêm).
+273|Nhuộm theo màu chính của bìa album.
+274|Màu bảng
+275|Độ mờ đục của bảng
+276|Toàn màn hình
+277|Nền của bảng phủ kín màn hình, như màn hình khóa. Hoặc dùng nút ⤢ phía trên lời.
+278|Nền phát sáng sống động
+279|Ở chế độ toàn màn hình, những mảng màu dịu phát sáng từ bìa trôi chầm chậm phía sau lời.
+280|Lời lấy nét mềm
+281|Các dòng khác dòng hiện tại hơi mờ (Android 12 trở lên).
+282|Màu lời
+283|Dòng đã hát
+284|Dòng sắp tới
+285|Chọn một màu phía trên sẽ tắt mục này.
+286|Dòng đã hát: độ mờ đục
+287|Dòng sắp tới: độ mờ đục
+288|Bài này
+289|Phát một bài để nhập lời hoặc đổi ảnh bìa.
+290|Tệp lời
+291|Nhập…
+292|Nhập .lrc, .srt, .vtt, .ass hoặc .txt: thành lời của bài này (lưu trên điện thoại, sửa lúc nào cũng được).
+293|Ảnh bìa
+294|Chọn ảnh…
+295|Dùng ảnh gốc
+296|Dùng cho mọi bài trong album “{0}”.
+297|Bài này không có tên album nên ảnh chỉ dùng cho bài này.
+298|Giỏi nhất trong việc bắt đúng thể loại và cảm xúc của từng bài. Lấy khóa tại console.anthropic.com → API Keys. Gói Max có tín dụng API hằng tháng; nếu không, khoảng vài xu mỗi bài.
+299|DeepSeek, SiliconFlow, Gemini, Groq, OpenRouter và khác. Nhận cùng hướng dẫn phong cách theo thể loại như Claude. Chọn dịch vụ bên dưới rồi dán khóa từ trang của dịch vụ đó.
+300|Kiểu dịch sát nghĩa. DeepL API Free: 500.000 ký tự mỗi tháng (hàng trăm bài). Lấy khóa tại deepl.com → API (khóa miễn phí kết thúc bằng “:fx”). Thường dùng được ở Trung Quốc đại lục.
+301|Kiểu dịch sát nghĩa. Gói miễn phí Azure Translator: khoảng 2 triệu ký tự mỗi tháng. Tạo tài nguyên Translator tại portal.azure.com, rồi sao chép khóa và vùng. Thường dùng được ở Trung Quốc đại lục.
+302|Kiểu dịch sát nghĩa, mạnh về tiếng Trung. Có hạn mức miễn phí hằng tháng sau khi xác minh tài khoản tại fanyi-api.baidu.com; trang thông tin nhà phát triển có App ID và khóa. Dùng được ở Trung Quốc đại lục.
+303|Kiểu dịch sát nghĩa, không cần cài đặt. Dùng truy cập web miễn phí của Google Dịch, không phải dịch vụ chính thức và có thể ngừng hoạt động. Không dùng được ở Trung Quốc đại lục nếu không có VPN.
+304|Hiện bản dịch
+305|Bản dịch dưới mỗi dòng, trong ứng dụng, lời nổi và màn hình khóa.
+306|Dịch sang
+307|Ưu tiên bản dịch do người dịch từ NetEase, QQ Music và Kugou; dịch vụ bên dưới bổ sung phần còn lại.
+308|Các trang nhạc chỉ có bản dịch tiếng Trung giản thể, nên dịch vụ bên dưới dịch mọi dòng.
+309|Dịch bằng dịch vụ
+310|Dòng chưa có bản dịch do người dịch sẽ được dịch vụ bạn chọn bên dưới dịch.
+311|Dịch vụ
+312|AI · hợp phong cách bài hát
+313|Công cụ dịch · kiểu sát nghĩa
+314|Dịch vụ AI
+315| Lấy khóa tại {0}.
+316|Địa chỉ (base URL)
+317|Mô hình
+318|tên mô hình
+319|Tên mô hình thỉnh thoảng thay đổi. Nếu dịch vụ báo mô hình không tồn tại, hãy sao chép tên hiện tại từ trang của họ vào ô này.
+320|Khóa bí mật
+321|Khóa API
+322|••••••••  (đã lưu; dán khóa mới để thay)
+323|dán khóa của bạn vào đây
+324|Xóa khóa
+325|Đã lưu ✓
+326|Chi phí dịch bằng Claude đến nay: US$
+327|Tùy chỉnh
+328|Bất kỳ dịch vụ nào có API chat tương thích OpenAI: nhập địa chỉ và mô hình.

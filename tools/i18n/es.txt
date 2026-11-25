@@ -1,0 +1,317 @@
+0|Letra flotante (bloqueada) y letra en pantalla de bloqueo activadas
+1|Letra flotante y letra en pantalla de bloqueo activadas
+2|Letra flotante activada (bloqueada)
+3|Letra flotante activada
+4|Letra en pantalla de bloqueo activada
+5|Los toques atraviesan la letra. Toca Desbloquear para moverla de nuevo.
+6|Toca la letra para ver los botones. Toca aquí para abrir la app.
+7|Muestra la letra en la pantalla de bloqueo mientras suena música. Toca aquí para abrir la app.
+8|Desbloquear
+9|Bloquear
+10|Letra flotante y de pantalla de bloqueo
+11|Desbloquear la letra flotante
+12|Letra flotante desbloqueada
+13|Letra bloqueada: los toques la atraviesan. Para desbloquear, toca dos veces su esquina superior derecha; para moverla, mantén pulsado ahí y arrastra.
+14|Letra flotante desactivada. Puedes volver a activarla en la app.
+15|Cargando letra…
+16|No hay letra sincronizada para esta canción
+17|Error de red, no se pudo obtener la letra
+18|Esta letra no tiene tiempos
+20|No se pudo obtener la letra
+21|Algunas líneas aún no tienen traducción. Añade una clave de {0} en los ajustes de Traducción para completarlas.
+22|La traducción con IA falló: 
+23|la clave API no fue aceptada. Revísala en los ajustes de Traducción.
+24|esta clave API no tiene permiso para usar Claude.
+25|la cuenta de Claude no tiene crédito.
+26|demasiadas solicitudes ahora. Inténtalo de nuevo en un minuto.
+27|Claude está ocupado ahora. Inténtalo de nuevo en un minuto.
+28|El servidor de Claude respondió con el error {0}.
+29|la clave no fue aceptada. Revísala en los ajustes de Traducción.
+30|se agotó el uso gratuito o el crédito del servicio.
+31|el servicio respondió con el error {0}.
+32|no se pudo conectar con el servicio (sin internet, o está bloqueado donde estás).
+33|error desconocido.
+35|Otra IA
+38|Baidu Traductor
+39|Google (sin clave)
+40|Región (p. ej. eastasia, global)
+43|Funciona en China continental. Muy barato, a menudo con crédito gratis para cuentas nuevas.
+45|Funciona en China continental. Varios modelos Qwen son gratuitos.
+47|Plan gratuito con límites diarios. No accesible desde China continental sin VPN.
+49|Plan gratuito, muy rápido. No accesible desde China continental sin VPN.
+51|Muchos modelos; los que terminan en “:free” no cuestan nada (con límites diarios).
+52|Acerca de
+54|Versión {0} (compilación {1})
+55|Comprobando…
+56|Buscar actualizaciones
+57|Tienes la última versión.
+58|Ya está disponible la versión {0}. Toca arriba para descargarla.
+59|No se pudo buscar actualizaciones (sin internet, o la página de descarga no es pública).
+60|Desarrollador
+61|Las letras provienen de LRCLIB, NetEase Cloud Music, QQ Music y Kugou. Las letras pertenecen a sus titulares; esta app las muestra para tu uso personal.
+62|⤡ Salir de pantalla completa
+63|Flotante: sí
+64|Flotante: no
+65|Un paso para empezar
+66|Para saber qué canción suena en Spotify, YouTube Music, NetEase, QQ Music u otra app de música, Android necesita que actives el acceso a notificaciones para esta app.\n\nLa app solo lee lo que suena; nunca lee tus notificaciones.
+67|Activar acceso a notificaciones
+68|En la lista que se abre, busca Lyrics Master, actívalo y vuelve.
+69|No suena nada
+70|Reproduce una canción en cualquier app de música
+71|en {0}
+72|Buscando traducciones…
+73|⤢ Pantalla completa
+74|✎ Editar letra
+75|＋ Añadir letra
+76|Aún no se encontró letra sincronizada para esta canción
+77|Reproduce una canción y su letra aparecerá aquí, línea a línea.
+78|No se encontró letra en ese archivo (prueba .lrc, .srt, .vtt, .ass o .txt)
+79|{0} líneas importadas
+80|Letra guardada
+81|No se pudo guardar el archivo
+82|Portada cambiada
+83|Ese archivo no es una imagen
+84|Ese archivo no es una fuente que Android pueda usar (elige un .ttf o .otf)
+85|‹ Atrás
+86|Letra flotante
+87|Restablecer
+88|Tamaño
+89|Ancho de la ventana
+90|Opacidad
+91|Fondo
+92|ninguno
+93|Fondo mientras se ven los botones
+94|Toca la letra flotante para ver los botones; el recuadro de detrás los hace fáciles de ver.
+95|Esquinas redondeadas
+96|Líneas
+97|Líneas antes de la actual
+98|Líneas después de la actual
+99|Título y artista arriba
+100|Traducción bajo la línea actual
+101|Texto
+102|Fuente
+103|Tu fuente ✓
+104|Tu fuente…
+105|“Tu fuente…” elige un archivo .ttf u .otf de tu teléfono, p. ej. una fuente que descargaste.
+106|Tamaño de la línea actual
+107|Línea actual en negrita
+108|Tamaño de la traducción
+109|Tamaño de las otras líneas
+110|Tamaño del título
+111|Alineación
+112|Contorno de las letras
+113|Mantiene el texto legible sobre cualquier fondo, p. ej. sin recuadro de fondo.
+114|Grosor del contorno
+115|Color del contorno
+116|Colores
+117|Línea actual (letra)
+118|Traducción
+119|Otras líneas
+120|Título y artista
+121|Seguir el estilo Noche / Día de la app
+122|Activado: los colores siguen el aspecto de la app (elegir un color arriba lo desactiva).
+123|Comportamiento
+124|Al cambiar de línea
+125|Sin efecto
+126|Bloquear la ventana
+127|Los toques pasan a la app de debajo. Su esquina superior derecha esconde un punto de bloqueo invisible: tócalo dos veces para desbloquear, o mantenlo pulsado y arrastra para mover la ventana. La notificación y este interruptor también la desbloquean. (Android deja una ventana bloqueada algo transparente.)
+128|Sincronía
+129|sin cambios
+130|%.1f s antes
+131|%.1f s después
+132|Si la letra llega tarde (p. ej. con auriculares Bluetooth), mueve esto a la derecha.
+133|Canción de muestra — Artista de muestra
+134|Tono
+135|Intensidad
+136|Brillo
+137|Usar este color
+138|Cancelar
+139|Brillo alrededor de la línea actual
+140|Color del brillo
+141|Igual que la línea
+142|Intensidad del brillo
+143|Difuminado del brillo
+144|Predeterminada
+145|Media
+146|Fina
+147|Condensada
+148|Serif
+149|Monoespaciada
+150|Informal
+151|Manuscrita
+152|Portada difuminada
+153|Colores de la portada
+154|Tu color
+155|Fondo de pantalla
+156|Vidrio esmerilado
+157|Ninguno
+158|Mezcla de colores
+159|Cuadrada
+160|Redondeada
+161|Círculo
+162|Vinilo
+164|Polaroid
+165|Quieta
+166|Girar
+167|Flotar
+168|Balancear
+169|Latir
+170|Inclinar (arrástrala)
+171|Imagen giratoria
+172|Flotante
+173|Respiración
+174|Espejo
+175|Clásica
+176|Fundido
+177|Deslizar arriba
+178|Zoom
+179|Centro
+180|Izquierda
+181|Desliza hacia arriba para desbloquear
+182|EEEE, d 'de' MMMM
+183|Canción de muestra
+184|Artista de muestra
+185|Letra en pantalla de bloqueo
+186|Mostrar la letra en la pantalla de bloqueo
+187|Si la pantalla se apaga mientras suena música, la letra te espera sobre la pantalla de bloqueo al encender el teléfono. Desliza hacia arriba para desbloquear.
+188|⚠ Necesita “Mostrar sobre otras apps” (Android solo deja abrir la letra con este permiso). Permítelo en la pantalla que se abrió y vuelve.
+189|Algunos teléfonos (Xiaomi, OPPO, vivo, Huawei…) también necesitan permitir “Mostrar en pantalla de bloqueo” y “Abrir ventanas nuevas en segundo plano” para esta app.
+190|Abrir los permisos de esta app
+191|Solo mientras suena música
+192|Desactivado: también con la canción en pausa.
+193|Mantener la pantalla encendida
+194|Evita que la pantalla se oscurezca mientras se ve la letra (gasta más batería).
+195|Difuminado
+196|Color de fondo
+197|Muestra el fondo de pantalla del teléfono detrás de la letra.
+198|Oscurecer el fondo
+199|Transparencia
+200|Reloj, portada, letra y botones
+201|Reloj
+202|Mostrar el reloj
+203|Tamaño del reloj
+204|Reloj en negrita
+205|Mostrar la fecha
+206|Canción
+207|Portada
+208|Tamaño de la portada
+209|Título y artista
+210|Letra
+211|Tu fuente
+212|“Tu fuente” aparece aquí cuando eliges un archivo de fuente en los ajustes de la letra flotante.
+213|Espacio entre líneas
+214|Línea actual
+215|Reloj, título y botones
+216|Blanco clásico
+217|Texto blanco que se lee bien sobre cualquier fondo (elegir un color arriba lo desactiva).
+218|Extras
+219|Botones de reproducir / pausa y saltar
+220|Línea de progreso de la canción
+221|Editar letra
+222|Guardar
+223|Detener sincronización por toques
+224|Sincronizar con toques
+225|Pegar letra
+226|Importar archivo
+227|Exportar .{0}
+228|Todo 0,5 s antes
+229|Todo 0,5 s después
+230|Usar la letra en línea
+231|Todas las líneas tienen tiempo. Revísalas y luego Guarda.
+232|Reproduce la canción desde el principio y toca cuando empiece esta línea:
+233|Empieza ahora
+234|Una atrás
+235|Aún no hay letra. Pégala (de cualquier web) y luego sincronízala con toques.
+236|Ahora
+237|Línea de la letra
+238|＋ Añadir una línea al final
+239|¿Guardar los cambios?
+240|Has cambiado esta letra.
+241|Descartar
+242|Una línea por cada línea de la letra. Reemplaza las líneas del editor; luego sincronízalas con toques.
+243|Usar esta letra
+244|Ajustes
+245|Idioma
+246|Pantalla principal
+247|Aspecto de la portada, colores de la letra y el panel de detrás
+248|Tamaño, líneas, fuente, colores, contorno, botones, bloqueo, sincronía
+249|Activada · fondo, reloj, portada, letra, colores
+250|Desactivada · mostrar la letra en la pantalla de bloqueo
+251|Activada · al {0} · servicios y claves
+252|Desactivada · idioma, servicios y claves
+253|Versión {0} · actualizaciones · desarrollador
+254|Sin portada
+255|Portada del álbum
+256|Preajustes
+257|Imagen
+258|Portada del álbum
+259|Forma
+260|Movimiento al reproducir
+261|Velocidad (segundos por movimiento)
+262|{0} s
+263|Brazo del tocadiscos
+264|Se apoya en el disco mientras suena.
+265|Brillo
+266|Un brillo suave del color del álbum.
+267|Reflejo de espejo
+268|La portada reflejada debajo, como sobre una superficie brillante.
+269|Tamaño en la pantalla principal
+270|A partir de {0}, la portada se coloca sobre el título.
+271|Panel detrás de la letra
+272|Vidrio esmerilado: la portada difuminada detrás de un velo claro (Día) u oscuro (Noche).
+273|Teñido con el color principal de la portada.
+274|Color del panel
+275|Opacidad del panel
+276|Pantalla completa
+277|El fondo del panel ocupa toda la pantalla, como en la pantalla de bloqueo. También: el botón ⤢ encima de la letra.
+278|Fondo luminoso animado
+279|En pantalla completa, colores suaves y luminosos de la portada se mueven despacio detrás de la letra.
+280|Letra con enfoque suave
+281|Las líneas que no son la actual se difuminan un poco (Android 12 o posterior).
+282|Colores de la letra
+283|Líneas ya cantadas
+284|Líneas por venir
+285|Elegir un color arriba lo desactiva.
+286|Líneas ya cantadas: opacidad
+287|Líneas por venir: opacidad
+288|Esta canción
+289|Reproduce una canción para importar su letra o cambiar su portada.
+290|Archivo de letra
+291|Importar…
+292|Importa .lrc, .srt, .vtt, .ass o .txt: será la letra de esta canción (guardada en este teléfono, edítala cuando quieras).
+293|Imagen de portada
+294|Elegir una imagen…
+295|Usar la original
+296|Se usa para todas las canciones del álbum «{0}».
+297|Esta canción no tiene nombre de álbum, así que la imagen se usa solo para ella.
+298|La mejor para adaptarse al género y tono de cada canción. Clave en console.anthropic.com → API Keys. El plan Max incluye crédito de API mensual; si no, unos céntimos por canción.
+299|DeepSeek, SiliconFlow, Gemini, Groq, OpenRouter y otros. Reciben las mismas instrucciones de estilo por género que Claude. Elige un servicio abajo y pega una clave de su web.
+300|Estilo literal. DeepL API Free: 500 000 caracteres al mes (cientos de canciones). Clave en deepl.com → API (las gratuitas terminan en “:fx”). Suele funcionar en China continental.
+301|Estilo literal. Plan gratuito de Azure Translator: unos 2 millones de caracteres al mes. Crea un recurso Translator en portal.azure.com y copia su clave y su región. Suele funcionar en China continental.
+302|Estilo literal, fuerte en chino. Uso gratuito mensual tras verificar tu cuenta en fanyi-api.baidu.com; la página de información de desarrollador muestra el App ID y la clave. Funciona en China continental.
+303|Estilo literal, sin configurar nada. Usa el acceso web gratuito de Google Translate, que no es un servicio oficial y podría dejar de funcionar. No accesible desde China continental sin VPN.
+304|Mostrar traducción
+305|Una traducción bajo cada línea, en la app, la letra flotante y la pantalla de bloqueo.
+306|Traducir al
+307|Primero se usan las traducciones humanas de NetEase, QQ Music y Kugou; el servicio de abajo completa el resto.
+308|Las webs de música solo tienen traducciones al chino simplificado, así que el servicio de abajo traduce todas las líneas.
+309|Traducir con un servicio
+310|Las líneas sin traducción humana las traduce el servicio que elijas abajo.
+311|Servicio
+312|IA · se adapta al estilo de la canción
+313|Traductor · estilo literal
+314|Servicio de IA
+315| Clave en {0}.
+316|Dirección (URL base)
+317|Modelo
+318|nombre del modelo
+319|Los nombres de modelo cambian de vez en cuando. Si el servicio dice que el modelo no existe, copia aquí un nombre actual de su web.
+320|Clave secreta
+321|Clave API
+322|••••••••  (guardada; pega otra para reemplazarla)
+323|pega tu clave aquí
+324|Eliminar clave
+325|Guardado ✓
+326|Traducción con Claude hasta ahora: US$
+327|Personalizado
+328|Cualquier servicio con una API de chat compatible con OpenAI: introduce su dirección y modelo.

@@ -1,4 +1,4 @@
-# All Connected Lyrics
+# Lyrics Master
 
 An Android app that floats time-synced lyrics over your screen for whatever is playing in
 Spotify, Apple Music or any other music app that shows media controls, with optional
@@ -32,7 +32,16 @@ Simplified Chinese translation.
   time or set it to "now", add / delete lines, shift the whole song, paste plain lyrics and
   tap-sync them. Saved lyrics stay on the phone and always win over the online ones
   ("Use online lyrics" goes back).
-- **English or Simplified Chinese** (Settings → Language), never mixed; follows the phone at first.
+- **14 app languages** (Settings → Language): English, 简体中文, 繁體中文, 日本語, 한국어, Español,
+  Français, Deutsch, Português, Русский, Bahasa Indonesia, ไทย, Tiếng Việt, العربية (right-to-left);
+  never mixed, follows the phone at first. Texts: `tools/i18n`.
+- **Translation into any of those 14 languages** (Translation → Translate into); Simplified
+  Chinese uses the music sites' human translations first.
+- **Lyrics files**: import .lrc / .srt / .vtt / .ass / .txt, export .lrc / .srt / .txt (editor and
+  Settings → Main screen → This song). **Custom cover pictures** per album (or per song).
+- **Glow** around the current line (colour, strength, blur) on the main screen, floating
+  window and lock screen; **full screen** with a lively glowing background.
+- **About** (Settings): version, check for updates, developer Edward J.Y. Wallen.
 - **译 Chinese translation** (off until you turn it on):
   1. Human translations from NetEase, QQ Music and Kugou, matched to the lyrics line by line,
      even when a site's copy is timed a little differently.

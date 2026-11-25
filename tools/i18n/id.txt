@@ -1,0 +1,317 @@
+0|Lirik melayang (terkunci) dan lirik layar kunci aktif
+1|Lirik melayang dan lirik layar kunci aktif
+2|Lirik melayang aktif (terkunci)
+3|Lirik melayang aktif
+4|Lirik layar kunci aktif
+5|Sentuhan menembus lirik. Ketuk Buka kunci untuk memindahkannya lagi.
+6|Ketuk lirik untuk tombol. Ketuk di sini untuk membuka aplikasi.
+7|Menampilkan lirik di layar kunci saat musik diputar. Ketuk di sini untuk membuka aplikasi.
+8|Buka kunci
+9|Kunci
+10|Lirik melayang & layar kunci
+11|Buka kunci lirik melayang
+12|Kunci lirik melayang dibuka
+13|Lirik terkunci: sentuhan menembusnya. Untuk membuka kunci, ketuk dua kali sudut kanan atasnya; untuk memindahkan, tekan lama di sana lalu seret.
+14|Lirik melayang dimatikan. Nyalakan lagi di aplikasi.
+15|Memuat lirik…
+16|Tidak ada lirik tersinkron untuk lagu ini
+17|Kesalahan jaringan, lirik tidak dapat diambil
+18|Lirik ini tidak punya waktu
+20|Tidak dapat mengambil lirik
+21|Beberapa baris belum diterjemahkan. Tambahkan kunci {0} di pengaturan Terjemahan untuk melengkapinya.
+22|Terjemahan AI gagal: 
+23|kunci API tidak diterima. Periksa di pengaturan Terjemahan.
+24|kunci API ini tidak diizinkan memakai Claude.
+25|saldo akun Claude habis.
+26|terlalu banyak permintaan sekarang. Coba lagi dalam semenit.
+27|Claude sedang sibuk. Coba lagi dalam semenit.
+28|Server Claude menjawab dengan kesalahan {0}.
+29|kunci tidak diterima. Periksa di pengaturan Terjemahan.
+30|kuota gratis atau saldo layanan sudah habis.
+31|layanan menjawab dengan kesalahan {0}.
+32|tidak dapat menghubungi layanan (tidak ada internet, atau diblokir di tempatmu).
+33|kesalahan tidak diketahui.
+35|AI lain
+38|Baidu Terjemahan
+39|Google (tanpa kunci)
+40|Region (mis. eastasia, global)
+43|Bisa dipakai di Tiongkok daratan. Sangat murah, sering ada saldo gratis untuk akun baru.
+45|Bisa dipakai di Tiongkok daratan. Beberapa model Qwen gratis.
+47|Paket gratis dengan batas harian. Tidak bisa diakses dari Tiongkok daratan tanpa VPN.
+49|Paket gratis, sangat cepat. Tidak bisa diakses dari Tiongkok daratan tanpa VPN.
+51|Banyak model; yang berakhiran “:free” gratis (dengan batas harian).
+52|Tentang
+54|Versi {0} (build {1})
+55|Memeriksa…
+56|Periksa pembaruan
+57|Kamu sudah memakai versi terbaru.
+58|Versi {0} sudah keluar. Ketuk di atas untuk mengunduhnya.
+59|Tidak dapat memeriksa pembaruan (tidak ada internet, atau halaman unduhan tidak publik).
+60|Pengembang
+61|Lirik berasal dari LRCLIB, NetEase Cloud Music, QQ Music, dan Kugou. Hak cipta lirik milik pemiliknya; aplikasi ini menampilkannya untuk penggunaan pribadimu.
+62|⤡ Keluar layar penuh
+63|Melayang: aktif
+64|Melayang: mati
+65|Satu langkah lagi
+66|Agar tahu lagu apa yang diputar di Spotify, YouTube Music, NetEase, QQ Music, atau aplikasi musik lain, Android memerlukan akses notifikasi untuk aplikasi ini.\n\nAplikasi hanya membaca lagu yang diputar; tidak pernah membaca notifikasimu.
+67|Nyalakan akses notifikasi
+68|Di daftar yang terbuka, cari Lyrics Master, nyalakan, lalu kembali.
+69|Tidak ada yang diputar
+70|Putar lagu di aplikasi musik mana pun
+71|di {0}
+72|Mencari terjemahan…
+73|⤢ Layar penuh
+74|✎ Edit lirik
+75|＋ Tambah lirik
+76|Belum ada lirik tersinkron untuk lagu ini
+77|Putar lagu, liriknya akan muncul di sini baris demi baris.
+78|Tidak ada lirik di file itu (coba .lrc, .srt, .vtt, .ass, atau .txt)
+79|{0} baris diimpor
+80|Lirik disimpan
+81|Tidak dapat menyimpan file
+82|Sampul diganti
+83|File itu bukan gambar
+84|File itu bukan font yang bisa dipakai Android (pilih file .ttf atau .otf)
+85|‹ Kembali
+86|Lirik melayang
+87|Atur ulang
+88|Ukuran
+89|Lebar jendela
+90|Opasitas
+91|Latar
+92|tidak ada
+93|Latar saat tombol tampil
+94|Ketuk lirik melayang untuk menampilkan tombol; kotak di belakangnya membuat tombol mudah dilihat.
+95|Sudut membulat
+96|Baris
+97|Baris sebelum baris saat ini
+98|Baris sesudah baris saat ini
+99|Judul & artis di atas
+100|Terjemahan di bawah baris saat ini
+101|Teks
+102|Font
+103|Font kamu ✓
+104|Font kamu…
+105|“Font kamu…” memilih file .ttf atau .otf dari ponselmu, mis. font yang kamu unduh.
+106|Ukuran baris saat ini
+107|Baris saat ini tebal
+108|Ukuran terjemahan
+109|Ukuran baris lain
+110|Ukuran judul
+111|Perataan
+112|Garis tepi huruf
+113|Menjaga teks tetap terbaca di latar apa pun, mis. tanpa kotak latar.
+114|Ketebalan garis tepi
+115|Warna garis tepi
+116|Warna
+117|Baris saat ini (lirik)
+118|Terjemahan
+119|Baris lain
+120|Judul & artis
+121|Ikuti gaya Malam / Siang aplikasi
+122|Aktif: warna mengikuti tampilan aplikasi (memilih warna di atas mematikannya).
+123|Perilaku
+124|Saat baris berganti
+125|Tanpa efek
+126|Kunci jendela
+127|Sentuhan diteruskan ke aplikasi di bawahnya. Sudut kanan atasnya menyimpan titik kunci tak terlihat: ketuk dua kali untuk membuka kunci, atau tekan lama dan seret untuk memindahkan jendela. Notifikasi dan sakelar ini juga membuka kuncinya. (Android membuat jendela terkunci sedikit transparan.)
+128|Waktu
+129|apa adanya
+130|%.1f dtk lebih awal
+131|%.1f dtk lebih lambat
+132|Jika lirik datang terlambat (mis. dengan headphone Bluetooth), geser ini ke kanan.
+133|Lagu Contoh — Artis Contoh
+134|Rona
+135|Kepekatan
+136|Kecerahan
+137|Pakai warna ini
+138|Batal
+139|Cahaya di sekitar baris saat ini
+140|Warna cahaya
+141|Sama seperti baris
+142|Kekuatan cahaya
+143|Kekaburan cahaya
+144|Bawaan
+145|Sedang
+146|Tipis
+147|Rapat
+148|Serif
+149|Mono
+150|Santai
+151|Tulisan tangan
+152|Sampul buram
+153|Warna sampul
+154|Warna kamu
+155|Wallpaper
+156|Kaca buram
+157|Tidak ada
+158|Campuran warna
+159|Persegi
+160|Membulat
+161|Lingkaran
+162|Piringan hitam
+164|Polaroid
+165|Diam
+166|Berputar
+167|Melayang
+168|Bergoyang
+169|Berdenyut
+170|Miring (seret)
+171|Gambar berputar
+172|Melayang
+173|Bernapas
+174|Cermin
+175|Klasik
+176|Memudar
+177|Geser ke atas
+178|Perbesar
+179|Tengah
+180|Kiri
+181|Geser ke atas untuk membuka
+182|EEEE, d MMMM
+183|Lagu Contoh
+184|Artis Contoh
+185|Lirik layar kunci
+186|Tampilkan lirik di layar kunci
+187|Saat layar mati ketika musik diputar, lirik menunggumu di layar kunci saat ponsel dinyalakan. Geser ke atas untuk membuka.
+188|⚠ Perlu izin “Tampilkan di atas aplikasi lain” (Android hanya membolehkan aplikasi membuka lirik dengan izin ini). Izinkan di layar yang terbuka, lalu kembali.
+189|Beberapa ponsel (Xiaomi, OPPO, vivo, Huawei…) juga perlu mengizinkan “Tampilkan di layar kunci” dan “Buka jendela baru saat berjalan di latar belakang” untuk aplikasi ini.
+190|Buka izin aplikasi ini
+191|Hanya saat musik diputar
+192|Mati: juga saat lagu dijeda.
+193|Biarkan layar menyala
+194|Mencegah layar meredup selama lirik tampil (lebih boros baterai).
+195|Buram
+196|Warna latar
+197|Menampilkan wallpaper ponselmu di belakang lirik.
+198|Gelapkan latar
+199|Transparansi
+200|Jam, sampul, lirik & tombol
+201|Jam
+202|Tampilkan jam
+203|Ukuran jam
+204|Jam tebal
+205|Tampilkan tanggal
+206|Lagu
+207|Sampul
+208|Ukuran sampul
+209|Judul & artis
+210|Lirik
+211|Font kamu
+212|“Font kamu” muncul di sini setelah kamu memilih file font di pengaturan lirik melayang.
+213|Jarak antarbaris
+214|Baris saat ini
+215|Jam, judul & tombol
+216|Putih klasik
+217|Teks putih yang terbaca di latar apa pun (memilih warna di atas mematikannya).
+218|Tambahan
+219|Tombol putar / jeda dan lompat
+220|Garis kemajuan lagu
+221|Edit lirik
+222|Simpan
+223|Hentikan sinkron ketuk
+224|Sinkron ketuk
+225|Tempel lirik
+226|Impor file
+227|Ekspor .{0}
+228|Semua 0,5 dtk lebih awal
+229|Semua 0,5 dtk lebih lambat
+230|Pakai lirik online
+231|Semua baris sudah punya waktu. Periksa, lalu Simpan.
+232|Putar lagu dari awal, dan ketuk saat baris ini dimulai:
+233|Mulai sekarang
+234|Mundur satu
+235|Belum ada lirik. Tempel dari situs mana pun, lalu sinkronkan dengan ketukan.
+236|Sekarang
+237|Baris lirik
+238|＋ Tambah baris di akhir
+239|Simpan perubahan?
+240|Kamu mengubah lirik ini.
+241|Buang
+242|Satu baris per baris lirik. Ini mengganti baris di editor; lalu sinkronkan dengan ketukan.
+243|Pakai lirik ini
+244|Pengaturan
+245|Bahasa
+246|Layar utama
+247|Tampilan sampul album, warna lirik, dan panel di belakangnya
+248|Ukuran, baris, font, warna, garis tepi, tombol, kunci, waktu
+249|Aktif · latar, jam, sampul, lirik, warna
+250|Mati · tampilkan lirik di layar kunci
+251|Aktif · ke {0} · layanan dan kunci
+252|Mati · bahasa, layanan dan kunci
+253|Versi {0} · pembaruan · pengembang
+254|Tanpa sampul
+255|Sampul album
+256|Preset
+257|Gambar
+258|Sampul album
+259|Bentuk
+260|Gerakan saat diputar
+261|Kecepatan (detik per gerakan)
+262|{0} dtk
+263|Lengan piringan
+264|Bersandar di piringan saat diputar.
+265|Cahaya
+266|Cahaya lembut berwarna album.
+267|Pantulan cermin
+268|Sampul terpantul di bawahnya, seperti di permukaan mengilap.
+269|Ukuran di layar utama
+270|Mulai {0}, sampul berada di atas judul lagu.
+271|Panel di belakang lirik
+272|Kaca buram: sampul album dibuat buram di balik selubung terang (Siang) atau gelap (Malam).
+273|Diberi warna utama sampul album.
+274|Warna panel
+275|Opasitas panel
+276|Layar penuh
+277|Latar panel memenuhi seluruh layar, seperti layar kunci. Juga: tombol ⤢ di atas lirik.
+278|Latar bercahaya yang hidup
+279|Di layar penuh, warna-warna lembut bercahaya dari sampul bergerak perlahan di belakang lirik.
+280|Lirik fokus lembut
+281|Baris selain baris saat ini sedikit dibuat buram (Android 12 ke atas).
+282|Warna lirik
+283|Baris yang sudah dinyanyikan
+284|Baris berikutnya
+285|Memilih warna di atas mematikannya.
+286|Baris yang sudah dinyanyikan: opasitas
+287|Baris berikutnya: opasitas
+288|Lagu ini
+289|Putar lagu untuk mengimpor liriknya atau mengganti sampulnya.
+290|File lirik
+291|Impor…
+292|Impor .lrc, .srt, .vtt, .ass, atau .txt: jadi lirik lagu ini (disimpan di ponsel ini, bisa diedit kapan saja).
+293|Gambar sampul
+294|Pilih gambar…
+295|Pakai yang asli
+296|Dipakai untuk semua lagu di album “{0}”.
+297|Lagu ini tidak punya nama album, jadi gambar hanya dipakai untuk lagu ini.
+298|Paling pandai menyesuaikan genre dan nada setiap lagu. Kunci dari console.anthropic.com → API Keys. Paket Max sudah termasuk saldo API bulanan; jika tidak, sekitar beberapa sen per lagu.
+299|DeepSeek, SiliconFlow, Gemini, Groq, OpenRouter, dan lainnya. Mendapat instruksi gaya per genre yang sama dengan Claude. Pilih layanan di bawah, lalu tempel kunci dari situsnya.
+300|Gaya harfiah. DeepL API Free: 500.000 karakter per bulan (ratusan lagu). Kunci dari deepl.com → API (kunci gratis berakhiran “:fx”). Biasanya bisa di Tiongkok daratan.
+301|Gaya harfiah. Paket gratis Azure Translator: sekitar 2 juta karakter per bulan. Buat resource Translator di portal.azure.com, lalu salin kunci dan region-nya. Biasanya bisa di Tiongkok daratan.
+302|Gaya harfiah, kuat untuk bahasa Mandarin. Kuota gratis bulanan setelah akun diverifikasi di fanyi-api.baidu.com; halaman info pengembang menampilkan App ID dan kuncinya. Bisa dipakai di Tiongkok daratan.
+303|Gaya harfiah, tanpa pengaturan. Memakai akses web gratis Google Terjemahan, yang bukan layanan resmi dan bisa berhenti berfungsi. Tidak bisa diakses dari Tiongkok daratan tanpa VPN.
+304|Tampilkan terjemahan
+305|Terjemahan di bawah setiap baris, di aplikasi, lirik melayang, dan layar kunci.
+306|Terjemahkan ke
+307|Terjemahan manusia dari NetEase, QQ Music, dan Kugou dipakai lebih dulu; layanan di bawah melengkapi sisanya.
+308|Situs musik hanya punya terjemahan Mandarin Sederhana, jadi layanan di bawah menerjemahkan setiap baris.
+309|Terjemahkan dengan layanan
+310|Baris tanpa terjemahan manusia diterjemahkan oleh layanan yang kamu pilih di bawah.
+311|Layanan
+312|AI · menyesuaikan gaya lagu
+313|Penerjemah · gaya harfiah
+314|Layanan AI
+315| Kunci dari {0}.
+316|Alamat (base URL)
+317|Model
+318|nama model
+319|Nama model sesekali berubah. Jika layanan bilang model tidak ada, salin nama terbaru dari situsnya ke kotak ini.
+320|Kunci rahasia
+321|Kunci API
+322|••••••••  (tersimpan; tempel untuk mengganti)
+323|tempel kuncimu di sini
+324|Hapus kunci
+325|Tersimpan ✓
+326|Biaya terjemahan Claude sejauh ini: US$
+327|Kustom
+328|Layanan apa pun dengan API chat yang kompatibel dengan OpenAI: masukkan alamat dan modelnya.

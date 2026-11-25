@@ -1,0 +1,317 @@
+0|Paroles flottantes (verrouillées) et sur l’écran de verrouillage activées
+1|Paroles flottantes et sur l’écran de verrouillage activées
+2|Paroles flottantes activées (verrouillées)
+3|Paroles flottantes activées
+4|Paroles sur l’écran de verrouillage activées
+5|Les touches traversent les paroles. Touchez Déverrouiller pour pouvoir les déplacer.
+6|Touchez les paroles pour afficher les boutons. Touchez ici pour ouvrir l’app.
+7|Affiche les paroles sur l’écran de verrouillage pendant la musique. Touchez ici pour ouvrir l’app.
+8|Déverrouiller
+9|Verrouiller
+10|Paroles flottantes et d’écran de verrouillage
+11|Déverrouiller les paroles flottantes
+12|Paroles flottantes déverrouillées
+13|Paroles verrouillées : les touches les traversent. Pour déverrouiller, touchez deux fois leur coin supérieur droit ; pour les déplacer, appuyez longuement à cet endroit et faites glisser.
+14|Paroles flottantes désactivées. Réactivez-les dans l’app.
+15|Chargement des paroles…
+16|Pas de paroles synchronisées pour ce titre
+17|Erreur réseau, impossible de récupérer les paroles
+18|Ces paroles n’ont pas de minutage
+20|Impossible de récupérer les paroles
+21|Certaines lignes ne sont pas encore traduites. Ajoutez une clé {0} dans les réglages de Traduction pour les compléter.
+22|La traduction IA a échoué : 
+23|la clé API a été refusée. Vérifiez-la dans les réglages de Traduction.
+24|cette clé API n’a pas le droit d’utiliser Claude.
+25|le compte Claude n’a plus de crédit.
+26|trop de demandes pour l’instant. Réessayez dans une minute.
+27|Claude est occupé pour l’instant. Réessayez dans une minute.
+28|Le serveur de Claude a renvoyé l’erreur {0}.
+29|la clé a été refusée. Vérifiez-la dans les réglages de Traduction.
+30|l’offre gratuite ou le crédit du service est épuisé.
+31|le service a renvoyé l’erreur {0}.
+32|impossible de joindre le service (pas d’internet, ou il est bloqué là où vous êtes).
+33|erreur inconnue.
+35|Autre IA
+38|Baidu Traduction
+39|Google (sans clé)
+40|Région (ex. eastasia, global)
+43|Fonctionne en Chine continentale. Très bon marché, souvent avec du crédit gratuit pour les nouveaux comptes.
+45|Fonctionne en Chine continentale. Plusieurs modèles Qwen sont gratuits.
+47|Offre gratuite avec limites quotidiennes. Inaccessible depuis la Chine continentale sans VPN.
+49|Offre gratuite, très rapide. Inaccessible depuis la Chine continentale sans VPN.
+51|De nombreux modèles ; ceux qui finissent par « :free » sont gratuits (avec limites quotidiennes).
+52|À propos
+54|Version {0} (build {1})
+55|Vérification…
+56|Rechercher des mises à jour
+57|Vous avez la dernière version.
+58|La version {0} est disponible. Touchez ci-dessus pour la télécharger.
+59|Impossible de rechercher des mises à jour (pas d’internet, ou la page de téléchargement n’est pas publique).
+60|Développeur
+61|Les paroles viennent de LRCLIB, NetEase Cloud Music, QQ Music et Kugou. Elles appartiennent à leurs ayants droit ; cette app les affiche pour votre usage personnel.
+62|⤡ Quitter le plein écran
+63|Flottant : oui
+64|Flottant : non
+65|Une étape pour commencer
+66|Pour savoir quel titre joue dans Spotify, YouTube Music, NetEase, QQ Music ou toute autre app de musique, Android vous demande d’activer l’accès aux notifications pour cette app.\n\nL’app lit seulement ce qui joue ; elle ne lit jamais vos notifications.
+67|Activer l’accès aux notifications
+68|Dans la liste qui s’ouvre, trouvez Lyrics Master, activez-le, puis revenez.
+69|Rien en lecture
+70|Lancez un titre dans n’importe quelle app de musique
+71|sur {0}
+72|Recherche de traductions…
+73|⤢ Plein écran
+74|✎ Modifier les paroles
+75|＋ Ajouter des paroles
+76|Pas encore de paroles synchronisées pour ce titre
+77|Lancez un titre et ses paroles s’afficheront ici, ligne par ligne.
+78|Aucune parole trouvée dans ce fichier (essayez .lrc, .srt, .vtt, .ass ou .txt)
+79|{0} lignes importées
+80|Paroles enregistrées
+81|Impossible d’enregistrer le fichier
+82|Pochette changée
+83|Ce fichier n’est pas une image
+84|Ce fichier n’est pas une police utilisable par Android (choisissez un .ttf ou .otf)
+85|‹ Retour
+86|Paroles flottantes
+87|Réinitialiser
+88|Taille
+89|Largeur de la fenêtre
+90|Opacité
+91|Fond
+92|aucun
+93|Fond quand les boutons s’affichent
+94|Touchez les paroles flottantes pour afficher les boutons ; le cadre derrière les rend faciles à voir.
+95|Coins arrondis
+96|Lignes
+97|Lignes avant la ligne actuelle
+98|Lignes après la ligne actuelle
+99|Titre et artiste en haut
+100|Traduction sous la ligne actuelle
+101|Texte
+102|Police
+103|Votre police ✓
+104|Votre police…
+105|« Votre police… » choisit un fichier .ttf ou .otf sur votre téléphone, par ex. une police téléchargée.
+106|Taille de la ligne actuelle
+107|Ligne actuelle en gras
+108|Taille de la traduction
+109|Taille des autres lignes
+110|Taille du titre
+111|Alignement
+112|Contour des lettres
+113|Garde le texte lisible sur n’importe quel fond, par ex. sans cadre de fond.
+114|Épaisseur du contour
+115|Couleur du contour
+116|Couleurs
+117|Ligne actuelle (paroles)
+118|Traduction
+119|Autres lignes
+120|Titre et artiste
+121|Suivre le style Nuit / Jour de l’app
+122|Activé : les couleurs suivent l’apparence de l’app (choisir une couleur ci-dessus le désactive).
+123|Comportement
+124|Au changement de ligne
+125|Aucun effet
+126|Verrouiller la fenêtre
+127|Les touches passent à l’app en dessous. Son coin supérieur droit cache un point de verrouillage invisible : touchez-le deux fois pour déverrouiller, ou appuyez longuement et faites glisser pour déplacer la fenêtre. La notification et cet interrupteur la déverrouillent aussi. (Android garde une fenêtre verrouillée un peu transparente.)
+128|Décalage
+129|tel quel
+130|%.1f s plus tôt
+131|%.1f s plus tard
+132|Si les paroles arrivent trop tard (par ex. avec un casque Bluetooth), déplacez ceci vers la droite.
+133|Titre d’exemple — Artiste d’exemple
+134|Teinte
+135|Saturation
+136|Luminosité
+137|Utiliser cette couleur
+138|Annuler
+139|Lueur autour de la ligne actuelle
+140|Couleur de la lueur
+141|Comme la ligne
+142|Intensité de la lueur
+143|Flou de la lueur
+144|Par défaut
+145|Medium
+146|Fine
+147|Condensée
+148|Serif
+149|Mono
+150|Décontractée
+151|Manuscrite
+152|Pochette floutée
+153|Couleurs de la pochette
+154|Votre couleur
+155|Fond d’écran
+156|Verre dépoli
+157|Aucun
+158|Mélange de couleurs
+159|Carré
+160|Arrondi
+161|Cercle
+162|Vinyle
+164|Polaroïd
+165|Immobile
+166|Rotation
+167|Flottement
+168|Balancement
+169|Pulsation
+170|Inclinaison (faites glisser)
+171|Image qui tourne
+172|Flottante
+173|Respiration
+174|Miroir
+175|Classique
+176|Fondu
+177|Glisser vers le haut
+178|Zoom
+179|Centré
+180|Gauche
+181|Balayez vers le haut pour déverrouiller
+182|EEEE d MMMM
+183|Titre d’exemple
+184|Artiste d’exemple
+185|Paroles sur l’écran de verrouillage
+186|Afficher les paroles sur l’écran de verrouillage
+187|Si l’écran s’éteint pendant la musique, les paroles vous attendent sur l’écran de verrouillage au réveil du téléphone. Balayez vers le haut pour déverrouiller.
+188|⚠ Nécessite « Superposition sur d’autres apps » (Android n’autorise l’ouverture des paroles qu’avec ce droit). Autorisez-le sur l’écran qui s’est ouvert, puis revenez.
+189|Certains téléphones (Xiaomi, OPPO, vivo, Huawei…) demandent aussi d’autoriser « Afficher sur l’écran de verrouillage » et « Ouvrir de nouvelles fenêtres en arrière-plan » pour cette app.
+190|Ouvrir les autorisations de l’app
+191|Seulement pendant la musique
+192|Désactivé : aussi quand le titre est en pause.
+193|Garder l’écran allumé
+194|Empêche l’écran de s’assombrir pendant l’affichage des paroles (consomme plus de batterie).
+195|Flou
+196|Couleur de fond
+197|Affiche le fond d’écran du téléphone derrière les paroles.
+198|Assombrir le fond
+199|Transparence
+200|Horloge, pochette, paroles et boutons
+201|Horloge
+202|Afficher l’horloge
+203|Taille de l’horloge
+204|Horloge en gras
+205|Afficher la date
+206|Titre
+207|Pochette
+208|Taille de la pochette
+209|Titre et artiste
+210|Paroles
+211|Votre police
+212|« Votre police » apparaît ici après avoir choisi un fichier de police dans les réglages des paroles flottantes.
+213|Espace entre les lignes
+214|Ligne actuelle
+215|Horloge, titre et boutons
+216|Blanc classique
+217|Texte blanc lisible sur n’importe quel fond (choisir une couleur ci-dessus le désactive).
+218|Extras
+219|Boutons lecture / pause et saut
+220|Barre de progression du titre
+221|Modifier les paroles
+222|Enregistrer
+223|Arrêter la synchro au toucher
+224|Synchro au toucher
+225|Coller des paroles
+226|Importer un fichier
+227|Exporter en .{0}
+228|Tout 0,5 s plus tôt
+229|Tout 0,5 s plus tard
+230|Utiliser les paroles en ligne
+231|Toutes les lignes sont minutées. Vérifiez-les, puis Enregistrez.
+232|Lancez le titre depuis le début et touchez quand cette ligne commence :
+233|Commence maintenant
+234|Une en arrière
+235|Pas encore de paroles. Collez-les (depuis n’importe quel site), puis synchronisez-les au toucher.
+236|Maintenant
+237|Ligne de paroles
+238|＋ Ajouter une ligne à la fin
+239|Enregistrer les modifications ?
+240|Vous avez modifié ces paroles.
+241|Abandonner
+242|Une ligne par ligne de paroles. Remplace les lignes de l’éditeur ; synchronisez-les ensuite au toucher.
+243|Utiliser ces paroles
+244|Réglages
+245|Langue
+246|Écran principal
+247|Aspect de la pochette, couleurs des paroles et panneau derrière
+248|Taille, lignes, police, couleurs, contour, boutons, verrouillage, décalage
+249|Activées · fond, horloge, pochette, paroles, couleurs
+250|Désactivées · afficher les paroles sur l’écran de verrouillage
+251|Activée · vers {0} · services et clés
+252|Désactivée · langue, services et clés
+253|Version {0} · mises à jour · développeur
+254|Pas de pochette
+255|Pochette d’album
+256|Préréglages
+257|Image
+258|Pochette de l’album
+259|Forme
+260|Mouvement pendant la lecture
+261|Vitesse (secondes par mouvement)
+262|{0} s
+263|Bras de lecture
+264|Se pose sur le disque pendant la lecture.
+265|Lueur
+266|Une douce lueur aux couleurs de l’album.
+267|Reflet miroir
+268|La pochette reflétée en dessous, comme sur une surface brillante.
+269|Taille sur l’écran principal
+270|À partir de {0}, la pochette se place au-dessus du titre.
+271|Panneau derrière les paroles
+272|Verre dépoli : la pochette floutée derrière un voile clair (Jour) ou sombre (Nuit).
+273|Teinté de la couleur principale de la pochette.
+274|Couleur du panneau
+275|Opacité du panneau
+276|Plein écran
+277|Le fond du panneau remplit tout l’écran, comme l’écran de verrouillage. Aussi : le bouton ⤢ au-dessus des paroles.
+278|Fond lumineux animé
+279|En plein écran, de douces lueurs aux couleurs de la pochette dérivent lentement derrière les paroles.
+280|Paroles en flou doux
+281|Les lignes autres que la ligne actuelle sont légèrement floutées (Android 12 et plus).
+282|Couleurs des paroles
+283|Lignes déjà chantées
+284|Lignes à venir
+285|Choisir une couleur ci-dessus le désactive.
+286|Lignes déjà chantées : opacité
+287|Lignes à venir : opacité
+288|Ce titre
+289|Lancez un titre pour importer ses paroles ou changer sa pochette.
+290|Fichier de paroles
+291|Importer…
+292|Importez un .lrc, .srt, .vtt, .ass ou .txt : il devient les paroles de ce titre (gardées sur ce téléphone, modifiables à tout moment).
+293|Image de pochette
+294|Choisir une image…
+295|Utiliser l’originale
+296|Utilisée pour tous les titres de l’album « {0} ».
+297|Ce titre n’a pas de nom d’album, l’image ne sert donc que pour lui.
+298|Le meilleur pour coller au genre et au ton de chaque titre. Clé sur console.anthropic.com → API Keys. Le forfait Max inclut un crédit API mensuel ; sinon, quelques centimes par titre.
+299|DeepSeek, SiliconFlow, Gemini, Groq, OpenRouter et d’autres. Reçoivent les mêmes consignes de style par genre que Claude. Choisissez un service ci-dessous, puis collez une clé de son site.
+300|Style littéral. DeepL API Free : 500 000 caractères par mois (des centaines de titres). Clé sur deepl.com → API (les clés gratuites finissent par « :fx »). Fonctionne en général en Chine continentale.
+301|Style littéral. Offre gratuite d’Azure Translator : environ 2 millions de caractères par mois. Créez une ressource Translator sur portal.azure.com et copiez sa clé et sa région. Fonctionne en général en Chine continentale.
+302|Style littéral, fort en chinois. Quota mensuel gratuit après vérification du compte sur fanyi-api.baidu.com ; la page d’infos développeur indique l’App ID et la clé. Fonctionne en Chine continentale.
+303|Style littéral, rien à configurer. Utilise l’accès web gratuit de Google Traduction, qui n’est pas un service officiel et pourrait cesser de fonctionner. Inaccessible depuis la Chine continentale sans VPN.
+304|Afficher la traduction
+305|Une traduction sous chaque ligne, dans l’app, les paroles flottantes et l’écran de verrouillage.
+306|Traduire en
+307|Les traductions humaines de NetEase, QQ Music et Kugou passent en premier ; le service ci-dessous complète le reste.
+308|Les sites de musique n’ont que des traductions en chinois simplifié : le service ci-dessous traduit donc chaque ligne.
+309|Traduire avec un service
+310|Les lignes sans traduction humaine sont traduites par le service choisi ci-dessous.
+311|Service
+312|IA · s’adapte au style du titre
+313|Traducteur · style littéral
+314|Service d’IA
+315| Clé sur {0}.
+316|Adresse (URL de base)
+317|Modèle
+318|nom du modèle
+319|Les noms de modèle changent de temps en temps. Si le service dit que le modèle n’existe pas, copiez ici un nom actuel depuis son site.
+320|Clé secrète
+321|Clé API
+322|••••••••  (enregistrée ; collez-en une autre pour la remplacer)
+323|collez votre clé ici
+324|Supprimer la clé
+325|Enregistré ✓
+326|Traduction Claude jusqu’ici : US$
+327|Personnalisé
+328|Tout service doté d’une API de chat compatible OpenAI : saisissez son adresse et son modèle.
