@@ -67,7 +67,10 @@ object LyricsRepo {
                     val result = withContext(Dispatchers.IO) {
                         try {
                             // your own edited lyrics always win over the online ones
+                            // then the PC's (through the cloud), then online
+                            if (CloudSync.sync(appContext)) forgetNotFound()
                             Result.success(mine.load(track.title, track.artist)
+                                ?: CloudSync.find(appContext, track.title, track.artist, track.durationMs / 1000.0)
                                 ?: LyricsSources.fetch(track.title, track.artist, track.album, track.durationMs / 1000.0))
                         } catch (e: Exception) {
                             Result.failure(e)
@@ -212,6 +215,29 @@ object LyricsRepo {
             cache[track.key] = found
             if (found != null) show(track, found) else _state.value = LyricsState.NotFound
         }
+    }
+
+    /** New lyrics from the PC: songs that had none get another look. */
+    private fun forgetNotFound() {
+        scope.launch { cache.entries.removeAll { it.value == null } }
+    }
+
+    /** Checks the cloud now (Settings → Sync with the PC); shows the PC's lyrics for the song playing if it has them. */
+    suspend fun syncNow(): String {
+        val got = withContext(Dispatchers.IO) { CloudSync.sync(appContext, now = true) }
+        if (got) {
+            cache.entries.removeAll { it.value == null || it.value?.source == CloudSync.SOURCE_FOUND || it.value?.source == CloudSync.SOURCE_MINE }
+            val track = NowPlaying.state.value.track
+            if (track != null && !mine.has(track.title, track.artist)) {
+                withContext(Dispatchers.IO) { CloudSync.find(appContext, track.title, track.artist, track.durationMs / 1000.0) }?.let {
+                    job?.cancel(); translateJob?.cancel()
+                    cache[track.key] = it
+                    translated.remove(track.key)
+                    show(track, it)
+                }
+            }
+        }
+        return CloudSync.status
     }
 
     /** How many songs have your own lyrics (edited here or brought from the PC). */
