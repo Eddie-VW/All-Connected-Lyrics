@@ -21,10 +21,12 @@ Simplified Chinese translation.
 
 ## Getting the app
 
-Every push is built and tested by GitHub Actions: open the **Actions** tab → **Android app** →
-the latest run → **Artifacts** → `AutosyncedLyrics-android`. Unzip it and open `app-debug.apk`
-on the phone (allow installing from your browser or files app when Android asks). All builds
-share one signing key (`app/debug.keystore`), so a newer build installs over the old one.
+Every push to `main` is built, tested and published on the **Releases** page. The newest build
+is always at
+[releases/latest/download/AllConnectedLyrics.apk](https://github.com/Eddie-VW/All-Connected-Lyrics/releases/latest/download/AllConnectedLyrics.apk):
+open that on the phone and install it (allow installing from your browser when Android asks).
+All builds share one signing key (`app/debug.keystore`), so a newer build installs over the old
+one as an update.
 
 ## Code
 

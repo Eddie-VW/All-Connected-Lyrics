@@ -1,5 +1,6 @@
-# Builds the Android app on GitHub's computers whenever the code changes,
-# runs its tests, and attaches the installable APK to the run (Actions tab -> the run -> Artifacts).
+# Builds the Android app on GitHub's computers whenever the code changes and runs its tests.
+# Every build of main is published on the Releases page as a ready-to-install .apk;
+# the newest one is always at .../releases/latest/download/AllConnectedLyrics.apk
 name: Android app
 
 on:
@@ -9,6 +10,8 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write        # to publish the release
     timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
@@ -25,12 +28,28 @@ jobs:
           chmod +x gradlew
           ./gradlew --no-daemon testDebugUnitTest assembleDebug
 
-      - name: Upload APK
+      - name: Name the APK
+        run: cp app/build/outputs/apk/debug/app-debug.apk AllConnectedLyrics.apk
+
+      - name: Publish on the Releases page
+        if: github.ref == 'refs/heads/main'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          version=$(grep -oP 'versionName = "\K[^"]+' app/build.gradle.kts)
+          tag="v${version}-build${{ github.run_number }}"
+          notes="Build ${{ github.run_number }} of version ${version}: $(git log -1 --pretty=%s)
+
+          On your phone: tap AllConnectedLyrics.apk below, then open it to install (allow installing from your browser when Android asks). It installs over the previous build as an update."
+          gh release create "$tag" AllConnectedLyrics.apk --title "All Connected Lyrics ${version} (build ${{ github.run_number }})" --notes "$notes" --target "${{ github.sha }}" --latest
+
+      - name: Keep the APK with this run too
         uses: actions/upload-artifact@v4
         with:
-          name: AutosyncedLyrics-android
-          path: app/build/outputs/apk/debug/app-debug.apk
+          name: AllConnectedLyrics-android
+          path: AllConnectedLyrics.apk
           if-no-files-found: error
+          retention-days: 14
 
       - name: Upload test report (if tests failed)
         if: failure()
