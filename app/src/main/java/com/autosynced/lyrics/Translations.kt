@@ -318,6 +318,36 @@ object TextRules {
 
     fun hasKana(lines: List<Line>): Boolean = lines.any { Regex("[$KANA]").containsMatchIn(it.text) }
 
+    /** The script a translation target is written in, when it has its own (Latin-script languages: null). */
+    private fun scriptOf(target: String): Regex? = when (target) {
+        "ko" -> Regex("[$HANGUL]")
+        "ja" -> Regex("[$KANA]")
+        "ru" -> Regex("[\\u0400-\\u04ff]")
+        "th" -> Regex("[\\u0e00-\\u0e7f]")
+        "ar" -> Regex("[\\u0600-\\u06ff]")
+        else -> null
+    }
+
+    private fun isChinese(target: String) = target == "zh" || target == "zh-Hant"
+
+    /** The whole song is already in [target] (nothing to translate). Latin-script targets can't be told apart: false. */
+    fun isSongIn(lines: List<Line>, target: String): Boolean {
+        if (isChinese(target)) return isChineseSong(lines)
+        val script = scriptOf(target) ?: return false
+        val text = lines.joinToString("") { it.text }
+        val all = letters.findAll(text).count()
+        return all > 0 && script.findAll(text).count().toDouble() / all > 0.5
+    }
+
+    /** A real lyric line not already written in [target]'s script. */
+    fun worthTranslatingInto(text: String, target: String, japaneseSong: Boolean = false): Boolean {
+        if (isChinese(target)) return worthTranslating(text, japaneseSong)
+        val t = text.trim()
+        if (!letters.containsMatchIn(t) || credit.containsMatchIn(t) || isSounds(t) || isEcho(t)) return false
+        val script = scriptOf(target) ?: return true
+        return script.findAll(t).count() < letters.findAll(t).count() * 0.5
+    }
+
     // Pure vocal sounds: a line is skipped only if EVERY word in it is one of these.
     private val syllable = Regex("^(?:o+h*|a+h*|e+h*|u+h*|h?m+|hm+|ye+a*h*|ye+h+|ya+h*|yo+|la+|na+|da+|do+|du+m+|" +
         "ba+|be+|bo+p+|bu+m+|bi+ng|ra+|ta+|sha+|shoo+|wo+p+|wo+|woo+|wee+|hoo+|ho+|ha+|" +

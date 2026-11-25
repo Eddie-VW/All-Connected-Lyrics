@@ -167,7 +167,7 @@ fun LockSettingsScreen(onBack: () -> Unit) {
                     0f..LockStyle.MAX_AROUND.toFloat(), LockStyle.MAX_AROUND - 1) { v -> set { it.copy(linesBefore = v.roundToInt()) } }
                 SliderRow(tr("Lines after the current one", "当前行之后的行数"), "${style.linesAfter}", style.linesAfter.toFloat(),
                     0f..LockStyle.MAX_AROUND.toFloat(), LockStyle.MAX_AROUND - 1) { v -> set { it.copy(linesAfter = v.roundToInt()) } }
-                SwitchRow(tr("Chinese translation", "中文翻译"), translateOn) { Prefs.setTranslate(context, it) }
+                SwitchRow(tr("Translation", "翻译"), translateOn) { Prefs.setTranslate(context, it) }
                 Label(tr("Font", "字体"))
                 Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     for (family in FloatStyle.FONTS) {

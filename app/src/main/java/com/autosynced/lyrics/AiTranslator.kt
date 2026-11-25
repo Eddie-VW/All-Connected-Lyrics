@@ -60,16 +60,52 @@ class AiTranslator(private val dir: File) {
             - Do not censor or soften explicit language; translate it faithfully.
         """.trimIndent()
 
+        /** English names of the languages lyrics can be translated into (Lang codes). */
+        val LANGUAGE_NAMES = mapOf("zh" to "Simplified Chinese", "zh-Hant" to "Traditional Chinese", "en" to "English",
+            "ja" to "Japanese", "ko" to "Korean", "es" to "Spanish", "fr" to "French", "de" to "German",
+            "pt" to "Portuguese", "ru" to "Russian", "id" to "Indonesian", "th" to "Thai", "vi" to "Vietnamese",
+            "ar" to "Arabic")
+
+        /** The instructions for translating into [target]: the Chinese ones above, or the same ideas for any language. */
+        fun systemPrompt(target: String): String {
+            if (target == "zh") return SYSTEM
+            val lang = LANGUAGE_NAMES[target] ?: "English"
+            return """
+                You translate song lyrics into $lang for a karaoke-style lyrics display.
+
+                First decide what kind of song this is - its genre, era and mood (for example: hip-hop, pop, rock, punk, R&B, folk, ballad, musical, anime song, EDM) - and who is singing to whom. Then write the $lang the way a gifted $lang-speaking lyricist working in that same genre would, so a listener feels the song rather than reads a gloss of it:
+                - Rap and hip-hop: punchy, rhythmic, street-level language; slang becomes natural $lang slang; keep the swagger and the flow. Rhyme where it comes naturally.
+                - Pop: natural, catchy, everyday spoken $lang.
+                - Rock and punk: raw, blunt, direct.
+                - Ballads, folk and love songs: tender and lyrical, but in plain words.
+                - Musicals, art songs and genuinely poetic lyrics: more literary phrasing is welcome.
+                Match the original's register: casual stays casual, poetic stays poetic.
+
+                Avoid both failure modes:
+                - Too bland: stiff word-for-word translationese, flat literal phrasing, explaining instead of singing.
+                - Too forced: piling on idioms or flowery, poetic phrasing that the original does not have; making a plain line sound grand.
+
+                Rules:
+                - One line of $lang per lyric line, about as long as the original; it is read in a second or two while the song plays.
+                - Carry the mood, imagery and wordplay; idioms become natural $lang equivalents, not literal ones.
+                - Keep names and brands as they are commonly written in $lang. Pure vocal sounds (oh, yeah, la la) stay as they are.
+                - A word repeated as an echo or backing vocal ("dead, dead, dead") is translated naturally, not as one word repeated mechanically.
+                - A line that is already in $lang is returned unchanged.
+                - Where human translations of nearby lines are given, match their wording and tone.
+                - Do not censor or soften explicit language; translate it faithfully.
+            """.trimIndent()
+        }
+
         private val SCHEMA: Map<String, Any> = mapOf(
             "type" to "object",
             "properties" to mapOf(
                 // Naming the genre and tone first keeps every line in the same voice.
                 "style" to mapOf("type" to "string",
-                    "description" to "The song's genre and mood, and the Chinese tone chosen for it, in a few words"),
+                    "description" to "The song's genre and mood, and the tone chosen for the translation, in a few words"),
                 "lines" to mapOf("type" to "array", "items" to mapOf(
                     "type" to "object",
-                    "properties" to mapOf("n" to mapOf("type" to "integer"), "zh" to mapOf("type" to "string")),
-                    "required" to listOf("n", "zh"), "additionalProperties" to false)),
+                    "properties" to mapOf("n" to mapOf("type" to "integer"), "tr" to mapOf("type" to "string")),
+                    "required" to listOf("n", "tr"), "additionalProperties" to false)),
             ),
             "required" to listOf("style", "lines"), "additionalProperties" to false,
         )
@@ -133,7 +169,7 @@ class AiTranslator(private val dir: File) {
      */
     fun fill(title: String, artist: String, lines: List<Line>, cfg: ProviderConfig): List<Line> {
         val japanese = TextRules.hasKana(lines)
-        val lyric = lines.indices.filter { TextRules.worthTranslating(lines[it].text, japanese) }
+        val lyric = lines.indices.filter { TextRules.worthTranslatingInto(lines[it].text, cfg.target, japanese) }
         val want = lyric.filter { lines[it].translation == null }
         if (want.isEmpty()) return lines
 
@@ -144,7 +180,7 @@ class AiTranslator(private val dir: File) {
         if (todo.isEmpty()) return out
 
         val got: Map<Int, String> = when (cfg.provider) {
-            Provider.CLAUDE -> askClaude(title, artist, lines, lyric, todo, cfg.key.orEmpty())
+            Provider.CLAUDE -> askClaude(title, artist, lines, lyric, todo, cfg.key.orEmpty(), cfg.target)
             Provider.OPENAI -> askOtherAi(title, artist, lines, lyric, todo, cfg)
             else -> askTranslator(title, artist, lines, todo, cfg)
         }
@@ -165,15 +201,15 @@ class AiTranslator(private val dir: File) {
 
     private fun askOtherAi(title: String, artist: String, lines: List<Line>, lyric: List<Int>, todo: List<Int>,
                            cfg: ProviderConfig): Map<Int, String> {
-        val system = SYSTEM + "\n\nAnswer with only a JSON object, no other text: " +
+        val system = systemPrompt(cfg.target) + "\n\nAnswer with only a JSON object, no other text: " +
             "{\"style\": \"<the song's genre and mood, and the Chinese tone chosen>\", " +
-            "\"lines\": [{\"n\": <line number>, \"zh\": \"<translation>\"}, ...]}"
+            "\"lines\": [{\"n\": <line number>, \"tr\": \"<translation>\"}, ...]}"
         val (text, tokens) = Translators.openAiChat(cfg, system, ask(title, artist, lines, lyric, todo))
         logUsage(JSONObject()
             .put("time", SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.US).format(Date()))
             .put("title", title).put("artist", artist).put("model", cfg.model).put("lines", todo.size)
             .put("tokens", tokens).put("cost", 0.0))
-        return parse(Translators.jsonIn(text), todo.toSet())
+        return parse(Translators.jsonIn(text), todo.toSet(), lines, cfg.target)
     }
 
     /** Classic translators: each line on its own (in batches), plain style. */
@@ -183,7 +219,7 @@ class AiTranslator(private val dir: File) {
         for (batch in todo.chunked(40)) {
             val result = Translators.translate(cfg, batch.map { lines[it].text })
             batch.forEachIndexed { k, n ->
-                result.getOrNull(k)?.let { zh -> if (TextRules.squash(zh) != TextRules.squash(lines[n].text)) got[n] = TextRules.tidy(zh) }
+                result.getOrNull(k)?.let { zh -> if (TextRules.squash(zh) != TextRules.squash(lines[n].text)) got[n] = tidyFor(zh, cfg.target) }
             }
         }
         logUsage(JSONObject()
@@ -194,7 +230,7 @@ class AiTranslator(private val dir: File) {
     }
 
     private fun askClaude(title: String, artist: String, lines: List<Line>, lyric: List<Int>, todo: List<Int>,
-                          apiKey: String): Map<Int, String> {
+                          apiKey: String, target: String): Map<Int, String> {
         val model = chooseModel(todo.size, lyric.size)
         val ask = ask(title, artist, lines, lyric, todo)
         val format = JsonOutputFormat.builder().schema(
@@ -203,7 +239,7 @@ class AiTranslator(private val dir: File) {
         val params = MessageCreateParams.builder()
             .model(model)
             .maxTokens(16000L)
-            .system(SYSTEM)
+            .system(systemPrompt(target))
             .addUserMessage(ask)
             .outputConfig(OutputConfig.builder()
                 .effort(if (model == FEW_MODEL) OutputConfig.Effort.LOW else OutputConfig.Effort.MEDIUM)
@@ -230,18 +266,23 @@ class AiTranslator(private val dir: File) {
             throw IllegalStateException("Claude declined to translate this song")
         }
         val text = response.content().mapNotNull { b -> b.text().orElse(null)?.text() }.joinToString("")
-        return parse(text, todo.toSet())
+        return parse(text, todo.toSet(), lines, target)
     }
 
     /** {line number: translation} from Claude's JSON answer, only for the numbers asked for. */
-    internal fun parse(text: String, asked: Set<Int>): Map<Int, String> {
+    /** Chinese gets its repeated-character clean-up; other languages are kept as written. */
+    private fun tidyFor(text: String, target: String) = if (target == "zh" || target == "zh-Hant") TextRules.tidy(text) else text
+
+    internal fun parse(text: String, asked: Set<Int>, lines: List<Line>? = null, target: String = "zh"): Map<Int, String> {
         val arr = try { JSONObject(text).optJSONArray("lines") } catch (_: Exception) { null } ?: return emptyMap()
         val got = LinkedHashMap<Int, String>()
         for (i in 0 until arr.length()) {
             val item = arr.optJSONObject(i) ?: continue
             val n = item.optInt("n", -1)
-            val zh = item.optString("zh").trim()
-            if (n in asked && zh.isNotEmpty()) got[n] = TextRules.tidy(zh)
+            val zh = item.optString("tr").ifEmpty { item.optString("zh") }.trim()
+            // a line given back unchanged was already in the target language: no translation needed
+            val same = lines != null && n in lines.indices && TextRules.squash(zh) == TextRules.squash(lines[n].text)
+            if (n in asked && zh.isNotEmpty() && !same) got[n] = tidyFor(zh, target)
         }
         return got
     }

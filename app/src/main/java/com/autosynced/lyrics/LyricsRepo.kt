@@ -86,10 +86,11 @@ object LyricsRepo {
         scope.launch { Prefs.aiTranslate.drop(1).collect { if (it) retranslate() } }
         // A different service: its own go at the lines the previous one translated.
         scope.launch { Prefs.provider.drop(1).collect { retranslate(dropAi = true) } }
+        scope.launch { Prefs.targetLang.drop(1).collect { retranslate() } }
     }
 
     private fun show(track: Track, lyrics: Lyrics) {
-        _state.value = LyricsState.Found(translated[track.key] ?: lyrics)
+        _state.value = LyricsState.Found(translated[tkey(track)] ?: lyrics)
         translate(track, lyrics)
     }
 
@@ -105,14 +106,25 @@ object LyricsRepo {
 
     private fun needsTranslation(lines: List<Line>): Boolean {
         val japanese = TextRules.hasKana(lines)
-        return lines.any { it.translation == null && TextRules.worthTranslating(it.text, japanese) }
+        val target = Prefs.targetLang.value
+        return lines.any { it.translation == null && TextRules.worthTranslatingInto(it.text, target, japanese) }
     }
+
+    /** Translations are remembered per song and per target language. */
+    private fun tkey(track: Track) = track.key + "\u0000" + Prefs.targetLang.value
 
     private fun translate(track: Track, raw: Lyrics) {
         translateJob?.cancel()
-        if (!Prefs.translate.value || !raw.synced || TextRules.isChineseSong(raw.lines)) return
+        if (!Prefs.translate.value || !raw.synced) return
+        if (TextRules.isSongIn(raw.lines, Prefs.targetLang.value)) {
+            // already in that language: show the lyrics without another language's translations
+            if (NowPlaying.state.value.track?.key == track.key) _state.value = LyricsState.Found(raw)
+            return
+        }
+        // show this language's translations so far (not another language's) while looking for more
+        if (NowPlaying.state.value.track?.key == track.key) _state.value = LyricsState.Found(translated[tkey(track)] ?: raw)
         translateJob = scope.launch {
-            var lines = translated[track.key]?.lines ?: raw.lines
+            var lines = translated[tkey(track)]?.lines ?: raw.lines
             fun emit(busy: Boolean, note: String? = null) {
                 if (NowPlaying.state.value.track?.key == track.key) {
                     _state.value = LyricsState.Found(raw.copy(lines = lines), busy, note)
@@ -120,12 +132,12 @@ object LyricsRepo {
             }
             if (!needsTranslation(lines)) { emit(false); return@launch }
             emit(true)
-            // 1. Human translations from NetEase / QQ Music / Kugou (asked once per song).
-            if (!translated.containsKey(track.key)) {
-                lines = try {
+            // 1. Human translations from NetEase / QQ Music / Kugou (asked once per song; they're all Simplified Chinese).
+            if (!translated.containsKey(tkey(track))) {
+                if (Prefs.targetLang.value == "zh") lines = try {
                     TranslationSources.attach(lines, track.title, track.artist, track.durationMs / 1000.0)
                 } catch (e: CancellationException) { throw e } catch (_: Exception) { lines }
-                translated[track.key] = raw.copy(lines = lines)
+                translated[tkey(track)] = raw.copy(lines = lines)
                 emit(true)
             }
             // 2. Claude for the lines still missing, if the user allows it and has a key.
@@ -142,7 +154,7 @@ object LyricsRepo {
                         lines = TranslationMatcher.share(withContext(Dispatchers.IO) {
                             ai.fill(track.title, track.artist, before, cfg)
                         })
-                        translated[track.key] = raw.copy(lines = lines)
+                        translated[tkey(track)] = raw.copy(lines = lines)
                     } catch (e: CancellationException) { throw e } catch (e: Exception) {
                         note = tr("AI translation didn't work: ", "AI 翻译失败：") + reason(e)
                     }
@@ -177,7 +189,7 @@ object LyricsRepo {
         mine.save(track.title, track.artist, clean)
         val lyrics = Lyrics(clean, LyricEdits.isSynced(clean), MyLyrics.SOURCE)
         cache[track.key] = lyrics
-        translated.remove(track.key)
+        translated.remove(tkey(track))
         show(track, lyrics)
     }
 
@@ -189,7 +201,7 @@ object LyricsRepo {
         val track = NowPlaying.state.value.track ?: return
         mine.delete(track.title, track.artist)
         cache.remove(track.key)
-        translated.remove(track.key)
+        translated.remove(tkey(track))
         job?.cancel(); translateJob?.cancel()
         _state.value = LyricsState.Loading
         job = scope.launch {

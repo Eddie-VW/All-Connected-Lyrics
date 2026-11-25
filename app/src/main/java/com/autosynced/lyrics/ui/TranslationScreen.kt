@@ -44,8 +44,10 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.autosynced.lyrics.tr
+import com.autosynced.lyrics.trf
 import com.autosynced.lyrics.AI_PRESETS
 import com.autosynced.lyrics.ApiKeyStore
+import com.autosynced.lyrics.Lang
 import com.autosynced.lyrics.LyricsRepo
 import com.autosynced.lyrics.Prefs
 import com.autosynced.lyrics.Provider
@@ -89,20 +91,27 @@ fun TranslationScreen(onBack: () -> Unit) {
     val translateOn by Prefs.translate.collectAsState()
     val aiOn by Prefs.aiTranslate.collectAsState()
     val provider by Prefs.provider.collectAsState()
+    val target by Prefs.targetLang.collectAsState()
 
     Column(Modifier.fillMaxSize().background(pal.bg).systemBarsPadding()) {
         Row(Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 6.dp), verticalAlignment = Alignment.CenterVertically) {
             TextButton(onClick = onBack) { Text(tr("‹ Back", "‹ 返回"), color = pal.accent, fontSize = 16.sp) }
-            Text(tr("Chinese translation", "中文翻译"), color = pal.text, fontSize = 18.sp, fontWeight = FontWeight.Bold)
+            Text(tr("Translation", "翻译"), color = pal.text, fontSize = 18.sp, fontWeight = FontWeight.Bold)
         }
         Column(Modifier.weight(1f).verticalScroll(rememberScrollState()).padding(horizontal = 18.dp)) {
             Section(tr("Translation", "翻译")) {
                 SwitchRow(tr("Show translation", "显示翻译"), translateOn,
-                    tr("Simplified Chinese under each line, in the app and the floating lyrics. Human translations " +
-                        "from NetEase, QQ Music and Kugou are always used first.",
-                        "在应用和悬浮歌词中，每行下面显示简体中文。总是优先使用网易云、QQ 音乐和酷狗的人工翻译。")) { Prefs.setTranslate(context, it) }
-                SwitchRow(tr("Fill in lines no music site translated", "补全音乐网站没有翻译的歌词"), aiOn,
-                    tr("Using the service you choose below.", "使用下面选择的服务。")) { Prefs.setAiTranslate(context, it) }
+                    tr("A translation under each line, in the app, the floating lyrics and the lock screen.",
+                        "在应用、悬浮歌词和锁屏上，每行下面显示翻译。")) { Prefs.setTranslate(context, it) }
+                Label(tr("Translate into", "翻译成"))
+                ValueChips(Lang.LANGUAGES.map { it.first }, target, { Lang.nameOf(it) }) { Prefs.setTargetLang(context, it) }
+                Hint(if (target == "zh") tr("Human translations from NetEase, QQ Music and Kugou are used first; the service below " +
+                    "fills in the rest.", "优先使用网易云、QQ 音乐和酷狗的人工翻译，其余由下面的服务补全。")
+                    else tr("Music sites only have Simplified Chinese translations, so the service below translates every line.",
+                        "音乐网站只有简体中文翻译，所以每一行都由下面的服务翻译。"))
+                SwitchRow(tr("Translate with a service", "使用翻译服务"), aiOn,
+                    tr("Lines without a human translation are translated by the service you choose below.",
+                        "没有人工翻译的歌词，由下面选择的服务翻译。")) { Prefs.setAiTranslate(context, it) }
             }
             if (aiOn) {
                 Section(tr("Service", "服务")) {

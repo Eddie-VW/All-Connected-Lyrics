@@ -65,9 +65,11 @@ data class ProviderConfig(
     val extra: String = "",        // Microsoft region / Baidu App ID
     val baseUrl: String = "",      // Other AI
     val model: String = "",        // Other AI
+    val target: String = "zh",     // the language to translate into (a Lang code)
 ) {
-    /** Separates remembered translations by service (a different AI may word things differently). */
-    val storeTag: String get() = if (provider == Provider.OPENAI) "openai:$model" else provider.id
+    /** Separates remembered translations by service (a different AI may word things differently) and language. */
+    val storeTag: String get() = (if (provider == Provider.OPENAI) "openai:$model" else provider.id) +
+        (if (target == "zh") "" else ":$target")
     val ready: Boolean get() = !provider.needsKey || !key.isNullOrBlank()
 }
 
@@ -77,6 +79,18 @@ class TranslatorException(val status: Int, message: String) : Exception(message)
 /** Calls to the non-Claude services (plain HTTP; all answers parsed here so they're tested on a PC). */
 object Translators {
     private const val UA = "Mozilla/5.0 (Linux; Android 14) LyricsMaster/1.0"
+
+    /** Each service's name for a language (Lang codes in, the service's codes out). */
+    fun code(p: Provider, target: String): String {
+        val i = listOf("zh", "zh-Hant", "en", "ja", "ko", "es", "fr", "de", "pt", "ru", "id", "th", "vi", "ar").indexOf(target)
+            .coerceAtLeast(0)
+        return when (p) {
+            Provider.DEEPL -> listOf("ZH-HANS", "ZH-HANT", "EN-US", "JA", "KO", "ES", "FR", "DE", "PT-BR", "RU", "ID", "TH", "VI", "AR")[i]
+            Provider.MICROSOFT -> listOf("zh-Hans", "zh-Hant", "en", "ja", "ko", "es", "fr", "de", "pt", "ru", "id", "th", "vi", "ar")[i]
+            Provider.BAIDU -> listOf("zh", "cht", "en", "jp", "kor", "spa", "fra", "de", "pt", "ru", "id", "th", "vie", "ara")[i]
+            else -> listOf("zh-CN", "zh-TW", "en", "ja", "ko", "es", "fr", "de", "pt", "ru", "id", "th", "vi", "ar")[i]
+        }
+    }
 
     // ---- AI services with an OpenAI-style chat API ---------------------------------------
     /** Claude-style answer text ({"style":…,"lines":[{"n":…,"zh":…}]}) and tokens used. */
@@ -114,7 +128,7 @@ object Translators {
         Provider.DEEPL -> deepl(cfg, texts)
         Provider.MICROSOFT -> microsoft(cfg, texts)
         Provider.BAIDU -> baidu(cfg, texts)
-        Provider.GOOGLE -> google(texts)
+        Provider.GOOGLE -> google(texts, cfg.target)
         else -> error("${cfg.provider} isn't a classic translator")
     }
 
@@ -123,7 +137,7 @@ object Translators {
 
     private fun deepl(cfg: ProviderConfig, texts: List<String>): List<String?> {
         val key = cfg.key.orEmpty().trim()
-        val body = JSONObject().put("text", JSONArray(texts)).put("target_lang", "ZH-HANS")
+        val body = JSONObject().put("text", JSONArray(texts)).put("target_lang", code(Provider.DEEPL, cfg.target))
         val (code, text) = http(deeplHost(key) + "/v2/translate", body.toString(),
             mapOf("Authorization" to "DeepL-Auth-Key $key", "Content-Type" to "application/json"))
         if (code !in 200..299) throw TranslatorException(code, errorMessage(text))
@@ -135,7 +149,7 @@ object Translators {
         val body = JSONArray(texts.map { JSONObject().put("Text", it) })
         val headers = mutableMapOf("Ocp-Apim-Subscription-Key" to cfg.key.orEmpty().trim(), "Content-Type" to "application/json")
         if (cfg.extra.isNotBlank() && cfg.extra.trim().lowercase() != "global") headers["Ocp-Apim-Subscription-Region"] = cfg.extra.trim()
-        val (code, text) = http("https://api.cognitive.microsofttranslator.com/translate?api-version=3.0&to=zh-Hans",
+        val (code, text) = http("https://api.cognitive.microsofttranslator.com/translate?api-version=3.0&to=" + code(Provider.MICROSOFT, cfg.target),
             body.toString(), headers)
         if (code !in 200..299) throw TranslatorException(code, errorMessage(text))
         return parseMicrosoft(text, texts.size)
@@ -157,7 +171,7 @@ object Translators {
         val secret = cfg.key.orEmpty().trim()
         val q = texts.joinToString("\n") { it.replace('\n', ' ') }
         val salt = System.currentTimeMillis().toString()
-        val form = listOf("q" to q, "from" to "auto", "to" to "zh", "appid" to appId, "salt" to salt,
+        val form = listOf("q" to q, "from" to "auto", "to" to code(Provider.BAIDU, cfg.target), "appid" to appId, "salt" to salt,
             "sign" to baiduSign(appId, q, salt, secret))
             .joinToString("&") { (k, v) -> k + "=" + URLEncoder.encode(v, "UTF-8") }
         val (code, text) = http("https://fanyi-api.baidu.com/api/trans/vip/translate", form,
@@ -175,10 +189,10 @@ object Translators {
         return (0 until n).map { arr.optJSONObject(it)?.optString("dst")?.takeIf { s -> s.isNotBlank() } }
     }
 
-    private fun google(texts: List<String>): List<String?> {
+    private fun google(texts: List<String>, target: String): List<String?> {
         // One request for the whole batch, a line per lyric line.
         val q = texts.joinToString("\n") { it.replace('\n', ' ') }
-        val url = "https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=zh-CN&dt=t&q=" +
+        val url = "https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=" + code(Provider.GOOGLE, target) + "&dt=t&q=" +
             URLEncoder.encode(q, "UTF-8")
         val (code, text) = http(url, null, emptyMap())
         if (code !in 200..299) throw TranslatorException(code, "Google Translate answered $code")

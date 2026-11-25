@@ -64,6 +64,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.autosynced.lyrics.tr
+import com.autosynced.lyrics.trf
 import com.autosynced.lyrics.translateIcon
 import com.autosynced.lyrics.CoverStyle
 import com.autosynced.lyrics.LyricsRepo
@@ -187,7 +188,7 @@ private fun TopBar(
     ) {
         Text(tr("Lyrics Master", "歌词大师"), color = pal.text, fontSize = 18.sp, fontWeight = FontWeight.Bold,
             maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f))
-        // Chinese translation: on/off and AI settings
+        // translation: on/off and its settings
         Pill(translateIcon(), translateOn, onTranslation)
         Spacer(Modifier.width(8.dp))
         Pill(if (floatingOn) tr("Floating on", "悬浮：开") else tr("Floating off", "悬浮：关"), floatingOn, onToggleFloating)
@@ -297,7 +298,7 @@ private fun ColumnScope.NowPlayingScreen(tint: Color?, translateOn: Boolean, ful
     val found = lyricsState as? LyricsState.Found
     val status = when {
         !translateOn || found == null -> null
-        found.translating -> tr("Finding Chinese translations…", "正在查找中文翻译…")
+        found.translating -> tr("Finding translations…", "正在查找翻译…")
         else -> found.note
     }
     // translation status on the left; edit (or add) the lyrics on the right

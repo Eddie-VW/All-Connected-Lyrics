@@ -127,7 +127,7 @@ fun FloatSettingsScreen(onBack: () -> Unit) {
                 SliderRow(tr("Lines after the current one", "当前行之后的行数"), "${style.linesAfter}", style.linesAfter.toFloat(),
                     0f..FloatStyle.MAX_AROUND.toFloat(), FloatStyle.MAX_AROUND - 1) { set { s -> s.copy(linesAfter = it.roundToInt()) } }
                 SwitchRow(tr("Song title & artist on top", "顶部显示歌名和歌手"), style.showHeader) { set { s -> s.copy(showHeader = it) } }
-                SwitchRow(tr("Chinese translation under the current line", "在当前行下显示中文翻译"), translateOn) { Prefs.setTranslate(context, it) }
+                SwitchRow(tr("Translation under the current line", "在当前行下显示翻译"), translateOn) { Prefs.setTranslate(context, it) }
             }
 
             Section(tr("Text", "文字")) {

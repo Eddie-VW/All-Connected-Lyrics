@@ -82,7 +82,8 @@ fun SettingsHub(onBack: () -> Unit, open: (Page) -> Unit) {
                 if (lock.enabled) tr("On · background, clock, cover, lyrics, colours", "已开启 · 背景、时钟、封面、歌词、颜色")
                 else tr("Off · show lyrics over the lock screen", "未开启 · 在锁屏上显示歌词")) { open(Page.LOCK) }
             HubRow(tr("Translation", "翻译"),
-                if (translate) tr("On · services and keys", "已开启 · 服务和密钥") else tr("Off · services and keys", "未开启 · 服务和密钥")) {
+                if (translate) trf("On · into {0} · services and keys", "已开启 · 翻译成{0} · 服务和密钥", Lang.nameOf(Prefs.targetLang.value))
+                else tr("Off · language, services and keys", "未开启 · 语言、服务和密钥")) {
                 open(Page.TRANSLATION) }
             HubRow(tr("About", "关于"), trf("Version {0} · updates · developer", "版本 {0} · 检查更新 · 开发者",
                 com.autosynced.lyrics.BuildConfig.VERSION_NAME)) { open(Page.ABOUT) }

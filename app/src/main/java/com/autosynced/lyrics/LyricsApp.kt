@@ -46,8 +46,14 @@ object Prefs {
     /** Everything needed to call the chosen service (reads the encrypted key: not on the main thread). */
     fun providerConfig(c: Context): ProviderConfig {
         val v = provider.value
-        return ProviderConfig(v, ApiKeyStore.get(c, ApiKeyStore.slot(v)), providerExtra(c, v), aiBaseUrl(c), aiModel(c))
+        return ProviderConfig(v, ApiKeyStore.get(c, ApiKeyStore.slot(v)), providerExtra(c, v), aiBaseUrl(c), aiModel(c),
+            targetLang.value)
     }
+
+    // The language lyrics are translated into (a Lang code); Simplified Chinese at first, as before.
+    private val _targetLang = MutableStateFlow("zh")
+    val targetLang: StateFlow<String> = _targetLang
+    fun setTargetLang(c: Context, v: String) { _targetLang.value = v; p(c).edit().putString("target_lang", v).apply() }
 
     // Colours of the main screen's lyrics, and the lock-screen lyrics' settings.
     private val _appLyrics = MutableStateFlow(AppLyricsStyle())
@@ -77,6 +83,7 @@ object Prefs {
         _appLyrics.value = AppLyricsStyle.fromJson(p(c).getString("app_lyrics", null))
         _lockStyle.value = LockStyle.fromJson(p(c).getString("lock_style", null))
         _provider.value = Provider.of(p(c).getString("provider", null))
+        _targetLang.value = p(c).getString("target_lang", null) ?: "zh"
         _floatStyle.value = FloatStyle.fromJson(p(c).getString("float_style", null))
         _translate.value = p(c).getBoolean("translate", false)
         _aiTranslate.value = p(c).getBoolean("ai_translate", true)
