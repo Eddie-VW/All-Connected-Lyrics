@@ -41,7 +41,8 @@ class LockStyleTest {
 
     @Test fun mainScreenColoursRoundTrip() {
         val s = AppLyricsStyle(styleColors = false, current = 0xFFFFD43B.toInt(), past = 0x40FFFFFF,
-            upcoming = 0x30FFFFFF, translation = 0xCC4DABF7.toInt(), panel = "colour", panelColor = 0xFF102030.toInt())
+            upcoming = 0x30FFFFFF, translation = 0xCC4DABF7.toInt(), panel = "colour", panelColor = 0xFF102030.toInt(),
+            panelOpacity = 0.4f, panelBlur = 30, softFocus = true, glow = true, fullScreen = true)
         assertEquals(s, AppLyricsStyle.fromJson(s.toJson()))
         assertEquals("glass", AppLyricsStyle.fromJson("""{"panel":"glitter"}""").panel)
         // Day style: the style's text colour, with the others see-through

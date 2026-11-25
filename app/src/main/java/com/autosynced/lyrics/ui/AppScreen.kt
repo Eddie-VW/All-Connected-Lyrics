@@ -104,19 +104,37 @@ fun AppScreen(
     val bgTop by animateColorAsState(
         if (pal.night) (tint ?: Color(0xFF3A3A3A)) else (tint?.copy(alpha = .22f) ?: Color(0x22FA2D48)),
         tween(600), label = "tint")
-    Column(
-        Modifier
-            .fillMaxSize()
-            .background(Brush.verticalGradient(listOf(bgTop, pal.bg), endY = 1400f))
-            .background(if (pal.night) Color.Transparent else pal.bg.copy(alpha = .55f))
-            .systemBarsPadding()
-    ) {
-        TopBar(style, floatingOn, translateOn, onToggleStyle, onToggleFloating,
-            onTranslation = { page = Page.TRANSLATION; fromHub = false }, onFloatSettings = { page = Page.HUB })
-        if (!hasAccess) {
-            AccessCard(onGrantAccess)
-        } else {
-            NowPlayingScreen(tint, translateOn, onEdit = { page = Page.EDITOR; fromHub = false })
+    // full screen: the lyrics panel's background (e.g. the blurred cover) fills the whole screen, lock-screen style
+    val context = androidx.compose.ui.platform.LocalContext.current
+    val appLyrics by Prefs.appLyrics.collectAsState()
+    val full = appLyrics.fullScreen && hasAccess
+    val toggleFull = { Prefs.setAppLyrics(context, Prefs.appLyrics.value.let { it.copy(fullScreen = !it.fullScreen) }) }
+    Box(Modifier.fillMaxSize().background(pal.bg)) {
+        if (full) LyricsPanel(appLyrics, playback.art, Modifier.fillMaxSize(), corner = 0.dp) {}
+        Column(
+            Modifier
+                .fillMaxSize()
+                .then(if (full) Modifier else Modifier
+                    .background(Brush.verticalGradient(listOf(bgTop, pal.bg), endY = 1400f))
+                    .background(if (pal.night) Color.Transparent else pal.bg.copy(alpha = .55f)))
+                .systemBarsPadding()
+        ) {
+            if (full) {
+                Row(Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 4.dp)) {
+                    Spacer(Modifier.weight(1f))
+                    Text(tr("⤡ Exit full screen", "⤡ 退出全屏"), color = pal.text, fontSize = 13.sp, fontWeight = FontWeight.SemiBold,
+                        modifier = Modifier.clip(RoundedCornerShape(50)).background(pal.surface.copy(alpha = 0.45f))
+                            .clickable(onClick = toggleFull).padding(horizontal = 12.dp, vertical = 7.dp))
+                }
+            } else {
+                TopBar(style, floatingOn, translateOn, onToggleStyle, onToggleFloating,
+                    onTranslation = { page = Page.TRANSLATION; fromHub = false }, onFloatSettings = { page = Page.HUB })
+            }
+            if (!hasAccess) {
+                AccessCard(onGrantAccess)
+            } else {
+                NowPlayingScreen(tint, translateOn, full, onEdit = { page = Page.EDITOR; fromHub = false }, onFullScreen = toggleFull)
+            }
         }
     }
 }
@@ -198,7 +216,8 @@ private fun AccessCard(onGrantAccess: () -> Unit) {
 
 // ---- now playing ----------------------------------------------------------------------------
 @Composable
-private fun ColumnScope.NowPlayingScreen(tint: Color?, translateOn: Boolean, onEdit: () -> Unit) {
+private fun ColumnScope.NowPlayingScreen(tint: Color?, translateOn: Boolean, full: Boolean, onEdit: () -> Unit,
+                                         onFullScreen: () -> Unit) {
     val pal = LocalPalette.current
     val appLyrics by Prefs.appLyrics.collectAsState()
     val playback by NowPlaying.state.collectAsState()
@@ -245,9 +264,11 @@ private fun ColumnScope.NowPlayingScreen(tint: Color?, translateOn: Boolean, onE
         else -> found.note
     }
     // translation status on the left; edit (or add) the lyrics on the right
-    if (track != null || status != null) {
+    if (track != null || status != null || !full) {
         Row(Modifier.fillMaxWidth().padding(start = 20.dp, end = 8.dp), verticalAlignment = Alignment.CenterVertically) {
             Text(status ?: "", color = pal.sub, fontSize = 12.sp, lineHeight = 16.sp, modifier = Modifier.weight(1f))
+            if (!full) Text(tr("⤢ Full screen", "⤢ 全屏"), color = pal.accent, fontSize = 13.sp, fontWeight = FontWeight.SemiBold,
+                modifier = Modifier.clip(RoundedCornerShape(50)).clickable(onClick = onFullScreen).padding(horizontal = 10.dp, vertical = 6.dp))
             if (track != null && lyricsState !is LyricsState.Loading) {
                 val has = lyricsState is LyricsState.Found
                 Text(if (has) tr("✎ Edit lyrics", "✎ 编辑歌词") else tr("＋ Add lyrics", "＋ 添加歌词"), color = pal.accent,
@@ -258,7 +279,9 @@ private fun ColumnScope.NowPlayingScreen(tint: Color?, translateOn: Boolean, onE
     }
 
     // lyrics
-    LyricsPanel(appLyrics, playback.art, Modifier.weight(1f).fillMaxWidth().padding(horizontal = 12.dp, vertical = 6.dp)) {
+    // in full screen the background is already behind everything, so the lyrics need no box of their own
+    LyricsPanel(if (full) appLyrics.copy(panel = "none") else appLyrics, playback.art,
+        Modifier.weight(1f).fillMaxWidth().padding(horizontal = 12.dp, vertical = 6.dp)) {
         when (val s = lyricsState) {
             is LyricsState.Found -> LyricsList(s.lyrics, now, playback.canSeek, translateOn)
             is LyricsState.Loading -> Message(tr("Loading lyrics…", "正在加载歌词…"))
@@ -315,6 +338,10 @@ private fun LyricsList(lyrics: com.autosynced.lyrics.Lyrics, now: Long, canSeek:
                         fontSize = (if (lyrics.synced) 24 else 18).sp * scale,
                         fontWeight = if (lyrics.synced) FontWeight.ExtraBold else FontWeight.SemiBold,
                         lineHeight = 30.sp,
+                        style = if (appLyrics.glow && isNow && lyrics.synced)
+                            androidx.compose.ui.text.TextStyle(shadow = androidx.compose.ui.graphics.Shadow(color.copy(alpha = 0.75f),
+                                androidx.compose.ui.geometry.Offset.Zero, 28f))
+                            else androidx.compose.ui.text.TextStyle.Default,
                         modifier = Modifier.softFocus(soft),
                     )
                     val lineTr = line.translation

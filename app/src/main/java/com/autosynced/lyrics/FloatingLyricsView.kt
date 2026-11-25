@@ -144,9 +144,23 @@ class FloatingLyricsView(context: Context) : LinearLayout(context) {
 
     val controlsShown: Boolean get() = controls.visibility == View.VISIBLE
 
+    /** The box behind the window: its own see-through setting, or (while the buttons show) at least
+     *  the buttons' setting, so they're easy to see even over a busy screen. */
+    private fun paintBackground() {
+        val c = style.colors(night)
+        val alpha = if (controlsShown) maxOf(style.bgOpacity, style.controlsOpacity) else style.bgOpacity
+        background = GradientDrawable().apply {
+            cornerRadius = dp(style.cornerDp.toFloat())
+            setColor(withAlpha(c.bg, alpha))
+            if (alpha > 0.05f) setStroke(dp(1f).toInt(), if (night || !style.styleColors) 0x26FFFFFF else 0x1F000000)
+        }
+        elevation = if (alpha > 0.3f) dp(6f) else 0f
+    }
+
     fun showControls(show: Boolean) {
         removeCallbacks(hideControls)
         controls.visibility = if (show) View.VISIBLE else View.GONE
+        paintBackground()
         if (!show) swatches.visibility = View.GONE
         if (show) keepControls()
     }
@@ -197,14 +211,7 @@ class FloatingLyricsView(context: Context) : LinearLayout(context) {
         val c = style.colors(night)
         val pad = dp(14f).toInt()
         setPadding(pad, dp(9f).toInt(), pad, dp(10f).toInt())
-        background = GradientDrawable().apply {
-            cornerRadius = dp(style.cornerDp.toFloat())
-            setColor(withAlpha(c.bg, style.bgOpacity))
-            if (style.bgOpacity > 0.05f) {
-                setStroke(dp(1f).toInt(), if (night || !style.styleColors) 0x26FFFFFF else 0x1F000000)
-            }
-        }
-        elevation = if (style.bgOpacity > 0.3f) dp(6f) else 0f
+        paintBackground()
         dress(header, style.headerSize.toFloat(), c.header, bold = false, maxLines = 1)
         header.visibility = if (style.showHeader && header.text.isNotEmpty()) View.VISIBLE else View.GONE
         tintControls()

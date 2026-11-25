@@ -113,6 +113,10 @@ fun FloatSettingsScreen(onBack: () -> Unit) {
                     set { s -> s.copy(opacity = it) } }
                 SliderRow(tr("Background", "背景"), if (style.bgOpacity < 0.01f) tr("none", "无") else "${(style.bgOpacity * 100).roundToInt()}%",
                     style.bgOpacity, 0f..1f, 19) { set { s -> s.copy(bgOpacity = it) } }
+                SliderRow(tr("Background while buttons show", "显示按钮时的背景"), "${(style.controlsOpacity * 100).roundToInt()}%",
+                    style.controlsOpacity, 0f..1f, 19) { set { s -> s.copy(controlsOpacity = it) } }
+                Hint(tr("Tap the floating lyrics to show the buttons; the box behind them makes them easy to see.",
+                    "点悬浮歌词会显示按钮；按钮后面的背景让它们更清楚。"))
                 SliderRow(tr("Rounded corners", "圆角"), "${style.cornerDp}", style.cornerDp.toFloat(), 0f..32f, 15) {
                     set { s -> s.copy(cornerDp = it.roundToInt()) } }
             }
@@ -183,9 +187,9 @@ fun FloatSettingsScreen(onBack: () -> Unit) {
                     }
                 }
                 SwitchRow(tr("Lock the window", "锁定窗口"), style.locked,
-                    tr("Touches go through it to the app underneath, and it can't be moved. Unlock from the " +
-                        "notification or here. (Android keeps a locked window a little see-through.)",
-                        "触摸会穿透到下面的应用，窗口也不能移动。可在通知或这里解锁。（安卓会让锁定的窗口略微透明。）")) {
+                    tr("Touches go through it to the app underneath, and it can't be moved. To unlock, tap the small lock " +
+                        "at its corner, the notification, or here. (Android keeps a locked window a little see-through.)",
+                        "触摸会穿透到下面的应用，窗口也不能移动。解锁：点窗口角落的小锁、通知或这里。（安卓会让锁定的窗口略微透明。）")) {
                     set { s -> s.copy(locked = it) } }
                 val secs = style.offsetMs / 1000.0
                 SliderRow(tr("Timing", "时间偏移"),

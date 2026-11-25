@@ -142,7 +142,10 @@ fun MainScreenSettings(onBack: () -> Unit) {
                         val i = (index + k).mod(SAMPLE.size)
                         val color = Color(when { k == 0 -> c.current; k < 0 -> c.past; else -> c.upcoming })
                         Text(SAMPLE[i].text, color = color, fontSize = if (k == 0) 16.sp else 14.sp, fontWeight = FontWeight.ExtraBold,
-                            maxLines = 1, modifier = if (k != 0) Modifier.softFocus(style.softFocus) else Modifier)
+                            maxLines = 1, modifier = if (k != 0) Modifier.softFocus(style.softFocus) else Modifier,
+                            style = if (style.glow && k == 0) androidx.compose.ui.text.TextStyle(shadow = androidx.compose.ui.graphics.Shadow(
+                                color.copy(alpha = 0.75f), androidx.compose.ui.geometry.Offset.Zero, 20f))
+                                else androidx.compose.ui.text.TextStyle.Default)
                         val line = SAMPLE[i].translation
                         if (translateOn && line != null && k == 0) Text(line, color = Color(c.translation),
                             fontSize = 12.sp, fontWeight = FontWeight.SemiBold, maxLines = 1)
@@ -200,6 +203,10 @@ fun MainScreenSettings(onBack: () -> Unit) {
                     SliderRow(tr("Blur", "模糊程度"), "${style.panelBlur}", style.panelBlur.toFloat(), 0f..100f, 19) { v ->
                         set { it.copy(panelBlur = v.roundToInt()) } }
                 }
+                SwitchRow(tr("Glow around the current line", "当前行发光"), style.glow) { on -> set { it.copy(glow = on) } }
+                SwitchRow(tr("Full screen", "全屏"), style.fullScreen,
+                    tr("The panel's background fills the whole screen, like the lock screen. Also: the ⤢ button above the lyrics.",
+                        "面板背景铺满整个屏幕，像锁屏一样。也可以用歌词上方的 ⤢ 按钮切换。")) { on -> set { it.copy(fullScreen = on) } }
                 SwitchRow(tr("Soft-focus lyrics", "柔焦歌词"), style.softFocus,
                     tr("Lines other than the current one are slightly blurred (Android 12 and newer).",
                         "当前行以外的歌词略微模糊（安卓 12 及以上）。")) { on -> set { it.copy(softFocus = on) } }

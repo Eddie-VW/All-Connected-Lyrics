@@ -17,6 +17,8 @@ data class AppLyricsStyle(
     val panelOpacity: Float = 0.85f,             // how solid the panel is, 0 = see-through
     val panelBlur: Int = 70,                     // 0..100, for "glass"
     val softFocus: Boolean = false,              // lines other than the current one slightly blurred (as on the PC in Day)
+    val glow: Boolean = false,                   // soft glow around the current line
+    val fullScreen: Boolean = false,             // the panel's background fills the whole screen (lock-screen style)
 ) {
     data class Colors(val current: Int, val past: Int, val upcoming: Int, val translation: Int)
 
@@ -37,6 +39,7 @@ data class AppLyricsStyle(
     fun toJson(): String = JSONObject().put("styleColors", styleColors).put("current", current).put("past", past)
         .put("upcoming", upcoming).put("translation", translation).put("panel", panel).put("panelColor", panelColor)
         .put("panelOpacity", panelOpacity.toDouble()).put("panelBlur", panelBlur).put("softFocus", softFocus)
+        .put("glow", glow).put("fullScreen", fullScreen)
         .toString()
 
     companion object {
@@ -57,6 +60,8 @@ data class AppLyricsStyle(
                 panelOpacity = (if (j.has("panelOpacity")) j.optDouble("panelOpacity", 0.85).toFloat() else d.panelOpacity).coerceIn(0f, 1f),
                 panelBlur = i("panelBlur", d.panelBlur).coerceIn(0, 100),
                 softFocus = j.optBoolean("softFocus", d.softFocus),
+                glow = j.optBoolean("glow", d.glow),
+                fullScreen = j.optBoolean("fullScreen", d.fullScreen),
             )
         }
     }

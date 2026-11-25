@@ -13,7 +13,7 @@ class FloatStyleTest {
         val s = FloatStyle(widthPct = 70, opacity = 0.6f, bgOpacity = 0f, linesBefore = 2, linesAfter = 3,
             showHeader = true, font = "serif", currentSize = 22, boldCurrent = false, outline = true,
             outlineColor = 0xFF112233.toInt(), styleColors = false, currentColor = 0xFFFFD43B.toInt(),
-            animation = "slide", locked = true, offsetMs = -400, align = "left")
+            animation = "slide", locked = true, offsetMs = -400, align = "left", controlsOpacity = 0.5f)
         assertEquals(s, FloatStyle.fromJson(s.toJson()))
     }
 

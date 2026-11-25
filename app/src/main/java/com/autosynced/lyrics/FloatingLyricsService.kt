@@ -66,6 +66,9 @@ class FloatingLyricsService : Service() {
     private var appliedStyle: FloatStyle? = null
     private var appliedNight = true
     private var screenOffWatch: BroadcastReceiver? = null
+    // While the window is locked, all its touches go through it, so it can't notice a tap; this
+    // small badge at its corner is the one part that can be tapped, to unlock it.
+    private var lockBadge: android.widget.ImageView? = null
 
     override fun onBind(intent: Intent?): IBinder? = null
 
@@ -82,7 +85,10 @@ class FloatingLyricsService : Service() {
     private fun refreshParts() {
         val floating = Prefs.floating(this) && canDraw(this)
         if (floating && card == null) addOverlay()
-        if (!floating) card?.let { try { wm.removeView(it) } catch (_: Exception) {}; card = null; appliedStyle = null }
+        if (!floating) {
+            card?.let { try { wm.removeView(it) } catch (_: Exception) {}; card = null; appliedStyle = null }
+            removeLockBadge()
+        }
         val lock = Prefs.lockStyle.value.enabled
         if (lock && screenOffWatch == null) {
             screenOffWatch = object : BroadcastReceiver() {
@@ -118,6 +124,7 @@ class FloatingLyricsService : Service() {
         handler.removeCallbacks(tick)
         card?.let { try { wm.removeView(it) } catch (_: Exception) {} }
         card = null
+        removeLockBadge()
         screenOffWatch?.let { try { unregisterReceiver(it) } catch (_: Exception) {} }
         screenOffWatch = null
         super.onDestroy()
@@ -220,6 +227,41 @@ class FloatingLyricsService : Service() {
         wm.addView(box, params)
     }
 
+    private fun showLockBadge() {
+        val size = (resources.displayMetrics.density * 30).toInt()
+        val badgeParams = WindowManager.LayoutParams(size, size, WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY,
+            WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE or WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS,
+            PixelFormat.TRANSLUCENT).apply {
+            gravity = Gravity.TOP or Gravity.START
+            // the window's top-right corner, slightly outside it
+            x = (params.x + params.width - size * 0.7f).toInt()
+            y = (params.y - size * 0.35f).toInt().coerceAtLeast(0)
+        }
+        val badge = lockBadge
+        if (badge != null) { try { wm.updateViewLayout(badge, badgeParams) } catch (_: Exception) {}; return }
+        lockBadge = android.widget.ImageView(this).apply {
+            setImageResource(android.R.drawable.ic_lock_lock)
+            setColorFilter(android.graphics.Color.WHITE)
+            val p = size / 5
+            setPadding(p, p, p, p)
+            background = android.graphics.drawable.GradientDrawable().apply {
+                shape = android.graphics.drawable.GradientDrawable.OVAL
+                setColor(0x99000000.toInt())
+            }
+            alpha = 0.6f
+            contentDescription = tr("Unlock the floating lyrics", "解锁悬浮歌词")
+            setOnClickListener {
+                Prefs.setFloatStyle(this@FloatingLyricsService, Prefs.floatStyle.value.copy(locked = false))
+                Toast.makeText(this@FloatingLyricsService, tr("Floating lyrics unlocked", "悬浮歌词已解锁"), Toast.LENGTH_SHORT).show()
+            }
+        }.also { try { wm.addView(it, badgeParams) } catch (_: Exception) {} }
+    }
+
+    private fun removeLockBadge() {
+        lockBadge?.let { try { wm.removeView(it) } catch (_: Exception) {} }
+        lockBadge = null
+    }
+
     /** What the floating window's buttons do. */
     private fun act(action: FloatingLyricsView.Action) {
         val style = Prefs.floatStyle.value
@@ -234,8 +276,8 @@ class FloatingLyricsService : Service() {
             FloatingLyricsView.Action.Lock -> {
                 card?.showControls(false)
                 Prefs.setFloatStyle(this, style.copy(locked = true))
-                Toast.makeText(this, tr("Lyrics locked: touches now go through them. Unlock from the notification " +
-                    "or the app's settings.", "歌词已锁定：触摸会穿透歌词。可在通知或应用设置中解锁。"), Toast.LENGTH_LONG).show()
+                Toast.makeText(this, tr("Lyrics locked: touches now go through them. Tap the small lock at the corner " +
+                    "to unlock.", "歌词已锁定：触摸会穿透歌词。点角落的小锁即可解锁。"), Toast.LENGTH_LONG).show()
             }
             is FloatingLyricsView.Action.Colour ->
                 Prefs.setFloatStyle(this, style.ownColors(night).copy(currentColor = action.color))
@@ -268,6 +310,7 @@ class FloatingLyricsService : Service() {
         params.flags = if (style.locked) params.flags or WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE
             else params.flags and WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE.inv()
         if (box.isAttachedToWindow) try { wm.updateViewLayout(box, params) } catch (_: Exception) {}
+        if (style.locked) showLockBadge() else removeLockBadge()
         if (lockChanged) getSystemService(NotificationManager::class.java).notify(NOTIFICATION_ID, notification(style.locked))
     }
 
@@ -283,8 +326,9 @@ class FloatingLyricsService : Service() {
         applyStyle()
         val p = NowPlaying.state.value
         val track = p.track
-        if (track == null) { box.visibility = View.GONE; return }
+        if (track == null) { box.visibility = View.GONE; lockBadge?.visibility = View.GONE; return }
         box.visibility = View.VISIBLE
+        lockBadge?.visibility = View.VISIBLE
         val style = Prefs.floatStyle.value
         val rows = when (val s = LyricsRepo.state.value) {
             is LyricsState.Loading -> LyricRows.message(track.title, tr("Loading lyrics…", "正在加载歌词…"))

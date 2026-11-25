@@ -17,6 +17,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.autosynced.lyrics.AppLyricsStyle
 
@@ -25,7 +26,8 @@ import com.autosynced.lyrics.AppLyricsStyle
  * frosted glass (the cover blurred behind a dark or light veil), the cover's colour, your colour, or none.
  */
 @Composable
-fun LyricsPanel(style: AppLyricsStyle, art: Bitmap?, modifier: Modifier = Modifier, content: @Composable BoxScope.() -> Unit) {
+fun LyricsPanel(style: AppLyricsStyle, art: Bitmap?, modifier: Modifier = Modifier, corner: Dp = 16.dp,
+                content: @Composable BoxScope.() -> Unit) {
     val pal = LocalPalette.current
     val tint = remember(art) { dominantColor(art) }
     val op = style.panelOpacity
@@ -39,16 +41,16 @@ fun LyricsPanel(style: AppLyricsStyle, art: Bitmap?, modifier: Modifier = Modifi
             } catch (_: Exception) { null }
         }
     }
-    Box(modifier.clip(RoundedCornerShape(16.dp))) {
+    Box(modifier.clip(RoundedCornerShape(corner))) {
         when (style.panel) {
             "glass" -> {
                 if (small != null) Image(small.asImageBitmap(), null,
                     Modifier.fillMaxSize().blur((style.panelBlur * 0.5f).dp, BlurredEdgeTreatment.Rectangle)
                         .graphicsLayer { alpha = op }, contentScale = ContentScale.Crop)
-                else Box(Modifier.fillMaxSize().background((if (pal.night) Color(0xFF2A2A2A) else Color.White).copy(alpha = op)))
-                // the veil: dark at night, light by day (the PC's day backdrop veil is #F5F5F7 at 62%)
+                else Box(Modifier.fillMaxSize().background((if (pal.night) Color(0xFF2A2A2A) else Color(0xFFDCDCE2)).copy(alpha = op)))
+                // the veil: dark at night; by day only a light haze, so the cover's colours still show
                 Box(Modifier.fillMaxSize().background(
-                    if (pal.night) Color.Black.copy(alpha = 0.38f * op) else Color(0xFFF5F5F7).copy(alpha = 0.62f * op)))
+                    if (pal.night) Color.Black.copy(alpha = 0.38f * op) else Color(0xFFF2F2F5).copy(alpha = 0.3f * op)))
             }
             "album" -> Box(Modifier.fillMaxSize().background(
                 if (pal.night) (tint ?: Color(0xFF2A2A2A)).copy(alpha = 0.9f * op)
