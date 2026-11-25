@@ -11,6 +11,10 @@ Simplified Chinese translation.
 - **Synced lyrics** from [LRCLIB](https://lrclib.net), then NetEase Cloud Music, then Kugou.
   Versions much longer or shorter than the song are skipped.
 - **Floating window** over other apps: drag to move, tap to open the app, long-press to hide.
+  The sliders button next to *Floating* adjusts it, with a live preview: width, opacity,
+  background, corners, how many lines before/after the current one, song title on top, font
+  (built-in or your own .ttf/.otf), text sizes, bold, alignment, outline, your own colours,
+  line-change effect, lock (touches pass through) and timing.
 - **译 Chinese translation** (off until you turn it on):
   1. Human translations from NetEase, QQ Music and Kugou, matched to the lyrics line by line,
      even when a site's copy is timed a little differently.
@@ -39,6 +43,7 @@ one as an update.
 | `AiTranslator.kt` | Claude translation of the lines left over, its cache and cost log |
 | `ApiKeyStore.kt` | The Claude API key, encrypted with Android's Keystore |
 | `FloatingLyricsService.kt` | The floating lyrics window |
+| `FloatStyle.kt` / `FloatingLyricsView.kt` | Its settings, which lines it shows, and how it draws them |
 | `ui/` | The main screen and the 译 settings panel |
 
 Tests (`app/src/test`) run on a PC: `./gradlew testDebugUnitTest`.

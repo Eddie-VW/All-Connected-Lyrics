@@ -9,36 +9,33 @@ import android.app.Service
 import android.content.Context
 import android.content.Intent
 import android.content.pm.ServiceInfo
-import android.graphics.Color
 import android.graphics.PixelFormat
-import android.graphics.Typeface
-import android.graphics.drawable.GradientDrawable
 import android.os.Build
 import android.os.Handler
 import android.os.IBinder
 import android.os.Looper
 import android.provider.Settings
-import android.text.TextUtils
-import android.util.TypedValue
 import android.view.Gravity
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewConfiguration
 import android.view.WindowManager
-import android.widget.LinearLayout
-import android.widget.TextView
 import android.widget.Toast
 import kotlin.math.abs
 
 /**
- * The floating lyrics strip shown over other apps: current line + next line.
- * Drag to move · tap to open the app · long-press to turn it off.
+ * The floating lyrics window shown over other apps, styled by [FloatStyle] (settings → Floating lyrics).
+ * Drag to move · tap to open the app · long-press to turn it off. When it's locked, touches go
+ * through to the app underneath; unlock it from the notification or the settings.
  * Runs as a foreground service (with a small notification) so Android keeps it on screen.
  */
 class FloatingLyricsService : Service() {
     companion object {
         private const val CHANNEL = "floating"
         private const val NOTIFICATION_ID = 7
+        private const val ACTION_TOGGLE_LOCK = "toggle_lock"
+        // Android only lets touches pass through a window that's at most this opaque.
+        private const val MAX_PASS_THROUGH_ALPHA = 0.8f
 
         fun canDraw(c: Context) = Settings.canDrawOverlays(c)
 
@@ -52,13 +49,11 @@ class FloatingLyricsService : Service() {
     }
 
     private lateinit var wm: WindowManager
-    private var card: LinearLayout? = null
-    private lateinit var current: TextView
-    private lateinit var next: TextView
+    private var card: FloatingLyricsView? = null
     private lateinit var params: WindowManager.LayoutParams
     private val handler = Handler(Looper.getMainLooper())
-    private var shownStyle = ""
-    private var shownTranslationRow = false
+    private var appliedStyle: FloatStyle? = null
+    private var appliedNight = true
 
     override fun onBind(intent: Intent?): IBinder? = null
 
@@ -73,6 +68,14 @@ class FloatingLyricsService : Service() {
         handler.post(tick)
     }
 
+    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        if (intent?.action == ACTION_TOGGLE_LOCK) {
+            val s = Prefs.floatStyle.value
+            Prefs.setFloatStyle(this, s.copy(locked = !s.locked))
+        }
+        return START_STICKY
+    }
+
     override fun onDestroy() {
         handler.removeCallbacks(tick)
         card?.let { try { wm.removeView(it) } catch (_: Exception) {} }
@@ -80,22 +83,31 @@ class FloatingLyricsService : Service() {
         super.onDestroy()
     }
 
-    private fun dp(v: Float) = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, v, resources.displayMetrics)
+    private fun notification(locked: Boolean): Notification {
+        val open = PendingIntent.getActivity(this, 0, Intent(this, MainActivity::class.java),
+            PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT)
+        val lock = PendingIntent.getService(this, 1,
+            Intent(this, FloatingLyricsService::class.java).setAction(ACTION_TOGGLE_LOCK),
+            PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT)
+        return Notification.Builder(this, CHANNEL)
+            .setSmallIcon(android.R.drawable.ic_media_play)
+            .setContentTitle(if (locked) "Floating lyrics is on (locked)" else "Floating lyrics is on")
+            .setContentText(if (locked) "Touches go through the lyrics. Tap Unlock to move them again."
+                else "Tap to open the app. Long-press the lyrics to turn them off.")
+            .setContentIntent(open)
+            .addAction(Notification.Action.Builder(
+                android.graphics.drawable.Icon.createWithResource(this, android.R.drawable.ic_lock_lock),
+                if (locked) "Unlock" else "Lock", lock).build())
+            .setOngoing(true)
+            .build()
+    }
 
     private fun startAsForeground() {
         val nm = getSystemService(NotificationManager::class.java)
         if (Build.VERSION.SDK_INT >= 26 && nm.getNotificationChannel(CHANNEL) == null) {
             nm.createNotificationChannel(NotificationChannel(CHANNEL, "Floating lyrics", NotificationManager.IMPORTANCE_MIN))
         }
-        val open = PendingIntent.getActivity(this, 0, Intent(this, MainActivity::class.java),
-            PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT)
-        val n: Notification = Notification.Builder(this, CHANNEL)
-            .setSmallIcon(android.R.drawable.ic_media_play)
-            .setContentTitle("Floating lyrics is on")
-            .setContentText("Tap to open Autosynced Lyrics. Long-press the lyrics to turn them off.")
-            .setContentIntent(open)
-            .setOngoing(true)
-            .build()
+        val n = notification(Prefs.floatStyle.value.locked)
         if (Build.VERSION.SDK_INT >= 34) {
             startForeground(NOTIFICATION_ID, n, ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE)
         } else {
@@ -105,36 +117,10 @@ class FloatingLyricsService : Service() {
 
     @SuppressLint("ClickableViewAccessibility")
     private fun addOverlay() {
-        val maxW = (resources.displayMetrics.widthPixels * 0.88f).toInt()
-        current = TextView(this).apply {
-            setTextSize(TypedValue.COMPLEX_UNIT_SP, 17f)
-            typeface = Typeface.DEFAULT_BOLD
-            maxWidth = maxW - dp(32f).toInt()
-            maxLines = 2
-            ellipsize = TextUtils.TruncateAt.END
-            gravity = Gravity.CENTER
-        }
-        next = TextView(this).apply {
-            setTextSize(TypedValue.COMPLEX_UNIT_SP, 13f)
-            maxWidth = maxW - dp(32f).toInt()
-            maxLines = 1
-            ellipsize = TextUtils.TruncateAt.END
-            gravity = Gravity.CENTER
-            setPadding(0, dp(3f).toInt(), 0, 0)
-        }
-        val box = LinearLayout(this).apply {
-            orientation = LinearLayout.VERTICAL
-            gravity = Gravity.CENTER_HORIZONTAL
-            setPadding(dp(16f).toInt(), dp(10f).toInt(), dp(16f).toInt(), dp(11f).toInt())
-            addView(current)
-            addView(next)
-            elevation = dp(6f)
-        }
+        val box = FloatingLyricsView(this)
         card = box
-        applyStyle()
-
         params = WindowManager.LayoutParams(
-            WindowManager.LayoutParams.WRAP_CONTENT, WindowManager.LayoutParams.WRAP_CONTENT,
+            box.widthPx(), WindowManager.LayoutParams.WRAP_CONTENT,
             WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY,
             WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE or WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS,
             PixelFormat.TRANSLUCENT,
@@ -144,7 +130,7 @@ class FloatingLyricsService : Service() {
             y = Prefs.floatY(this@FloatingLyricsService)
         }
 
-        // drag to move, tap to open the app, long-press to turn off
+        // drag to move, tap to open the app, long-press to turn off (not while locked: touches pass through)
         val slop = ViewConfiguration.get(this).scaledTouchSlop
         var downX = 0f; var downY = 0f; var startX = 0; var startY = 0; var moved = false
         val longPress = Runnable {
@@ -178,27 +164,26 @@ class FloatingLyricsService : Service() {
             }
             true
         }
+        applyStyle()
         wm.addView(box, params)
     }
 
-    /** Night: near-black with white text · Day: frosted light with dark text. */
+    /** Re-applies the settings when they (or the app's Night / Day style) change. */
     private fun applyStyle() {
-        val style = Prefs.style(this)
-        if (style == shownStyle) return
-        shownStyle = style
-        val night = style != "day"
-        card?.background = GradientDrawable().apply {
-            cornerRadius = dp(18f)
-            setColor(if (night) Color.parseColor("#EB181818") else Color.parseColor("#F2F7F7F9"))
-            setStroke(dp(1f).toInt(), if (night) Color.parseColor("#26FFFFFF") else Color.parseColor("#1F000000"))
-        }
-        current.setTextColor(if (night) Color.WHITE else Color.parseColor("#1D1D1F"))
-        next.setTextColor(when {
-            shownTranslationRow && night -> Color.parseColor("#E0E0E0")
-            shownTranslationRow -> Color.parseColor("#3A3A3C")
-            night -> Color.parseColor("#A7A7A7")
-            else -> Color.parseColor("#6E6E73")
-        })
+        val box = card ?: return
+        val style = Prefs.floatStyle.value
+        val night = Prefs.style(this) != "day"
+        if (style == appliedStyle && night == appliedNight) return
+        val lockChanged = appliedStyle?.locked != style.locked
+        appliedStyle = style
+        appliedNight = night
+        box.apply(style, night)
+        params.width = box.widthPx()
+        params.alpha = if (style.locked) minOf(style.opacity, MAX_PASS_THROUGH_ALPHA) else style.opacity
+        params.flags = if (style.locked) params.flags or WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE
+            else params.flags and WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE.inv()
+        if (box.isAttachedToWindow) try { wm.updateViewLayout(box, params) } catch (_: Exception) {}
+        if (lockChanged) getSystemService(NotificationManager::class.java).notify(NOTIFICATION_ID, notification(style.locked))
     }
 
     private val tick = object : Runnable {
@@ -212,37 +197,21 @@ class FloatingLyricsService : Service() {
         val box = card ?: return
         applyStyle()
         val p = NowPlaying.state.value
-        if (p.track == null) { box.visibility = View.GONE; return }
+        val track = p.track
+        if (track == null) { box.visibility = View.GONE; return }
         box.visibility = View.VISIBLE
-        var cur = "♪"; var nxt = ""; var translationRow = false
-        when (val s = LyricsRepo.state.value) {
-            is LyricsState.Loading -> { cur = p.track.title; nxt = "Loading lyrics…" }
-            is LyricsState.NotFound -> { cur = p.track.title; nxt = "No synced lyrics for this song" }
-            is LyricsState.NetworkError -> { cur = p.track.title; nxt = "Network error, unable to fetch lyrics" }
-            is LyricsState.Found -> {
-                val l = s.lyrics
-                if (!l.synced) { cur = p.track.title; nxt = "These lyrics have no timing" }
-                else {
-                    val i = l.indexAt(p.position())
-                    cur = if (i >= 0) l.lines[i].text.ifBlank { "♪" } else "♪"
-                    // With translation on, the second row is this line's Chinese (when it has one);
-                    // otherwise the next line, as before.
-                    val tr = if (Prefs.translate.value) l.lines.getOrNull(i)?.translation else null
-                    nxt = tr ?: l.lines.getOrNull(i + 1)?.text ?: ""
-                    translationRow = tr != null
-                }
-            }
-            else -> {}
+        val style = Prefs.floatStyle.value
+        val rows = when (val s = LyricsRepo.state.value) {
+            is LyricsState.Loading -> LyricRows.message(track.title, "Loading lyrics…")
+            is LyricsState.NotFound -> LyricRows.message(track.title, "No synced lyrics for this song")
+            is LyricsState.NetworkError -> LyricRows.message(track.title, "Network error, unable to fetch lyrics")
+            is LyricsState.Found ->
+                if (!s.lyrics.synced) LyricRows.message(track.title, "These lyrics have no timing")
+                else LyricRows.build(s.lyrics.lines, s.lyrics.indexAt(p.position() + style.offsetMs), style,
+                    Prefs.translate.value)
+            else -> listOf(Row("♪", Row.Kind.CURRENT))
         }
-        if (current.text != cur) current.text = cur
-        if (next.text != nxt) next.text = nxt
-        // a translation reads a little bigger and brighter than a preview of the next line
-        if (translationRow != shownTranslationRow) {
-            shownTranslationRow = translationRow
-            next.setTextSize(TypedValue.COMPLEX_UNIT_SP, if (translationRow) 15f else 13f)
-            next.maxLines = if (translationRow) 2 else 1
-            shownStyle = ""; applyStyle()
-        }
-        next.visibility = if (nxt.isEmpty()) View.GONE else View.VISIBLE
+        val title = if (track.artist.isBlank()) track.title else "${track.title} — ${track.artist}"
+        box.show(title, rows)
     }
 }

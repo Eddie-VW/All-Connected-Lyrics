@@ -81,6 +81,8 @@ fun AppScreen(
     val tint = remember(playback.art) { dominantColor(playback.art) }
     val translateOn by Prefs.translate.collectAsState()
     var translationSettings by remember { mutableStateOf(false) }
+    var floatSettings by remember { mutableStateOf(false) }
+    if (floatSettings) { FloatSettingsScreen { floatSettings = false }; return }
     val bgTop by animateColorAsState(
         if (pal.night) (tint ?: Color(0xFF3A3A3A)) else (tint?.copy(alpha = .22f) ?: Color(0x22FA2D48)),
         tween(600), label = "tint")
@@ -91,7 +93,8 @@ fun AppScreen(
             .background(if (pal.night) Color.Transparent else pal.bg.copy(alpha = .55f))
             .systemBarsPadding()
     ) {
-        TopBar(style, floatingOn, translateOn, onToggleStyle, onToggleFloating) { translationSettings = true }
+        TopBar(style, floatingOn, translateOn, onToggleStyle, onToggleFloating,
+            onTranslation = { translationSettings = true }, onFloatSettings = { floatSettings = true })
         if (!hasAccess) {
             AccessCard(onGrantAccess)
         } else {
@@ -105,7 +108,7 @@ fun AppScreen(
 @Composable
 private fun TopBar(
     style: String, floatingOn: Boolean, translateOn: Boolean,
-    onToggleStyle: () -> Unit, onToggleFloating: () -> Unit, onTranslation: () -> Unit,
+    onToggleStyle: () -> Unit, onToggleFloating: () -> Unit, onTranslation: () -> Unit, onFloatSettings: () -> Unit,
 ) {
     val pal = LocalPalette.current
     Row(
@@ -118,7 +121,11 @@ private fun TopBar(
         Pill("译", translateOn, onTranslation)
         Spacer(Modifier.width(8.dp))
         Pill(if (floatingOn) "Floating on" else "Floating off", floatingOn, onToggleFloating)
-        Spacer(Modifier.width(8.dp))
+        // floating window settings (size, colours, font, lines…)
+        Box(
+            Modifier.size(44.dp).clip(CircleShape).clickable(onClick = onFloatSettings),
+            contentAlignment = Alignment.Center,
+        ) { TuneIcon(pal.text) }
         // Night / Day switch
         Box(
             Modifier.size(48.dp).clip(CircleShape).clickable(onClick = onToggleStyle),
@@ -178,7 +185,7 @@ private fun ColumnScope.NowPlayingScreen(tint: Color?, translateOn: Boolean) {
     val lyricsState by LyricsRepo.state.collectAsState()
     var now by remember { mutableLongStateOf(0L) }
     LaunchedEffect(Unit) {          // song position, smooth
-        while (true) { now = NowPlaying.state.value.position(); delay(50) }
+        while (true) { now = NowPlaying.state.value.position() + Prefs.floatStyle.value.offsetMs; delay(50) }
     }
     val track = playback.track
 
@@ -367,6 +374,16 @@ fun SpinningRecord(art: Bitmap?, playing: Boolean, size: androidx.compose.ui.uni
 }
 
 // ---- small drawn icons (play, pause, skip, sun, moon) ------------------------------------------
+/** Three sliders: "adjust the floating window". */
+@Composable private fun TuneIcon(c: Color) = Canvas(Modifier.size(22.dp)) {
+    val w = size.width; val h = size.height; val stroke = w * 0.09f
+    for ((i, knob) in listOf(0.3f, 0.68f, 0.45f).withIndex()) {
+        val y = h * (0.22f + i * 0.28f)
+        drawLine(c, Offset(w * 0.08f, y), Offset(w * 0.92f, y), stroke)
+        drawCircle(c, w * 0.11f, Offset(w * knob, y))
+    }
+}
+
 @Composable private fun PlayIcon(c: Color) = Canvas(Modifier.size(26.dp)) {
     val p = Path().apply { moveTo(size.width * .28f, size.height * .16f); lineTo(size.width * .86f, size.height * .5f)
         lineTo(size.width * .28f, size.height * .84f); close() }

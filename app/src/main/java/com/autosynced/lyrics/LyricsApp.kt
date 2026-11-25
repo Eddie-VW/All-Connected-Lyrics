@@ -25,7 +25,13 @@ object Prefs {
     private val _aiTranslate = MutableStateFlow(true)
     val aiTranslate: StateFlow<Boolean> = _aiTranslate
 
+    // How the floating window looks (see FloatStyle); changes show up in it right away.
+    private val _floatStyle = MutableStateFlow(FloatStyle())
+    val floatStyle: StateFlow<FloatStyle> = _floatStyle
+    fun setFloatStyle(c: Context, v: FloatStyle) { _floatStyle.value = v; p(c).edit().putString("float_style", v.toJson()).apply() }
+
     fun load(c: Context) {
+        _floatStyle.value = FloatStyle.fromJson(p(c).getString("float_style", null))
         _translate.value = p(c).getBoolean("translate", false)
         _aiTranslate.value = p(c).getBoolean("ai_translate", true)
     }
