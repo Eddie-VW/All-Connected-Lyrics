@@ -74,14 +74,14 @@ class MainActivity : ComponentActivity() {
             NowPlaying.start(this)
             LyricsRepo.start(this)
         }
-        if (floating && canDraw) FloatingLyricsService.start(this)
+        FloatingLyricsService.refresh(this)     // floating window and/or lock-screen lyrics
     }
 
     private fun toggleFloating() {
         if (floating && canDraw) {
             floating = false
             Prefs.setFloating(this, false)
-            FloatingLyricsService.stop(this)
+            FloatingLyricsService.refresh(this)
             return
         }
         floating = true

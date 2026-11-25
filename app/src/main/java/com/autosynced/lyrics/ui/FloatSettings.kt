@@ -63,7 +63,7 @@ import java.util.Locale
 import kotlin.math.roundToInt
 
 // Made-up sample lines for the preview (with translations, to show how those look too).
-private val SAMPLE = listOf(
+internal val SAMPLE = listOf(
     Line(0, "City lights are fading slow", "城市灯火缓缓暗去"),
     Line(1, "I keep your name inside my coat", "我把你的名字藏在大衣里"),
     Line(2, "Every train is going home", "每一班列车都驶向归途"),
@@ -259,7 +259,7 @@ internal fun Hint(text: String) {
 }
 
 @Composable
-private fun SliderRow(label: String, value: String, current: Float, range: ClosedFloatingPointRange<Float>, steps: Int,
+internal fun SliderRow(label: String, value: String, current: Float, range: ClosedFloatingPointRange<Float>, steps: Int,
                       onChange: (Float) -> Unit) {
     val pal = LocalPalette.current
     Column {
@@ -301,7 +301,7 @@ internal fun Chip(label: String, selected: Boolean, typeface: Typeface?, onClick
 }
 
 @Composable
-private fun ColorRow(label: String, color: Int, onClick: () -> Unit) {
+internal fun ColorRow(label: String, color: Int, onClick: () -> Unit) {
     val pal = LocalPalette.current
     Row(Modifier.fillMaxWidth().clickable(onClick = onClick).padding(vertical = 6.dp), verticalAlignment = Alignment.CenterVertically) {
         Text(label, color = pal.text, fontSize = 15.sp, modifier = Modifier.weight(1f))
@@ -317,7 +317,7 @@ private val PRESETS = listOf(
 
 /** Ready-made colours plus hue / saturation / brightness sliders for any other. */
 @Composable
-private fun ColorPickerDialog(title: String, initial: Int, onDismiss: () -> Unit, onPick: (Int) -> Unit) {
+internal fun ColorPickerDialog(title: String, initial: Int, onDismiss: () -> Unit, onPick: (Int) -> Unit) {
     val pal = LocalPalette.current
     val hsv = remember { FloatArray(3).also { android.graphics.Color.colorToHSV(initial, it) } }
     var h by remember { mutableFloatStateOf(hsv[0]) }

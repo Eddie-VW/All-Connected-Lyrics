@@ -53,6 +53,7 @@ import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.CompositingStrategy
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalDensity
@@ -82,13 +83,21 @@ fun AppScreen(
     val playback by NowPlaying.state.collectAsState()
     val tint = remember(playback.art) { dominantColor(playback.art) }
     val translateOn by Prefs.translate.collectAsState()
-    var translationSettings by remember { mutableStateOf(false) }
-    var floatSettings by remember { mutableStateOf(false) }
+    // settings pages: the list (HUB) leads to each; Back goes to where you came from
+    var page by remember { mutableStateOf<Page?>(null) }
+    var fromHub by remember { mutableStateOf(false) }
     LaunchedEffect(requestedPage) {
-        if (requestedPage == com.autosynced.lyrics.MainActivity.PAGE_FLOAT_SETTINGS) { floatSettings = true; onPageOpened() }
+        if (requestedPage == com.autosynced.lyrics.MainActivity.PAGE_FLOAT_SETTINGS) { page = Page.FLOAT; fromHub = false; onPageOpened() }
     }
-    if (floatSettings) { FloatSettingsScreen { floatSettings = false }; return }
-    if (translationSettings) { TranslationScreen { translationSettings = false }; return }
+    val back = { page = if (fromHub && page != Page.HUB) Page.HUB else null }
+    when (page) {
+        Page.HUB -> { SettingsHub(onBack = { page = null }) { page = it; fromHub = true }; return }
+        Page.FLOAT -> { FloatSettingsScreen(back); return }
+        Page.LOCK -> { LockSettingsScreen(back); return }
+        Page.MAIN_LYRICS -> { MainLyricsSettings(back); return }
+        Page.TRANSLATION -> { TranslationScreen(back); return }
+        null -> {}
+    }
     val bgTop by animateColorAsState(
         if (pal.night) (tint ?: Color(0xFF3A3A3A)) else (tint?.copy(alpha = .22f) ?: Color(0x22FA2D48)),
         tween(600), label = "tint")
@@ -100,7 +109,7 @@ fun AppScreen(
             .systemBarsPadding()
     ) {
         TopBar(style, floatingOn, translateOn, onToggleStyle, onToggleFloating,
-            onTranslation = { translationSettings = true }, onFloatSettings = { floatSettings = true })
+            onTranslation = { page = Page.TRANSLATION; fromHub = false }, onFloatSettings = { page = Page.HUB })
         if (!hasAccess) {
             AccessCard(onGrantAccess)
         } else {
@@ -186,6 +195,7 @@ private fun AccessCard(onGrantAccess: () -> Unit) {
 @Composable
 private fun ColumnScope.NowPlayingScreen(tint: Color?, translateOn: Boolean) {
     val pal = LocalPalette.current
+    val appLyrics by Prefs.appLyrics.collectAsState()
     val playback by NowPlaying.state.collectAsState()
     val lyricsState by LyricsRepo.state.collectAsState()
     var now by remember { mutableLongStateOf(0L) }
@@ -223,7 +233,11 @@ private fun ColumnScope.NowPlayingScreen(tint: Color?, translateOn: Boolean) {
     Box(
         Modifier.weight(1f).fillMaxWidth().padding(horizontal = 12.dp, vertical = 6.dp)
             .clip(RoundedCornerShape(16.dp))
-            .background(if (pal.night) (tint ?: Color(0xFF2A2A2A)).copy(alpha = .9f) else Color.Transparent)
+            .background(when (appLyrics.panel) {
+                "none" -> Color.Transparent
+                "colour" -> Color(appLyrics.panelColor)
+                else -> if (pal.night) (tint ?: Color(0xFF2A2A2A)).copy(alpha = .9f) else Color.Transparent
+            })
     ) {
         when (val s = lyricsState) {
             is LyricsState.Found -> LyricsList(s.lyrics, now, playback.canSeek, translateOn)
@@ -250,6 +264,8 @@ private fun Message(text: String) {
 @Composable
 private fun LyricsList(lyrics: com.autosynced.lyrics.Lyrics, now: Long, canSeek: Boolean, translateOn: Boolean) {
     val pal = LocalPalette.current
+    val appLyrics by Prefs.appLyrics.collectAsState()
+    val c = appLyrics.colors(pal.night, pal.text.toArgb())
     val listState = rememberLazyListState()
     val current = if (lyrics.synced) lyrics.indexAt(now) else -1
     BoxWithConstraints(Modifier.fillMaxSize()) {
@@ -264,14 +280,11 @@ private fun LyricsList(lyrics: com.autosynced.lyrics.Lyrics, now: Long, canSeek:
         ) {
             itemsIndexed(lyrics.lines) { i, line ->
                 val isNow = i == current
-                val color = when {
-                    !lyrics.synced -> pal.text
-                    pal.night && isNow -> Color.White
-                    pal.night && i < current -> Color.White.copy(alpha = .55f)
-                    pal.night -> Color.White.copy(alpha = .38f)
-                    isNow -> pal.text
-                    else -> pal.text.copy(alpha = .3f)
-                }
+                val color = Color(when {
+                    !lyrics.synced || isNow -> c.current
+                    i < current -> c.past
+                    else -> c.upcoming
+                })
                 val scale by animateFloatAsState(if (isNow) 1f else .96f, tween(300), label = "scale")
                 Column(Modifier.fillMaxWidth()
                     .clickable(enabled = lyrics.synced && canSeek) { NowPlaying.seekTo(line.timeMs) }) {
@@ -286,7 +299,8 @@ private fun LyricsList(lyrics: com.autosynced.lyrics.Lyrics, now: Long, canSeek:
                     if (translateOn && tr != null) {
                         Text(
                             tr,
-                            color = color.copy(alpha = color.alpha * .85f),
+                            color = if (isNow || !lyrics.synced) Color(c.translation)
+                                else Color(c.translation).copy(alpha = color.alpha * .85f),
                             fontSize = 17.sp * scale,
                             fontWeight = FontWeight.SemiBold,
                             lineHeight = 23.sp,
@@ -389,17 +403,17 @@ fun SpinningRecord(art: Bitmap?, playing: Boolean, size: androidx.compose.ui.uni
     }
 }
 
-@Composable private fun PlayIcon(c: Color) = Canvas(Modifier.size(26.dp)) {
+@Composable internal fun PlayIcon(c: Color) = Canvas(Modifier.size(26.dp)) {
     val p = Path().apply { moveTo(size.width * .28f, size.height * .16f); lineTo(size.width * .86f, size.height * .5f)
         lineTo(size.width * .28f, size.height * .84f); close() }
     drawPath(p, c)
 }
-@Composable private fun PauseIcon(c: Color) = Canvas(Modifier.size(26.dp)) {
+@Composable internal fun PauseIcon(c: Color) = Canvas(Modifier.size(26.dp)) {
     val w = size.width * .22f
     drawRect(c, Offset(size.width * .22f, size.height * .16f), androidx.compose.ui.geometry.Size(w, size.height * .68f))
     drawRect(c, Offset(size.width * .56f, size.height * .16f), androidx.compose.ui.geometry.Size(w, size.height * .68f))
 }
-@Composable private fun SkipIcon(c: Color, forward: Boolean) = Canvas(Modifier.size(28.dp)) {
+@Composable internal fun SkipIcon(c: Color, forward: Boolean) = Canvas(Modifier.size(28.dp)) {
     val w = size.width; val h = size.height
     val p = Path()
     if (forward) { p.moveTo(w * .2f, h * .2f); p.lineTo(w * .68f, h * .5f); p.lineTo(w * .2f, h * .8f) }

@@ -6,8 +6,10 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.app.Service
+import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import android.content.pm.ServiceInfo
 import android.graphics.PixelFormat
 import android.os.Build
@@ -29,6 +31,10 @@ import kotlin.math.abs
  * long-press to turn it off. When it's locked, touches go
  * through to the app underneath; unlock it from the notification or the settings.
  * Runs as a foreground service (with a small notification) so Android keeps it on screen.
+ *
+ * It also runs for lock-screen lyrics: when the screen turns off while music plays, it opens
+ * [LockScreenActivity], which shows over the lock screen the next time the phone wakes up.
+ * The service stays on while either is switched on ([refresh] re-checks).
  */
 class FloatingLyricsService : Service() {
     companion object {
@@ -40,13 +46,17 @@ class FloatingLyricsService : Service() {
 
         fun canDraw(c: Context) = Settings.canDrawOverlays(c)
 
-        fun start(c: Context) {
-            if (!canDraw(c)) return
+        /** Floating window wanted (and allowed), or lock-screen lyrics on? */
+        private fun wanted(c: Context) = (Prefs.floating(c) && canDraw(c)) || Prefs.lockStyle.value.enabled
+
+        /** Starts the service, or tells it to re-check its settings (it stops itself when nothing's on). */
+        fun refresh(c: Context) {
             val i = Intent(c, FloatingLyricsService::class.java)
+            if (!wanted(c)) { c.stopService(i); return }
             if (Build.VERSION.SDK_INT >= 26) c.startForegroundService(i) else c.startService(i)
         }
 
-        fun stop(c: Context) { c.stopService(Intent(c, FloatingLyricsService::class.java)) }
+        fun start(c: Context) = refresh(c)
     }
 
     private lateinit var wm: WindowManager
@@ -55,6 +65,7 @@ class FloatingLyricsService : Service() {
     private val handler = Handler(Looper.getMainLooper())
     private var appliedStyle: FloatStyle? = null
     private var appliedNight = true
+    private var screenOffWatch: BroadcastReceiver? = null
 
     override fun onBind(intent: Intent?): IBinder? = null
 
@@ -62,11 +73,36 @@ class FloatingLyricsService : Service() {
         super.onCreate()
         startAsForeground()
         wm = getSystemService(WINDOW_SERVICE) as WindowManager
-        if (!canDraw(this)) { stopSelf(); return }
         NowPlaying.start(this)
         LyricsRepo.start(this)
-        addOverlay()
         handler.post(tick)
+    }
+
+    /** Adds or removes the floating window and the screen-off watch to match the settings. */
+    private fun refreshParts() {
+        val floating = Prefs.floating(this) && canDraw(this)
+        if (floating && card == null) addOverlay()
+        if (!floating) card?.let { try { wm.removeView(it) } catch (_: Exception) {}; card = null; appliedStyle = null }
+        val lock = Prefs.lockStyle.value.enabled
+        if (lock && screenOffWatch == null) {
+            screenOffWatch = object : BroadcastReceiver() {
+                override fun onReceive(c: Context, i: Intent) { screenTurnedOff() }
+            }.also { registerReceiver(it, IntentFilter(Intent.ACTION_SCREEN_OFF)) }
+        }
+        if (!lock) screenOffWatch?.let { try { unregisterReceiver(it) } catch (_: Exception) {}; screenOffWatch = null }
+        if (!floating && !lock) { stopSelf(); return }
+        getSystemService(NotificationManager::class.java).notify(NOTIFICATION_ID, notification(Prefs.floatStyle.value.locked))
+    }
+
+    /** Screen off: put the lyrics up, so they're there when the phone wakes (over the lock screen). */
+    private fun screenTurnedOff() {
+        val lock = Prefs.lockStyle.value
+        val p = NowPlaying.state.value
+        if (!lock.enabled || p.track == null || (lock.onlyWhenPlaying && !p.playing)) return
+        try {
+            startActivity(Intent(this, LockScreenActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or
+                Intent.FLAG_ACTIVITY_NO_ANIMATION or Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS))
+        } catch (_: Exception) {}   // e.g. Android didn't allow it: nothing to show this time
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -74,6 +110,7 @@ class FloatingLyricsService : Service() {
             val s = Prefs.floatStyle.value
             Prefs.setFloatStyle(this, s.copy(locked = !s.locked))
         }
+        refreshParts()
         return START_STICKY
     }
 
@@ -81,32 +118,46 @@ class FloatingLyricsService : Service() {
         handler.removeCallbacks(tick)
         card?.let { try { wm.removeView(it) } catch (_: Exception) {} }
         card = null
+        screenOffWatch?.let { try { unregisterReceiver(it) } catch (_: Exception) {} }
+        screenOffWatch = null
         super.onDestroy()
     }
 
-    private fun notification(locked: Boolean): Notification {
+    private fun notification(lockedIn: Boolean): Notification {
+        val floating = Prefs.floating(this) && canDraw(this)
+        val lockScreen = Prefs.lockStyle.value.enabled
+        val locked = floating && lockedIn
         val open = PendingIntent.getActivity(this, 0, Intent(this, MainActivity::class.java),
             PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT)
         val lock = PendingIntent.getService(this, 1,
             Intent(this, FloatingLyricsService::class.java).setAction(ACTION_TOGGLE_LOCK),
             PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT)
-        return Notification.Builder(this, CHANNEL)
+        val title = when {
+            floating && lockScreen -> if (locked) "Floating (locked) and lock-screen lyrics are on" else "Floating and lock-screen lyrics are on"
+            floating -> if (locked) "Floating lyrics is on (locked)" else "Floating lyrics is on"
+            else -> "Lock-screen lyrics are on"
+        }
+        val text = when {
+            locked -> "Touches go through the lyrics. Tap Unlock to move them again."
+            floating -> "Tap the lyrics for buttons. Tap here to open the app."
+            else -> "Lyrics show on the lock screen while music plays. Tap here to open the app."
+        }
+        val b = Notification.Builder(this, CHANNEL)
             .setSmallIcon(android.R.drawable.ic_media_play)
-            .setContentTitle(if (locked) "Floating lyrics is on (locked)" else "Floating lyrics is on")
-            .setContentText(if (locked) "Touches go through the lyrics. Tap Unlock to move them again."
-                else "Tap the lyrics for buttons. Tap here to open the app.")
+            .setContentTitle(title)
+            .setContentText(text)
             .setContentIntent(open)
-            .addAction(Notification.Action.Builder(
-                android.graphics.drawable.Icon.createWithResource(this, android.R.drawable.ic_lock_lock),
-                if (locked) "Unlock" else "Lock", lock).build())
             .setOngoing(true)
-            .build()
+        if (floating) b.addAction(Notification.Action.Builder(
+            android.graphics.drawable.Icon.createWithResource(this, android.R.drawable.ic_lock_lock),
+            if (locked) "Unlock" else "Lock", lock).build())
+        return b.build()
     }
 
     private fun startAsForeground() {
         val nm = getSystemService(NotificationManager::class.java)
         if (Build.VERSION.SDK_INT >= 26 && nm.getNotificationChannel(CHANNEL) == null) {
-            nm.createNotificationChannel(NotificationChannel(CHANNEL, "Floating lyrics", NotificationManager.IMPORTANCE_MIN))
+            nm.createNotificationChannel(NotificationChannel(CHANNEL, "Floating & lock-screen lyrics", NotificationManager.IMPORTANCE_MIN))
         }
         val n = notification(Prefs.floatStyle.value.locked)
         if (Build.VERSION.SDK_INT >= 34) {
@@ -138,7 +189,7 @@ class FloatingLyricsService : Service() {
         val longPress = Runnable {
             Prefs.setFloating(this, false)
             Toast.makeText(this, "Floating lyrics turned off", Toast.LENGTH_SHORT).show()
-            stopSelf()
+            refreshParts()
         }
         box.setOnTouchListener { _, e ->
             when (e.actionMasked) {
@@ -179,6 +230,12 @@ class FloatingLyricsService : Service() {
             FloatingLyricsView.Action.Translate -> Prefs.setTranslate(this, !Prefs.translate.value)
             FloatingLyricsView.Action.Bigger -> Prefs.setFloatStyle(this, style.resized(+1))
             FloatingLyricsView.Action.Smaller -> Prefs.setFloatStyle(this, style.resized(-1))
+            FloatingLyricsView.Action.Lock -> {
+                card?.showControls(false)
+                Prefs.setFloatStyle(this, style.copy(locked = true))
+                Toast.makeText(this, "Lyrics locked: touches now go through them. Unlock from the notification " +
+                    "or the app's settings.", Toast.LENGTH_LONG).show()
+            }
             is FloatingLyricsView.Action.Colour ->
                 Prefs.setFloatStyle(this, style.ownColors(night).copy(currentColor = action.color))
             FloatingLyricsView.Action.Settings -> {
@@ -190,7 +247,7 @@ class FloatingLyricsService : Service() {
             FloatingLyricsView.Action.Close -> {
                 Prefs.setFloating(this, false)
                 Toast.makeText(this, "Floating lyrics turned off. Turn them on again in the app.", Toast.LENGTH_SHORT).show()
-                stopSelf()
+                refreshParts()
             }
         }
     }

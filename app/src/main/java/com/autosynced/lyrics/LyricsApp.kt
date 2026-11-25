@@ -49,7 +49,17 @@ object Prefs {
         return ProviderConfig(v, ApiKeyStore.get(c, ApiKeyStore.slot(v)), providerExtra(c, v), aiBaseUrl(c), aiModel(c))
     }
 
+    // Colours of the main screen's lyrics, and the lock-screen lyrics' settings.
+    private val _appLyrics = MutableStateFlow(AppLyricsStyle())
+    val appLyrics: StateFlow<AppLyricsStyle> = _appLyrics
+    fun setAppLyrics(c: Context, v: AppLyricsStyle) { _appLyrics.value = v; p(c).edit().putString("app_lyrics", v.toJson()).apply() }
+    private val _lockStyle = MutableStateFlow(LockStyle())
+    val lockStyle: StateFlow<LockStyle> = _lockStyle
+    fun setLockStyle(c: Context, v: LockStyle) { _lockStyle.value = v; p(c).edit().putString("lock_style", v.toJson()).apply() }
+
     fun load(c: Context) {
+        _appLyrics.value = AppLyricsStyle.fromJson(p(c).getString("app_lyrics", null))
+        _lockStyle.value = LockStyle.fromJson(p(c).getString("lock_style", null))
         _provider.value = Provider.of(p(c).getString("provider", null))
         _floatStyle.value = FloatStyle.fromJson(p(c).getString("float_style", null))
         _translate.value = p(c).getBoolean("translate", false)

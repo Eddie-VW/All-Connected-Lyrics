@@ -1,0 +1,56 @@
+package com.autosynced.lyrics
+
+import org.json.JSONObject
+
+/**
+ * Colours of the big scrolling lyrics on the app's main screen. With [styleColors] they follow
+ * the Night / Day style (as before); otherwise your own. Colours are ARGB, so they may be see-through.
+ */
+data class AppLyricsStyle(
+    val styleColors: Boolean = true,
+    val current: Int = 0xFFFFFFFF.toInt(),
+    val past: Int = 0x8CFFFFFF.toInt(),          // lines already sung
+    val upcoming: Int = 0x61FFFFFF,              // lines still to come
+    val translation: Int = 0xD9FFFFFF.toInt(),
+    val panel: String = "album",                 // album (tinted by the cover) / colour / none
+    val panelColor: Int = 0xFF2A2A2A.toInt(),
+) {
+    data class Colors(val current: Int, val past: Int, val upcoming: Int, val translation: Int)
+
+    /** Night / Day style colours ([text] is the style's text colour), or your own. */
+    fun colors(night: Boolean, text: Int): Colors = when {
+        !styleColors -> Colors(current, past, upcoming, translation)
+        night -> Colors(0xFFFFFFFF.toInt(), 0x8CFFFFFF.toInt(), 0x61FFFFFF, 0xD9FFFFFF.toInt())
+        else -> Colors(text, withAlpha(text, 0.3f), withAlpha(text, 0.3f), withAlpha(text, 0.8f))
+    }
+
+    /** Switches to your own colours, starting from the ones showing now. */
+    fun own(night: Boolean, text: Int): AppLyricsStyle {
+        if (!styleColors) return this
+        val c = colors(night, text)
+        return copy(styleColors = false, current = c.current, past = c.past, upcoming = c.upcoming, translation = c.translation)
+    }
+
+    fun toJson(): String = JSONObject().put("styleColors", styleColors).put("current", current).put("past", past)
+        .put("upcoming", upcoming).put("translation", translation).put("panel", panel).put("panelColor", panelColor)
+        .toString()
+
+    companion object {
+        val PANELS = listOf("Album colour" to "album", "Your colour" to "colour", "None" to "none")
+
+        fun withAlpha(color: Int, alpha: Float): Int = ((alpha.coerceIn(0f, 1f) * 255).toInt() shl 24) or (color and 0xFFFFFF)
+
+        fun fromJson(text: String?): AppLyricsStyle {
+            val d = AppLyricsStyle()
+            val j = try { JSONObject(text ?: return d) } catch (_: Exception) { return d }
+            fun i(k: String, v: Int) = if (j.has(k)) j.optInt(k, v) else v
+            return AppLyricsStyle(
+                styleColors = j.optBoolean("styleColors", d.styleColors),
+                current = i("current", d.current), past = i("past", d.past), upcoming = i("upcoming", d.upcoming),
+                translation = i("translation", d.translation),
+                panel = j.optString("panel", d.panel).takeIf { p -> PANELS.any { it.second == p } } ?: d.panel,
+                panelColor = i("panelColor", d.panelColor),
+            )
+        }
+    }
+}

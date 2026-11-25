@@ -27,6 +27,17 @@
             </intent-filter>
         </activity>
 
+        <!-- Lock-screen lyrics (歌词锁屏): shown over the lock screen, in its own task so unlocking
+             returns to whatever was open before, not to this app. -->
+        <activity
+            android:name=".LockScreenActivity"
+            android:exported="false"
+            android:showWhenLocked="true"
+            android:launchMode="singleInstance"
+            android:taskAffinity=".lockscreen"
+            android:excludeFromRecents="true"
+            android:theme="@style/Theme.LockLyrics" />
+
         <!-- Lets the app see what music apps are playing (needs "notification access"). -->
         <service
             android:name=".MediaListenerService"

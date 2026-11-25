@@ -11,12 +11,20 @@ Simplified Chinese translation.
 - **Synced lyrics** from [LRCLIB](https://lrclib.net), then NetEase Cloud Music, then Kugou.
   Versions much longer or shorter than the song are skipped.
 - **Floating window** over other apps: drag to move, long-press to hide, and **tap for buttons**:
-  previous / play-pause / next, 译 on/off, close, text size A− / A+, a row of quick text
-  colours, and ⚙ straight to the window's settings.
+  one compact row with previous / play-pause / next, 译 on/off, text size A− / A+, quick text
+  colours, 🔒 lock (touches pass through; unlock from the notification), ⚙ settings and close.
   The sliders button next to *Floating* adjusts it, with a live preview: width, opacity,
   background, corners, how many lines before/after the current one, song title on top, font
   (built-in or your own .ttf/.otf), text sizes, bold, alignment, outline, your own colours,
   line-change effect, lock (touches pass through) and timing.
+- **Lock-screen lyrics 歌词锁屏** (Settings → Lock screen lyrics): when the screen turns off
+  while music plays, the lyrics wait over the lock screen; swipe up to unlock. Adjustable with a
+  live preview: background (blurred cover, cover colours, your colour, wallpaper), blur, darkening,
+  transparency, clock and date, cover shape (incl. spinning vinyl) and size, lines before/after,
+  font, sizes, spacing, bold, glow, alignment, line-change effect, colours, buttons and progress.
+  Needs "Display over other apps"; some phones also need 锁屏显示 / 后台弹出界面 allowed.
+- **Main screen lyrics colours** (Settings → Main screen lyrics): current, sung, coming and
+  translation colours, their see-through, and the panel behind them.
 - **译 Chinese translation** (off until you turn it on):
   1. Human translations from NetEase, QQ Music and Kugou, matched to the lyrics line by line,
      even when a site's copy is timed a little differently.
@@ -52,7 +60,9 @@ one as an update.
 | `ApiKeyStore.kt` | The services' API keys, encrypted with Android's Keystore |
 | `FloatingLyricsService.kt` | The floating lyrics window |
 | `FloatStyle.kt` / `FloatingLyricsView.kt` | Its settings, which lines it shows, and how it draws them |
-| `ui/` | The main screen, the 译 page and the floating window's settings |
+| `LockStyle.kt` / `LockScreenActivity.kt` | Lock-screen lyrics: their settings, and the screen over the lock screen |
+| `AppLyricsStyle.kt` | Colours of the main screen's lyrics |
+| `ui/` | The main screen, the lock screen design, and the settings pages |
 
 Tests (`app/src/test`) run on a PC: `./gradlew testDebugUnitTest`.
 

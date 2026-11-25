@@ -10,6 +10,7 @@ import android.text.TextUtils
 import android.util.TypedValue
 import android.view.Gravity
 import android.view.View
+import android.widget.HorizontalScrollView
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
@@ -43,6 +44,7 @@ class FloatingLyricsView(context: Context) : LinearLayout(context) {
         data object Settings : Action()
         data object Bigger : Action()
         data object Smaller : Action()
+        data object Lock : Action()
         data class Colour(val color: Int) : Action()
     }
 
@@ -68,34 +70,41 @@ class FloatingLyricsView(context: Context) : LinearLayout(context) {
 
     // ---- the control bar ----------------------------------------------------------------
     private fun buildControls() {
-        val size = dp(38f).toInt()
+        // one compact row; if the window is narrower than the row, it scrolls sideways
+        val size = dp(32f).toInt()
+        val gap = dp(1.5f).toInt()
         fun icon(res: Int, action: Action) = ImageView(context).apply {
             setImageResource(res)
             scaleType = ImageView.ScaleType.CENTER_INSIDE
-            setPadding(dp(7f).toInt(), dp(7f).toInt(), dp(7f).toInt(), dp(7f).toInt())
-            layoutParams = LayoutParams(size, size).apply { marginStart = dp(4f).toInt(); marginEnd = dp(4f).toInt() }
+            val p = dp(6f).toInt()
+            setPadding(p, p, p, p)
+            layoutParams = LayoutParams(size, size).apply { marginStart = gap; marginEnd = gap }
             setOnClickListener { tapped(action) }
             buttons.add(this)
         }
         fun text(label: String, action: Action) = TextView(context).apply {
             text = label
             gravity = Gravity.CENTER
-            setTextSize(TypedValue.COMPLEX_UNIT_SP, 15f)
+            setTextSize(TypedValue.COMPLEX_UNIT_SP, 14f)
             typeface = Typeface.DEFAULT_BOLD
-            layoutParams = LayoutParams(size, size).apply { marginStart = dp(4f).toInt(); marginEnd = dp(4f).toInt() }
+            layoutParams = LayoutParams(size, size).apply { marginStart = gap; marginEnd = gap }
             setOnClickListener { tapped(action) }
             buttons.add(this)
         }
-        fun row(vararg views: View) = LinearLayout(context).apply {
-            orientation = HORIZONTAL
-            gravity = Gravity.CENTER
-            setPadding(0, dp(4f).toInt(), 0, 0)
-            views.forEach { addView(it) }
+        fun row(vararg views: View) = HorizontalScrollView(context).apply {
+            isFillViewport = true
+            isHorizontalScrollBarEnabled = false
+            setPadding(0, dp(6f).toInt(), 0, 0)
+            addView(LinearLayout(context).apply {
+                orientation = HORIZONTAL
+                gravity = Gravity.CENTER
+                views.forEach { addView(it) }
+            }, LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT))
         }
         playButton = icon(android.R.drawable.ic_media_play, Action.PlayPause)
         translateButton = text("译", Action.Translate)
         colourDot = View(context).apply {
-            layoutParams = LayoutParams(size, size).apply { marginStart = dp(4f).toInt(); marginEnd = dp(4f).toInt() }
+            layoutParams = LayoutParams(size, size).apply { marginStart = gap; marginEnd = gap }
             setOnClickListener {
                 swatches.visibility = if (swatches.visibility == View.VISIBLE) View.GONE else View.VISIBLE
                 keepControls()
@@ -104,9 +113,10 @@ class FloatingLyricsView(context: Context) : LinearLayout(context) {
         controls.addView(row(
             icon(android.R.drawable.ic_media_previous, Action.Previous), playButton,
             icon(android.R.drawable.ic_media_next, Action.Next), translateButton,
+            text("A−", Action.Smaller), text("A+", Action.Bigger), colourDot,
+            icon(android.R.drawable.ic_lock_lock, Action.Lock),
+            icon(android.R.drawable.ic_menu_preferences, Action.Settings),
             icon(android.R.drawable.ic_menu_close_clear_cancel, Action.Close)))
-        controls.addView(row(text("A−", Action.Smaller), text("A+", Action.Bigger), colourDot,
-            icon(android.R.drawable.ic_menu_preferences, Action.Settings)))
         val dot = dp(26f).toInt()
         for (c in QUICK_COLOURS) {
             swatches.addView(View(context).apply {
