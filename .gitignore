@@ -1,0 +1,9 @@
+# Android build files and this PC's SDK path
+local.properties
+.gradle/
+.kotlin/
+build/
+app/build/
+.idea/
+*.apk
+.env
