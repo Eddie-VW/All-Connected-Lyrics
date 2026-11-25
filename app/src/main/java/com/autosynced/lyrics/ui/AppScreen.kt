@@ -116,6 +116,7 @@ fun AppScreen(
             Page.TRANSLATION -> TranslationScreen(back)
             Page.EDITOR -> LyricsEditorScreen(back)
             Page.ABOUT -> AboutScreen(back)
+            Page.CLOUD -> CloudSyncScreen(back)
             null -> MainScreen(hasAccess, floatingOn, style, onGrantAccess, onToggleStyle, onToggleFloating,
                 open = { target, viaHub -> page = target; fromHub = viaHub })
         }

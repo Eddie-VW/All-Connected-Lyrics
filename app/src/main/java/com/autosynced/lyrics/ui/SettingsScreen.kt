@@ -55,7 +55,7 @@ import kotlinx.coroutines.withContext
 import kotlin.math.roundToInt
 
 /** The settings pages, opened from the main screen's top bar (or straight from the floating window). */
-enum class Page { HUB, FLOAT, LOCK, MAIN, TRANSLATION, EDITOR, ABOUT }
+enum class Page { HUB, FLOAT, LOCK, MAIN, TRANSLATION, EDITOR, ABOUT, CLOUD }
 
 /** Settings: the language, then one row leading to each page. */
 @Composable
@@ -93,6 +93,9 @@ fun SettingsHub(onBack: () -> Unit, open: (Page) -> Unit) {
                 else tr("Off · language, services and keys", "未开启 · 语言、服务和密钥")) {
                 open(Page.TRANSLATION) }
             PcLyricsRow()
+            HubRow(tr("Sync with the PC", "与电脑同步"),
+                if (com.autosynced.lyrics.CloudSync.enabled(context)) tr("On · lyrics and translations from the PC app, through the cloud", "已开启 · 通过云端获取电脑版的歌词和翻译")
+                else tr("Off · get the PC app's lyrics automatically, through a free cloud folder", "未开启 · 通过免费云盘自动获取电脑版的歌词")) { open(Page.CLOUD) }
             HubRow(tr("About", "关于"), trf("Version {0} · updates · developer", "版本 {0} · 检查更新 · 开发者",
                 com.autosynced.lyrics.BuildConfig.VERSION_NAME)) { open(Page.ABOUT) }
         }
