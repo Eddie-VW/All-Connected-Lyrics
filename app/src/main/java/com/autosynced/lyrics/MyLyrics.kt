@@ -42,6 +42,9 @@ class MyLyrics(private val dir: File) {
 
     fun delete(title: String, artist: String) { file(title, artist).delete() }
 
+    /** How many songs have your own lyrics. */
+    fun count(): Int = dir.listFiles { f -> f.name.endsWith(".json") }?.size ?: 0
+
     companion object {
         const val SOURCE = "Mine"
     }

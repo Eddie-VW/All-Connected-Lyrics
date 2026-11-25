@@ -1,6 +1,8 @@
 package com.autosynced.lyrics.ui
 
 import androidx.activity.compose.BackHandler
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
@@ -27,6 +29,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -40,11 +43,15 @@ import androidx.compose.ui.unit.sp
 import com.autosynced.lyrics.AppLyricsStyle
 import com.autosynced.lyrics.CoverStyle
 import com.autosynced.lyrics.Lang
+import com.autosynced.lyrics.LyricsRepo
 import com.autosynced.lyrics.NowPlaying
 import com.autosynced.lyrics.Prefs
 import com.autosynced.lyrics.tr
 import com.autosynced.lyrics.trf
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import kotlin.math.roundToInt
 
 /** The settings pages, opened from the main screen's top bar (or straight from the floating window). */
@@ -85,9 +92,39 @@ fun SettingsHub(onBack: () -> Unit, open: (Page) -> Unit) {
                 if (translate) trf("On · into {0} · services and keys", "已开启 · 翻译成{0} · 服务和密钥", Lang.nameOf(Prefs.targetLang.value))
                 else tr("Off · language, services and keys", "未开启 · 语言、服务和密钥")) {
                 open(Page.TRANSLATION) }
+            PcLyricsRow()
             HubRow(tr("About", "关于"), trf("Version {0} · updates · developer", "版本 {0} · 检查更新 · 开发者",
                 com.autosynced.lyrics.BuildConfig.VERSION_NAME)) { open(Page.ABOUT) }
         }
+    }
+}
+
+/** Import the lyrics synced in the PC app (its My Lyrics page → Send to phone makes a zip of them). */
+@Composable
+private fun PcLyricsRow() {
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+    var count by remember { mutableIntStateOf(-1) }
+    var note by remember { mutableStateOf<String?>(null) }
+    LaunchedEffect(Unit) { count = withContext(Dispatchers.IO) { LyricsRepo.mineCount() } }
+    val pick = rememberLauncherForActivityResult(ActivityResultContracts.OpenMultipleDocuments()) { uris ->
+        if (uris.isEmpty()) return@rememberLauncherForActivityResult
+        note = tr("Importing…", "正在导入…")
+        scope.launch {
+            val (added, skipped) = withContext(Dispatchers.IO) { LyricsRepo.importFromPc(context, uris) }
+            count = withContext(Dispatchers.IO) { LyricsRepo.mineCount() }
+            note = trf("Songs imported: {0}", "已导入 {0} 首", added) +
+                (if (skipped > 0) trf(" · files skipped (not lyrics): {0}", " · 跳过非歌词文件：{0} 个", skipped) else "")
+        }
+    }
+    val total = when {
+        count < 0 -> ""
+        count == 0 -> tr("None yet", "还没有")
+        else -> trf("Songs with your own lyrics: {0}", "有你自己歌词的歌曲：{0} 首", count)
+    }
+    HubRow(tr("Lyrics from the PC", "电脑上的歌词"),
+        (note?.let { "$it · " } ?: "") + tr("On the PC: My Lyrics → Send to phone, then pick the zip here. ", "电脑上：我的歌词 → 发送到手机，然后在这里选择该 zip。") + total) {
+        pick.launch(arrayOf("application/zip", "application/octet-stream", "text/*", "*/*"))
     }
 }
 

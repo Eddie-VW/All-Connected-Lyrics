@@ -214,6 +214,47 @@ object LyricsRepo {
         }
     }
 
+    /** How many songs have your own lyrics (edited here or brought from the PC). */
+    fun mineCount(): Int = mine.count()
+
+    /**
+     * Saves the lyrics in the picked files (the PC app's "Send to phone" zip, or .lrc files) as
+     * your own, then shows them if one is for the song playing. Returns (songs added, files skipped).
+     * Call off the main thread.
+     */
+    fun importFromPc(context: Context, uris: List<android.net.Uri>): Pair<Int, Int> {
+        var added = 0
+        var skipped = 0
+        for (uri in uris) {
+            try {
+                val name = displayName(context, uri) ?: uri.lastPathSegment ?: "lyrics.lrc"
+                val r = context.contentResolver.openInputStream(uri)?.use { LrcImport.read(name, it) }
+                if (r == null) { skipped++; continue }
+                for (s in r.songs) mine.save(s.title, s.artist, s.lines)
+                added += r.songs.size
+                skipped += r.skipped
+            } catch (_: Exception) { skipped++ }
+        }
+        if (added > 0) scope.launch { reloadPlaying() }
+        return added to skipped
+    }
+
+    private fun displayName(context: Context, uri: android.net.Uri): String? = try {
+        context.contentResolver.query(uri, arrayOf(android.provider.OpenableColumns.DISPLAY_NAME), null, null, null)?.use {
+            if (it.moveToFirst()) it.getString(0) else null
+        }
+    } catch (_: Exception) { null }
+
+    /** The song playing now has your own lyrics (just imported): show them instead of the online ones. */
+    private fun reloadPlaying() {
+        val track = NowPlaying.state.value.track ?: return
+        val own = mine.load(track.title, track.artist) ?: return
+        job?.cancel(); translateJob?.cancel()
+        cache[track.key] = own
+        translated.remove(track.key)
+        show(track, own)
+    }
+
     /** Total spent on AI translation (US$) and number of requests, for the settings screen. */
     fun aiSpent(): Pair<Double, Int> = ai.spent()
 }
