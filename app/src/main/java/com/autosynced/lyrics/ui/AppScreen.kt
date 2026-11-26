@@ -3,6 +3,12 @@ package com.autosynced.lyrics.ui
 import android.graphics.Bitmap
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.togetherWith
+import androidx.activity.compose.BackHandler
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.foundation.gestures.animateScrollBy
+import androidx.compose.ui.draw.drawWithContent
+import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
@@ -148,10 +154,11 @@ private fun MainScreen(
     // the moving background (if chosen) sits behind the whole screen, in full screen or not
     val moving = appLyrics.backdrop != "none" && hasAccess
     var quick by remember { mutableStateOf(false) }
+    BackHandler(enabled = full) { toggleFull() }     // back leaves full screen first; again exits
     Box(Modifier.fillMaxSize().background(pal.bg)) {
         if (full) LyricsPanel(appLyrics, playback.art, Modifier.fillMaxSize(), corner = 0.dp) {}
         if (moving) Backdrop(appLyrics.backdrop, playback.art, playback.playing, appLyrics.backdropSpeed,
-            appLyrics.backdropStrength, Modifier.fillMaxSize(), appLyrics.backdropBrightness)
+            appLyrics.backdropStrength, Modifier.fillMaxSize(), appLyrics.brightness(pal.night))
         Column(
             Modifier
                 .fillMaxSize()
@@ -278,14 +285,14 @@ private fun ColumnScope.NowPlayingScreen(tint: Color?, translateOn: Boolean, ful
     }
     val coverShown = cover.source != "none"
     if (coverShown && cover.size >= CoverStyle.LARGE) {
-        Column(Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = if (full) 2.dp else 6.dp),
+        Column(Modifier.fillMaxWidth().padding(start = 16.dp, end = 16.dp, top = if (full) 28.dp else 6.dp, bottom = if (full) 2.dp else 6.dp),
             horizontalAlignment = Alignment.CenterHorizontally) {
             AlbumCover(cover, playback.art, playback.playing, cover.size.dp, track?.title ?: "", track?.title ?: "")
             Spacer(Modifier.height(8.dp))
             titleBlock(true)
         }
     } else {
-        Row(Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = if (full) 4.dp else 8.dp),
+        Row(Modifier.fillMaxWidth().padding(start = 16.dp, end = 16.dp, top = if (full) 30.dp else 8.dp, bottom = if (full) 4.dp else 8.dp),
             verticalAlignment = Alignment.CenterVertically) {
             if (coverShown) {
                 AlbumCover(cover, playback.art, playback.playing, cover.size.dp, track?.title ?: "", track?.title ?: "")
@@ -334,7 +341,7 @@ private fun ColumnScope.NowPlayingScreen(tint: Color?, translateOn: Boolean, ful
         Modifier.weight(1f).fillMaxWidth().padding(horizontal = 12.dp, vertical = 6.dp)) {
         androidx.compose.animation.Crossfade(targetState = lyricsState::class, animationSpec = tween(350), label = "lyrics") { _ ->
         when (val s = lyricsState) {
-            is LyricsState.Found -> LyricsList(s.lyrics, now, playback.canSeek, translateOn)
+            is LyricsState.Found -> LyricsList(s.lyrics, now, playback.canSeek, translateOn, full)
             is LyricsState.Loading -> Message(tr("Loading lyrics…", "正在加载歌词…"))
             is LyricsState.NotFound -> Message(tr("No synced lyrics found for this song yet", "暂时没有找到这首歌的同步歌词"))
             is LyricsState.NetworkError -> Message(tr("Network error, unable to fetch lyrics", "网络错误，无法获取歌词"))
@@ -357,7 +364,8 @@ private fun Message(text: String) {
 }
 
 @Composable
-private fun LyricsList(lyrics: com.autosynced.lyrics.Lyrics, now: Long, canSeek: Boolean, translateOn: Boolean) {
+private fun LyricsList(lyrics: com.autosynced.lyrics.Lyrics, now: Long, canSeek: Boolean, translateOn: Boolean,
+                       full: Boolean = false) {
     val pal = LocalPalette.current
     val appLyrics by Prefs.appLyrics.collectAsState()
     val c = appLyrics.colors(pal.night, pal.text.toArgb())
@@ -369,11 +377,43 @@ private fun LyricsList(lyrics: com.autosynced.lyrics.Lyrics, now: Long, canSeek:
     val current = if (lyrics.synced) lyrics.indexAt(now) else -1
     BoxWithConstraints(Modifier.fillMaxSize()) {
         val third = with(LocalDensity.current) { (maxHeight * 0.32f).roundToPx() }
-        LaunchedEffect(current) {       // keep the current line about a third of the way down
-            if (current >= 0) listState.animateScrollToItem(current, -third)
+        // keep the current line about a third of the way down; how it moves there is the user's choice
+        val dur = (700 / appLyrics.lineAnimSpeed).toInt()
+        val look = remember { Animatable(1f) }          // fade / zoom: the whole list dips out and back
+        var first by remember { mutableStateOf(true) }
+        LaunchedEffect(current) {
+            if (current < 0) return@LaunchedEffect
+            val kind = if (first) "none" else appLyrics.lineAnim
+            first = false
+            when (kind) {
+                "slide" -> {
+                    val item = listState.layoutInfo.visibleItemsInfo.firstOrNull { it.index == current }
+                    if (item == null) listState.animateScrollToItem(current, -third)
+                    else listState.animateScrollBy((item.offset - third).toFloat(), tween(dur, easing = FastOutSlowInEasing))
+                }
+                "fade", "zoom" -> {
+                    look.animateTo(0f, tween(dur * 2 / 5, easing = FastOutSlowInEasing))
+                    listState.scrollToItem(current, -third)
+                    look.animateTo(1f, tween(dur * 3 / 5, easing = FastOutSlowInEasing))
+                }
+                else -> listState.scrollToItem(current, -third)
+            }
         }
+        val zoom = appLyrics.lineAnim == "zoom"
         LazyColumn(
             state = listState,
+            modifier = Modifier
+                .graphicsLayer {
+                    alpha = 0.15f + 0.85f * look.value
+                    if (zoom) { val k = 0.94f + 0.06f * look.value; scaleX = k; scaleY = k }
+                    if (full) compositingStrategy = CompositingStrategy.Offscreen
+                }
+                .then(if (!full) Modifier else Modifier.drawWithContent {
+                    // full screen: the top and bottom edges fade out
+                    drawContent()
+                    drawRect(Brush.verticalGradient(0f to Color.Transparent, 0.12f to Color.Black,
+                        0.86f to Color.Black, 1f to Color.Transparent), blendMode = BlendMode.DstIn)
+                }),
             contentPadding = PaddingValues(start = 20.dp, end = 20.dp, top = 24.dp, bottom = maxHeight),
             verticalArrangement = Arrangement.spacedBy(14.dp),
         ) {
@@ -384,7 +424,7 @@ private fun LyricsList(lyrics: com.autosynced.lyrics.Lyrics, now: Long, canSeek:
                     i < current -> c.past
                     else -> c.upcoming
                 })
-                val scale by animateFloatAsState(if (isNow) 1f else .96f, tween(300), label = "scale")
+                val scale by animateFloatAsState(if (isNow) 1f else .96f, tween(dur, easing = FastOutSlowInEasing), label = "scale")
                 Column(Modifier.fillMaxWidth()
                     .clickable(enabled = lyrics.synced && canSeek) { NowPlaying.seekTo(line.timeMs) }) {
                     val soft = appLyrics.softFocus && lyrics.synced && !isNow

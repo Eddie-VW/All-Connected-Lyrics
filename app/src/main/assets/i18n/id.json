@@ -335,5 +335,16 @@
  "steady": "tetap",
  "Lyric text": "Teks lirik",
  "More background settings ›": "Pengaturan latar lainnya ›",
- "100% is tuned for the style: bright by day, dark at night.": "100% disesuaikan dengan gaya: terang di siang hari, gelap di malam hari."
+ "100% is tuned for the style: bright by day, dark at night.": "100% disesuaikan dengan gaya: terang di siang hari, gelap di malam hari.",
+ "User manual": "Panduan pengguna",
+ "Locking": "Mengunci",
+ "Brightness (Day)": "Kecerahan (siang)",
+ "Brightness (Night)": "Kecerahan (malam)",
+ "Day and Night keep their own brightness.": "Siang dan malam menyimpan kecerahannya sendiri.",
+ "Line change speed": "Kecepatan pergantian baris",
+ "Turning it on": "Menyalakan",
+ "Moving the window": "Memindahkan jendela",
+ "The button bar": "Bilah tombol",
+ "Look and size": "Tampilan dan ukuran",
+ "If it doesn't appear": "Jika tidak muncul"
 }

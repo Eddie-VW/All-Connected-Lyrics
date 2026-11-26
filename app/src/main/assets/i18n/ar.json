@@ -335,5 +335,16 @@
  "steady": "ثابت",
  "Lyric text": "نص الكلمات",
  "More background settings ›": "المزيد من إعدادات الخلفية ›",
- "100% is tuned for the style: bright by day, dark at night.": "‏100% مضبوط حسب النمط: فاتح نهارًا، داكن ليلًا."
+ "100% is tuned for the style: bright by day, dark at night.": "‏100% مضبوط حسب النمط: فاتح نهارًا، داكن ليلًا.",
+ "User manual": "دليل المستخدم",
+ "Locking": "القفل",
+ "Brightness (Day)": "السطوع (نهارًا)",
+ "Brightness (Night)": "السطوع (ليلًا)",
+ "Day and Night keep their own brightness.": "يحتفظ النهار والليل بسطوع خاص بكل منهما.",
+ "Line change speed": "سرعة تغيير السطر",
+ "Turning it on": "التشغيل",
+ "Moving the window": "تحريك النافذة",
+ "The button bar": "شريط الأزرار",
+ "Look and size": "الشكل والحجم",
+ "If it doesn't appear": "إذا لم تظهر"
 }

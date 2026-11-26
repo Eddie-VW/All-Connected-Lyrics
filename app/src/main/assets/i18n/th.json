@@ -335,5 +335,16 @@
  "steady": "คงที่",
  "Lyric text": "ตัวอักษรเนื้อเพลง",
  "More background settings ›": "ตั้งค่าพื้นหลังเพิ่มเติม ›",
- "100% is tuned for the style: bright by day, dark at night.": "100% ปรับตามสไตล์: กลางวันสว่าง กลางคืนมืด"
+ "100% is tuned for the style: bright by day, dark at night.": "100% ปรับตามสไตล์: กลางวันสว่าง กลางคืนมืด",
+ "User manual": "คู่มือการใช้งาน",
+ "Locking": "การล็อก",
+ "Brightness (Day)": "ความสว่าง (กลางวัน)",
+ "Brightness (Night)": "ความสว่าง (กลางคืน)",
+ "Day and Night keep their own brightness.": "กลางวันและกลางคืนเก็บความสว่างแยกกัน",
+ "Line change speed": "ความเร็วในการเปลี่ยนบรรทัด",
+ "Turning it on": "การเปิดใช้งาน",
+ "Moving the window": "การย้ายหน้าต่าง",
+ "The button bar": "แถบปุ่ม",
+ "Look and size": "รูปลักษณ์และขนาด",
+ "If it doesn't appear": "หากไม่ปรากฏ"
 }

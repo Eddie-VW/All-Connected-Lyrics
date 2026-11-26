@@ -194,6 +194,8 @@ fun LockSettingsScreen(onBack: () -> Unit) {
                 ValueChips(listOf("center", "left"), style.align) { v -> set { it.copy(align = v) } }
                 Label(tr("When the line changes", "换行效果"))
                 ValueChips(LockStyle.ANIMATIONS, style.animation, { if (it == "none") tr("No effect", "无效果") else optionLabel(it) }) { v -> set { it.copy(animation = v) } }
+                if (style.animation != "none") SliderRow(tr("Line change speed", "换行速度"), "${(style.animSpeed * 100).roundToInt()}%",
+                    style.animSpeed, 0.3f..3f, 26) { v -> set { it.copy(animSpeed = v) } }
             }
 
             Section(tr("Colours", "颜色")) {

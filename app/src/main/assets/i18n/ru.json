@@ -335,5 +335,16 @@
  "steady": "постоянно",
  "Lyric text": "Шрифт текста",
  "More background settings ›": "Ещё настройки фона ›",
- "100% is tuned for the style: bright by day, dark at night.": "100% подобрано под стиль: светлее днём, темнее ночью."
+ "100% is tuned for the style: bright by day, dark at night.": "100% подобрано под стиль: светлее днём, темнее ночью.",
+ "User manual": "Руководство",
+ "Locking": "Блокировка",
+ "Brightness (Day)": "Яркость (день)",
+ "Brightness (Night)": "Яркость (ночь)",
+ "Day and Night keep their own brightness.": "День и ночь хранят свою яркость отдельно.",
+ "Line change speed": "Скорость смены строки",
+ "Turning it on": "Включение",
+ "Moving the window": "Перемещение окна",
+ "The button bar": "Панель кнопок",
+ "Look and size": "Вид и размер",
+ "If it doesn't appear": "Если окно не появляется"
 }

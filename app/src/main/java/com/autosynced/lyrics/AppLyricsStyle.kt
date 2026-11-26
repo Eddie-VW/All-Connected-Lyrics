@@ -26,7 +26,11 @@ data class AppLyricsStyle(
     val backdrop: String = "mesh",               // full screen's moving background: none / mesh / fluid / glow / aurora / breathing
     val backdropSpeed: Float = 1f,               // 0.25..3
     val backdropStrength: Float = 0.8f,          // 0.1..1
-    val backdropBrightness: Float = 1f,          // 0.3..3; 1 = tuned for the style (bright by day, dark at night)
+    val backdropBrightness: Float = 1f,          // (1.3) one brightness for both styles; now Day / Night below
+    val brightnessDay: Float = 1f,               // 0.3..3; 1 = tuned for the style (bright by day, dark at night)
+    val brightnessNight: Float = 1f,
+    val lineAnim: String = "slide",              // how the lines move on to the next: none / fade / slide / zoom
+    val lineAnimSpeed: Float = 1f,               // 0.3..3
     val font: String = "sans-serif",             // the lyrics' font (as FloatStyle.font)
     val fontSize: Int = 24,                      // sp, the current line
     val glowSpeed: Float = 0.3f,                 // glow breathing, 0 = steady
@@ -54,11 +58,17 @@ data class AppLyricsStyle(
         .put("glowColor", glowColor).put("glowStrength", glowStrength.toDouble()).put("glowBlur", glowBlur)
         .put("lively", lively).put("backdrop", backdrop).put("backdropSpeed", backdropSpeed.toDouble())
         .put("backdropStrength", backdropStrength.toDouble())
-        .put("backdropBrightness", backdropBrightness.toDouble()).put("font", font).put("fontSize", fontSize)
+        .put("backdropBrightness", backdropBrightness.toDouble())
+        .put("brightnessDay", brightnessDay.toDouble()).put("brightnessNight", brightnessNight.toDouble())
+        .put("lineAnim", lineAnim).put("lineAnimSpeed", lineAnimSpeed.toDouble()).put("font", font).put("fontSize", fontSize)
         .put("glowSpeed", glowSpeed.toDouble())
         .toString()
 
+    fun brightness(night: Boolean) = if (night) brightnessNight else brightnessDay
+    fun withBrightness(night: Boolean, v: Float) = if (night) copy(brightnessNight = v) else copy(brightnessDay = v)
+
     companion object {
+        val ANIMATIONS = LockStyle.ANIMATIONS
         val PANELS = listOf("glass", "album", "colour", "none")
         val BACKDROPS = listOf("none", "mesh", "fluid", "glow", "aurora", "breathing")
 
@@ -87,6 +97,11 @@ data class AppLyricsStyle(
                     ?: if (!j.has("lively")) d.backdrop else if (j.optBoolean("lively", true)) "glow" else "none",
                 backdropSpeed = (if (j.has("backdropSpeed")) j.optDouble("backdropSpeed", 1.0).toFloat() else d.backdropSpeed).coerceIn(0.25f, 3f),
                 backdropBrightness = j.optDouble("backdropBrightness", 1.0).toFloat().coerceIn(0.3f, 3f),
+                // 1.3 kept one brightness; it becomes the starting point for both
+                brightnessDay = j.optDouble("brightnessDay", j.optDouble("backdropBrightness", 1.0)).toFloat().coerceIn(0.3f, 3f),
+                brightnessNight = j.optDouble("brightnessNight", j.optDouble("backdropBrightness", 1.0)).toFloat().coerceIn(0.3f, 3f),
+                lineAnim = j.optString("lineAnim", d.lineAnim).takeIf { it in LockStyle.ANIMATIONS } ?: d.lineAnim,
+                lineAnimSpeed = j.optDouble("lineAnimSpeed", 1.0).toFloat().coerceIn(0.3f, 3f),
                 font = j.optString("font", d.font), fontSize = i("fontSize", d.fontSize).coerceIn(14, 40),
                 glowSpeed = j.optDouble("glowSpeed", d.glowSpeed.toDouble()).toFloat().coerceIn(0f, 2f),
                 backdropStrength = (if (j.has("backdropStrength")) j.optDouble("backdropStrength", 0.8).toFloat() else d.backdropStrength).coerceIn(0.1f, 1f),

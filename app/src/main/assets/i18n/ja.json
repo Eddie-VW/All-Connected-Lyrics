@@ -337,5 +337,16 @@
  "steady": "一定",
  "Lyric text": "歌詞の文字",
  "More background settings ›": "背景の詳細設定 ›",
- "100% is tuned for the style: bright by day, dark at night.": "100% はスタイルに合わせた値です：デイは明るく、ナイトは暗め。"
+ "100% is tuned for the style: bright by day, dark at night.": "100% はスタイルに合わせた値です：デイは明るく、ナイトは暗め。",
+ "User manual": "使い方",
+ "Locking": "ロック",
+ "Brightness (Day)": "明るさ（昼）",
+ "Brightness (Night)": "明るさ（夜）",
+ "Day and Night keep their own brightness.": "昼と夜で明るさを別々に保存します。",
+ "Line change speed": "行切り替えの速さ",
+ "Turning it on": "オンにする",
+ "Moving the window": "ウィンドウの移動",
+ "The button bar": "ボタンバー",
+ "Look and size": "見た目とサイズ",
+ "If it doesn't appear": "表示されないとき"
 }

@@ -335,3 +335,14 @@
 346|Chữ lời bài hát
 347|Thêm cài đặt nền ›
 348|100% được tinh chỉnh theo kiểu: sáng ban ngày, tối ban đêm.
+349|Hướng dẫn sử dụng
+350|Khóa
+351|Độ sáng (ngày)
+352|Độ sáng (đêm)
+353|Ngày và đêm lưu độ sáng riêng.
+354|Tốc độ chuyển dòng
+355|Bật
+356|Di chuyển cửa sổ
+357|Thanh nút
+358|Giao diện và kích thước
+359|Nếu không xuất hiện

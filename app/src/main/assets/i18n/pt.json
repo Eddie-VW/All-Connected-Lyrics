@@ -335,5 +335,16 @@
  "steady": "fixo",
  "Lyric text": "Texto da letra",
  "More background settings ›": "Mais ajustes do fundo ›",
- "100% is tuned for the style: bright by day, dark at night.": "100% é ajustado ao estilo: claro de dia, escuro à noite."
+ "100% is tuned for the style: bright by day, dark at night.": "100% é ajustado ao estilo: claro de dia, escuro à noite.",
+ "User manual": "Manual do usuário",
+ "Locking": "Bloqueio",
+ "Brightness (Day)": "Brilho (dia)",
+ "Brightness (Night)": "Brilho (noite)",
+ "Day and Night keep their own brightness.": "Dia e noite mantêm seu próprio brilho.",
+ "Line change speed": "Velocidade da troca de linha",
+ "Turning it on": "Ativar",
+ "Moving the window": "Mover a janela",
+ "The button bar": "A barra de botões",
+ "Look and size": "Aparência e tamanho",
+ "If it doesn't appear": "Se não aparecer"
 }

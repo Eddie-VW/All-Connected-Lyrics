@@ -64,11 +64,10 @@ fun Backdrop(kind: String, art: Bitmap?, playing: Boolean, speed: Float, strengt
     }
     val colors = remember(art) { coverColors(art) }
     val night = LocalPalette.current.night
-    val deep = remember(art, night) { coverColors(art, dark = true, night = night) }   // the mesh's shades
     val small = remember(art) { art?.let { shrink(it, 48) } }
     Box(modifier.clipToBounds()) {
         when (kind) {
-            "mesh" -> Mesh(deep, t, strength)
+            "mesh" -> Mesh(colors, t, strength)
             "fluid" -> Fluid(small, colors, t, strength)
             "glow" -> LivelyGlow(art, playing, Modifier.fillMaxSize().graphicsLayer { alpha = strength })
             "aurora" -> Aurora(colors, t, strength)
@@ -86,8 +85,7 @@ fun Backdrop(kind: String, art: Bitmap?, playing: Boolean, speed: Float, strengt
 }
 
 /** Five vivid colours from different parts of the cover (or a gentle default set). */
-fun coverColors(art: Bitmap?, dark: Boolean = false, night: Boolean = true): List<Color> {
-    val depth = if (!dark) 1f else if (night) 0.78f else 0.92f    // mesh: a bit deeper, by day less so
+fun coverColors(art: Bitmap?): List<Color> {
     val fallback = listOf(Color(0xFF7C5CFF), Color(0xFFFF6B9A), Color(0xFF3FC5F0), Color(0xFFFFB86B), Color(0xFF6BE3A6))
     val bmp = art?.let { shrink(it, 3) } ?: return fallback
     val spots = listOf(0 to 0, 2 to 0, 1 to 1, 0 to 2, 2 to 2)
@@ -95,10 +93,8 @@ fun coverColors(art: Bitmap?, dark: Boolean = false, night: Boolean = true): Lis
         val hsv = FloatArray(3)
         android.graphics.Color.colorToHSV(bmp.getPixel(x, y), hsv)
         // a little more colour and light than the raw pixel, so the background feels alive, not muddy
-        // spread the brightness apart (more contrast between the samples), then deepen for the mesh
-        val v = (0.5f + (hsv[2] - 0.5f) * 1.4f + 0.12f).coerceIn(0.3f, 1f)
-        Color.hsv(hsv[0], (hsv[1] * 1.3f + 0.1f).coerceIn(0f, 0.95f), v * depth)
-    }.let { if (dark && art == null) it.map { c -> c.copy(red = c.red * depth, green = c.green * depth, blue = c.blue * depth) } else it }
+        Color.hsv(hsv[0], (hsv[1] * 1.25f + 0.1f).coerceIn(0f, 0.95f), (hsv[2] * 1.1f + 0.15f).coerceIn(0.35f, 1f))
+    }
 }
 
 private fun shrink(src: Bitmap, size: Int): Bitmap? = try {

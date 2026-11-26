@@ -82,6 +82,7 @@ fun FloatSettingsScreen(onBack: () -> Unit) {
     val translateOn by Prefs.translate.collectAsState()
     fun set(change: (FloatStyle) -> FloatStyle) = Prefs.setFloatStyle(context, change(Prefs.floatStyle.value))
     var picking by remember { mutableStateOf<ColorTarget?>(null) }
+    var manual by remember { mutableStateOf(false) }       // the "User manual" tab
 
     val fontPicker = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
         if (uri == null) return@rememberLauncherForActivityResult
@@ -103,6 +104,11 @@ fun FloatSettingsScreen(onBack: () -> Unit) {
                 modifier = Modifier.weight(1f))
             TextButton(onClick = { set { FloatStyle() } }) { Text(tr("Reset", "重置"), color = pal.sub) }
         }
+        Row(Modifier.padding(horizontal = 18.dp, vertical = 4.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            Chip(tr("Settings", "设置"), !manual, null) { manual = false }
+            Chip(tr("User manual", "使用说明"), manual, null) { manual = true }
+        }
+        if (manual) { UserManual(Modifier.weight(1f)); return@Column }
         Preview(style, translateOn)
 
         Column(Modifier.weight(1f).verticalScroll(rememberScrollState()).padding(horizontal = 18.dp)) {
@@ -214,6 +220,44 @@ fun FloatSettingsScreen(onBack: () -> Unit) {
             set { target.set(it.ownColors(pal.night), c) }
             picking = null
         }
+    }
+}
+
+/** How to use the floating lyrics window, step by step. */
+@Composable
+private fun UserManual(modifier: Modifier) {
+    val pal = LocalPalette.current
+    val topics = listOf(
+        tr("Turning it on", "开启") to tr(
+            "1. On the main screen, tap the \"Floating off\" button at the top so it reads \"Floating on\".\n2. The first time, Android asks you to allow \"Display over other apps\" for Lyrics Master: allow it, then come back.\n3. Play a song in Spotify, Apple Music or any other player. The window appears over every app and follows the song line by line.\n4. A notification stays while the window is on; its button locks or unlocks the window.",
+            "1. 在主界面点击顶部的「悬浮：关」按钮，使其变为「悬浮：开」。\n2. 第一次使用时，安卓会请求为 Lyrics Master 开启「显示在其他应用上层」：请允许，然后返回。\n3. 在 Spotify、Apple Music 或其他播放器中播放歌曲，窗口会显示在所有应用上方，并随歌曲逐行滚动。\n4. 窗口开启时会有一条常驻通知，通知上的按钮可以锁定或解锁窗口。"),
+        tr("Moving the window", "移动窗口") to tr(
+            "Press anywhere on the window and drag it where you like. It remembers its place next time.",
+            "按住窗口任意位置拖动到你想要的地方。下次会记住位置。"),
+        tr("The button bar", "按钮栏") to tr(
+            "Tap the window once to show its buttons, tap again to hide them (they also hide by themselves after a few seconds). From left to right:\n• ⏮ ⏯ ⏭  previous song, play / pause, next song\n• A/文  translation on / off (filled when on)\n• A− A+  smaller / bigger text\n• ●  the colour dot: opens a row of quick colours for the lyrics\n• 🔒  lock the window (see below)\n• ⚙  opens these settings\n• ✕  closes the window\nIf the window is narrow, swipe the bar sideways to reach every button.",
+            "单击窗口显示按钮，再单击隐藏（几秒后也会自动隐藏）。从左到右：\n• ⏮ ⏯ ⏭  上一首、播放 / 暂停、下一首\n• A/文  开关翻译（开启时为实心）\n• A− A+  缩小 / 放大文字\n• ●  颜色圆点：打开一排快捷歌词颜色\n• 🔒  锁定窗口（见下文）\n• ⚙  打开本设置\n• ✕  关闭窗口\n窗口较窄时，可以左右滑动按钮栏找到所有按钮。"),
+        tr("Locking", "锁定") to tr(
+            "A locked window lets every touch pass through to the app underneath, so it never gets in your way. While locked:\n• Its top-right corner hides an invisible lock spot. Double-tap that spot to unlock.\n• Long-press the spot and drag to move the locked window.\n• You can also unlock from the notification, or with \"Lock the window\" in these settings.\nAndroid keeps a locked window a little see-through; that is normal.",
+            "锁定后，所有触摸都会穿透到下面的应用，窗口不会妨碍操作。锁定时：\n• 窗口右上角有一个隐形的锁定点，双击它即可解锁。\n• 长按该点并拖动，可以移动已锁定的窗口。\n• 也可以通过通知，或本设置中的「锁定窗口」解锁。\n安卓会让锁定的窗口略微透明，这是正常的。"),
+        tr("Look and size", "外观与大小") to tr(
+            "In the Settings tab: window width, how many lines to show, font, text sizes, outline, colours, background and see-through level. The preview at the top shows every change at once. Reset puts everything back to the defaults.",
+            "在「设置」标签页中可以调整：窗口宽度、显示行数、字体、字号、描边、颜色、背景和透明度。顶部的预览会立即显示每项改动。「重置」可恢复全部默认设置。"),
+        tr("Timing", "时间偏移") to tr(
+            "If the lyrics come too late or too early (often with Bluetooth headphones), use Timing in Behaviour: move it right if the lyrics are late, left if they are early.",
+            "如果歌词出现得太晚或太早（常见于蓝牙耳机），在「行为」中调整「时间偏移」：歌词慢了往右拖，快了往左拖。"),
+        tr("Translation", "翻译") to tr(
+            "A/文 shows a translation under each line. Choose the language and the translation services in Settings → Translation.",
+            "A/文 会在每行下方显示翻译。在 设置 → 翻译 中选择目标语言和翻译服务。"),
+        tr("If it doesn't appear", "窗口不出现时") to tr(
+            "• Check that \"Display over other apps\" is allowed for Lyrics Master.\n• Check that notification access is on (the app needs it to see what is playing).\n• Some phones close background apps: allow Lyrics Master to run in the background in the battery settings.\n• No lyrics? The song may have no synced lyrics yet; you can add your own with the lyrics editor.",
+            "• 确认已允许 Lyrics Master「显示在其他应用上层」。\n• 确认已开启通知使用权（应用需要它来识别正在播放的歌曲）。\n• 部分手机会关闭后台应用：请在电池设置中允许 Lyrics Master 后台运行。\n• 没有歌词？这首歌可能还没有同步歌词，可以用歌词编辑器自己添加。"),
+    )
+    Column(modifier.verticalScroll(rememberScrollState()).padding(horizontal = 18.dp)) {
+        for ((title, body) in topics) Section(title) {
+            Text(body, color = pal.text, fontSize = 14.sp, lineHeight = 21.sp)
+        }
+        Spacer(Modifier.height(24.dp))
     }
 }
 

@@ -4,6 +4,7 @@ import android.graphics.Bitmap
 import android.text.format.DateFormat
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.ContentTransform
+import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -236,7 +237,7 @@ private fun Lyrics(style: LockStyle, c: LockContent, family: FontFamily) {
     }
     AnimatedContent(
         targetState = c.index,
-        transitionSpec = { transition(style.animation) },
+        transitionSpec = { transition(style.animation, style.animSpeed) },
         label = "lyrics",
     ) { index ->
         Column(Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(style.lineSpacing.dp)) {
@@ -269,13 +270,18 @@ private fun Lyrics(style: LockStyle, c: LockContent, family: FontFamily) {
     }
 }
 
-private fun transition(kind: String): ContentTransform = when (kind) {
-    "fade" -> fadeIn(tween(350)) togetherWith fadeOut(tween(250))
-    "slide" -> (slideInVertically(tween(380)) { it / 4 } + fadeIn(tween(380))) togetherWith
-        (slideOutVertically(tween(300)) { -it / 4 } + fadeOut(tween(300)))
-    "zoom" -> (scaleIn(tween(350), initialScale = 0.9f) + fadeIn(tween(350))) togetherWith
-        (scaleOut(tween(250), targetScale = 1.06f) + fadeOut(tween(250)))
-    else -> fadeIn(tween(0)) togetherWith fadeOut(tween(0))
+private fun transition(kind: String, speed: Float): ContentTransform {
+    // slower and smoother than before by default; the speed slider scales every duration
+    fun ms(base: Int) = (base / speed).toInt()
+    val ease = FastOutSlowInEasing
+    return when (kind) {
+        "fade" -> fadeIn(tween(ms(600), easing = ease)) togetherWith fadeOut(tween(ms(450), easing = ease))
+        "slide" -> (slideInVertically(tween(ms(700), easing = ease)) { it / 3 } + fadeIn(tween(ms(700), easing = ease))) togetherWith
+            (slideOutVertically(tween(ms(600), easing = ease)) { -it / 3 } + fadeOut(tween(ms(550), easing = ease)))
+        "zoom" -> (scaleIn(tween(ms(600), easing = ease), initialScale = 0.9f) + fadeIn(tween(ms(600), easing = ease))) togetherWith
+            (scaleOut(tween(ms(450), easing = ease), targetScale = 1.06f) + fadeOut(tween(ms(450), easing = ease)))
+        else -> fadeIn(tween(0)) togetherWith fadeOut(tween(0))
+    }
 }
 
 // ---- progress & buttons -------------------------------------------------------------------------------

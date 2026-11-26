@@ -335,5 +335,16 @@
  "steady": "gleichmäßig",
  "Lyric text": "Songtext-Schrift",
  "More background settings ›": "Weitere Hintergrundeinstellungen ›",
- "100% is tuned for the style: bright by day, dark at night.": "100 % ist auf den Stil abgestimmt: hell bei Tag, dunkel bei Nacht."
+ "100% is tuned for the style: bright by day, dark at night.": "100 % ist auf den Stil abgestimmt: hell bei Tag, dunkel bei Nacht.",
+ "User manual": "Bedienungsanleitung",
+ "Locking": "Sperren",
+ "Brightness (Day)": "Helligkeit (Tag)",
+ "Brightness (Night)": "Helligkeit (Nacht)",
+ "Day and Night keep their own brightness.": "Tag und Nacht behalten ihre eigene Helligkeit.",
+ "Line change speed": "Tempo des Zeilenwechsels",
+ "Turning it on": "Einschalten",
+ "Moving the window": "Fenster verschieben",
+ "The button bar": "Die Tastenleiste",
+ "Look and size": "Aussehen und Größe",
+ "If it doesn't appear": "Wenn es nicht erscheint"
 }

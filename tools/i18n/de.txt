@@ -335,3 +335,14 @@
 346|Songtext-Schrift
 347|Weitere Hintergrundeinstellungen ›
 348|100 % ist auf den Stil abgestimmt: hell bei Tag, dunkel bei Nacht.
+349|Bedienungsanleitung
+350|Sperren
+351|Helligkeit (Tag)
+352|Helligkeit (Nacht)
+353|Tag und Nacht behalten ihre eigene Helligkeit.
+354|Tempo des Zeilenwechsels
+355|Einschalten
+356|Fenster verschieben
+357|Die Tastenleiste
+358|Aussehen und Größe
+359|Wenn es nicht erscheint

@@ -335,5 +335,16 @@
  "steady": "cố định",
  "Lyric text": "Chữ lời bài hát",
  "More background settings ›": "Thêm cài đặt nền ›",
- "100% is tuned for the style: bright by day, dark at night.": "100% được tinh chỉnh theo kiểu: sáng ban ngày, tối ban đêm."
+ "100% is tuned for the style: bright by day, dark at night.": "100% được tinh chỉnh theo kiểu: sáng ban ngày, tối ban đêm.",
+ "User manual": "Hướng dẫn sử dụng",
+ "Locking": "Khóa",
+ "Brightness (Day)": "Độ sáng (ngày)",
+ "Brightness (Night)": "Độ sáng (đêm)",
+ "Day and Night keep their own brightness.": "Ngày và đêm lưu độ sáng riêng.",
+ "Line change speed": "Tốc độ chuyển dòng",
+ "Turning it on": "Bật",
+ "Moving the window": "Di chuyển cửa sổ",
+ "The button bar": "Thanh nút",
+ "Look and size": "Giao diện và kích thước",
+ "If it doesn't appear": "Nếu không xuất hiện"
 }

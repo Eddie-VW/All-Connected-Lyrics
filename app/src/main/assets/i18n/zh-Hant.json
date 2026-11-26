@@ -346,5 +346,16 @@
  "steady": "常亮",
  "Lyric text": "歌詞文字",
  "More background settings ›": "更多背景設定 ›",
- "100% is tuned for the style: bright by day, dark at night.": "100% 為目前風格的建議值：日間明亮，夜間偏暗。"
+ "100% is tuned for the style: bright by day, dark at night.": "100% 為目前風格的建議值：日間明亮，夜間偏暗。",
+ "User manual": "使用說明",
+ "Locking": "鎖定",
+ "Brightness (Day)": "亮度（日間）",
+ "Brightness (Night)": "亮度（夜間）",
+ "Day and Night keep their own brightness.": "日間與夜間的亮度分別儲存。",
+ "Line change speed": "換行速度",
+ "Turning it on": "開啟",
+ "Moving the window": "移動視窗",
+ "The button bar": "按鈕列",
+ "Look and size": "外觀與大小",
+ "If it doesn't appear": "視窗不出現時"
 }

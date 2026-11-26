@@ -271,11 +271,13 @@ fun MainScreenSettings(onBack: () -> Unit, focusBackdrop: Boolean = false) {
                 // a live sample, on the song playing (or sample colours)
                 Backdrop(style.backdrop, playback.art, playing = true, speed = style.backdropSpeed, strength = style.backdropStrength,
                     modifier = Modifier.fillMaxWidth().height(120.dp).clip(RoundedCornerShape(16.dp)).background(pal.surface2),
-                    brightness = style.backdropBrightness)
+                    brightness = style.brightness(pal.night))
                 if (style.backdrop != "none") {
-                    SliderRow(tr("Brightness", "亮度"), "${(style.backdropBrightness * 100).roundToInt()}%",
-                        style.backdropBrightness, 0.3f..3f, 26) { v -> set { it.copy(backdropBrightness = v) } }
-                    Hint(tr("100% is tuned for the style: bright by day, dark at night.", "100% 为当前风格的推荐值：日间明亮，夜间偏暗。"))
+                    val bright = style.brightness(pal.night)
+                    SliderRow(if (pal.night) tr("Brightness (Night)", "亮度（夜间）") else tr("Brightness (Day)", "亮度（日间）"),
+                        "${(bright * 100).roundToInt()}%", bright, 0.3f..3f, 26) { v -> set { it.withBrightness(pal.night, v) } }
+                    Hint(tr("100% is tuned for the style: bright by day, dark at night.", "100% 为当前风格的推荐值：日间明亮，夜间偏暗。") + " " +
+                        tr("Day and Night keep their own brightness.", "日间与夜间的亮度分别保存。"))
                     SliderRow(tr("Animation speed", "动画速度"), "${(style.backdropSpeed * 100).roundToInt()}%",
                         style.backdropSpeed, 0.25f..3f, 10) { v -> set { it.copy(backdropSpeed = v) } }
                     SliderRow(tr("Animation intensity", "动画强度"), "${(style.backdropStrength * 100).roundToInt()}%",
@@ -289,6 +291,11 @@ fun MainScreenSettings(onBack: () -> Unit, focusBackdrop: Boolean = false) {
                 ValueChips(com.autosynced.lyrics.FloatStyle.FONTS, style.font) { v -> set { it.copy(font = v) } }
                 SliderRow(tr("Current line size", "当前行字号"), "${style.fontSize}", style.fontSize.toFloat(), 14f..40f, 25) { v ->
                     set { it.copy(fontSize = v.roundToInt()) } }
+                Label(tr("When the line changes", "换行效果"))
+                ValueChips(AppLyricsStyle.ANIMATIONS, style.lineAnim, { if (it == "none") tr("No effect", "无效果") else optionLabel(it) }) { v ->
+                    set { it.copy(lineAnim = v) } }
+                if (style.lineAnim != "none") SliderRow(tr("Line change speed", "换行速度"), "${(style.lineAnimSpeed * 100).roundToInt()}%",
+                    style.lineAnimSpeed, 0.3f..3f, 26) { v -> set { it.copy(lineAnimSpeed = v) } }
             }
 
             Section(tr("Lyric colours", "歌词颜色")) {

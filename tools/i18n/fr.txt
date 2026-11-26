@@ -335,3 +335,14 @@
 346|Texte des paroles
 347|Plus de réglages du fond ›
 348|100 % est réglé selon le style : clair le jour, sombre la nuit.
+349|Mode d'emploi
+350|Verrouillage
+351|Luminosité (jour)
+352|Luminosité (nuit)
+353|Le jour et la nuit gardent chacun leur luminosité.
+354|Vitesse du changement de ligne
+355|L'activer
+356|Déplacer la fenêtre
+357|La barre de boutons
+358|Apparence et taille
+359|S'il n'apparaît pas

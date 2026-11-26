@@ -335,3 +335,14 @@
 346|Teks lirik
 347|Pengaturan latar lainnya ›
 348|100% disesuaikan dengan gaya: terang di siang hari, gelap di malam hari.
+349|Panduan pengguna
+350|Mengunci
+351|Kecerahan (siang)
+352|Kecerahan (malam)
+353|Siang dan malam menyimpan kecerahannya sendiri.
+354|Kecepatan pergantian baris
+355|Menyalakan
+356|Memindahkan jendela
+357|Bilah tombol
+358|Tampilan dan ukuran
+359|Jika tidak muncul

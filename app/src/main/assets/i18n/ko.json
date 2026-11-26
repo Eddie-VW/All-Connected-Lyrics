@@ -335,5 +335,16 @@
  "steady": "고정",
  "Lyric text": "가사 글자",
  "More background settings ›": "배경 설정 더 보기 ›",
- "100% is tuned for the style: bright by day, dark at night.": "100%는 스타일에 맞춘 값입니다: 주간엔 밝게, 야간엔 어둡게."
+ "100% is tuned for the style: bright by day, dark at night.": "100%는 스타일에 맞춘 값입니다: 주간엔 밝게, 야간엔 어둡게.",
+ "User manual": "사용 설명서",
+ "Locking": "잠금",
+ "Brightness (Day)": "밝기(낮)",
+ "Brightness (Night)": "밝기(밤)",
+ "Day and Night keep their own brightness.": "낮과 밤의 밝기를 따로 저장합니다.",
+ "Line change speed": "줄 바뀜 속도",
+ "Turning it on": "켜기",
+ "Moving the window": "창 이동",
+ "The button bar": "버튼 막대",
+ "Look and size": "모양과 크기",
+ "If it doesn't appear": "나타나지 않을 때"
 }

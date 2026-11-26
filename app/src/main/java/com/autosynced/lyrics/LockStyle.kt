@@ -42,6 +42,7 @@ data class LockStyle(
     val glowSpeed: Float = 0.3f,             // glow breathing, 0 = steady
     val lineSpacing: Int = 12,               // dp between lines
     val animation: String = "slide",         // none / fade / slide / zoom
+    val animSpeed: Float = 1f,               // 0.3..3
     // colours (white with see-through others by default, which suits any background)
     val styleColors: Boolean = true,
     val currentColor: Int = 0xFFFFFFFF.toInt(),
@@ -74,7 +75,7 @@ data class LockStyle(
         .put("font", font).put("currentSize", currentSize).put("otherSize", otherSize)
         .put("translationPct", translationPct).put("boldCurrent", boldCurrent).put("glow", glow)
         .put("glowColor", glowColor).put("glowStrength", glowStrength.toDouble()).put("glowBlur", glowBlur).put("glowSpeed", glowSpeed.toDouble())
-        .put("lineSpacing", lineSpacing).put("animation", animation).put("styleColors", styleColors)
+        .put("lineSpacing", lineSpacing).put("animation", animation).put("animSpeed", animSpeed.toDouble()).put("styleColors", styleColors)
         .put("currentColor", currentColor).put("otherColor", otherColor).put("translationColor", translationColor)
         .put("accentColor", accentColor).put("showControls", showControls).put("showProgress", showProgress)
         .toString()
@@ -117,6 +118,7 @@ data class LockStyle(
                 glowSpeed = f("glowSpeed", d.glowSpeed).coerceIn(0f, 2f),
                 lineSpacing = i("lineSpacing", d.lineSpacing).coerceIn(0, 40),
                 animation = s("animation", d.animation, ANIMATIONS),
+                animSpeed = f("animSpeed", d.animSpeed).coerceIn(0.3f, 3f),
                 styleColors = b("styleColors", d.styleColors), currentColor = i("currentColor", d.currentColor),
                 otherColor = i("otherColor", d.otherColor), translationColor = i("translationColor", d.translationColor),
                 accentColor = i("accentColor", d.accentColor),

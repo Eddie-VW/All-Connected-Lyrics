@@ -335,3 +335,14 @@
 346|Texto da letra
 347|Mais ajustes do fundo ›
 348|100% é ajustado ao estilo: claro de dia, escuro à noite.
+349|Manual do usuário
+350|Bloqueio
+351|Brilho (dia)
+352|Brilho (noite)
+353|Dia e noite mantêm seu próprio brilho.
+354|Velocidade da troca de linha
+355|Ativar
+356|Mover a janela
+357|A barra de botões
+358|Aparência e tamanho
+359|Se não aparecer
