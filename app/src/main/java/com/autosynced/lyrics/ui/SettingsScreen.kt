@@ -274,7 +274,7 @@ fun MainScreenSettings(onBack: () -> Unit, focusBackdrop: Boolean = false) {
                     brightness = style.backdropBrightness)
                 if (style.backdrop != "none") {
                     SliderRow(tr("Brightness", "亮度"), "${(style.backdropBrightness * 100).roundToInt()}%",
-                        style.backdropBrightness, 0.3f..1.7f, 13) { v -> set { it.copy(backdropBrightness = v) } }
+                        style.backdropBrightness, 0.3f..3f, 26) { v -> set { it.copy(backdropBrightness = v) } }
                     Hint(tr("100% is tuned for the style: bright by day, dark at night.", "100% 为当前风格的推荐值：日间明亮，夜间偏暗。"))
                     SliderRow(tr("Animation speed", "动画速度"), "${(style.backdropSpeed * 100).roundToInt()}%",
                         style.backdropSpeed, 0.25f..3f, 10) { v -> set { it.copy(backdropSpeed = v) } }
