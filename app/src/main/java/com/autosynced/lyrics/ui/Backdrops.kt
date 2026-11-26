@@ -44,7 +44,8 @@ import kotlin.math.sin
  * [speed] and [strength] come from the settings. Movement slows almost to a stop while paused.
  */
 @Composable
-fun Backdrop(kind: String, art: Bitmap?, playing: Boolean, speed: Float, strength: Float, modifier: Modifier = Modifier) {
+fun Backdrop(kind: String, art: Bitmap?, playing: Boolean, speed: Float, strength: Float, modifier: Modifier = Modifier,
+             brightness: Float = 1f) {
     if (kind == "none") return
     // one clock for all styles; it eases between full and paused speed instead of jumping
     val target by rememberUpdatedState(speed * if (playing) 1f else 0.15f)
@@ -62,20 +63,27 @@ fun Backdrop(kind: String, art: Bitmap?, playing: Boolean, speed: Float, strengt
         }
     }
     val colors = remember(art) { coverColors(art) }
+    val deep = remember(art) { coverColors(art, dark = true) }        // the mesh's deeper shades
+    val night = LocalPalette.current.night
     val small = remember(art) { art?.let { shrink(it, 48) } }
     Box(modifier.clipToBounds()) {
         when (kind) {
-            "mesh" -> Mesh(colors, t, strength)
+            "mesh" -> Mesh(deep, t, strength)
             "fluid" -> Fluid(small, colors, t, strength)
             "glow" -> LivelyGlow(art, playing, Modifier.fillMaxSize().graphicsLayer { alpha = strength })
             "aurora" -> Aurora(colors, t, strength)
             "breathing" -> Breathing(small, colors, t, strength)
         }
+        // tuned per style (light by day, dark at night, matching the main screen), then the user's brightness
+        val dim = ((if (night) 0.55f else 0.15f) + (1f - brightness).coerceAtLeast(0f) * 0.6f).coerceIn(0f, 0.9f)
+        val lift = (brightness - 1f).coerceAtLeast(0f) * (if (night) 0.3f else 0.45f)
+        Box(Modifier.fillMaxSize().background(Color.Black.copy(alpha = dim)))
+        if (lift > 0f) Box(Modifier.fillMaxSize().background(Color.White.copy(alpha = lift)))
     }
 }
 
 /** Five vivid colours from different parts of the cover (or a gentle default set). */
-fun coverColors(art: Bitmap?): List<Color> {
+fun coverColors(art: Bitmap?, dark: Boolean = false): List<Color> {
     val fallback = listOf(Color(0xFF7C5CFF), Color(0xFFFF6B9A), Color(0xFF3FC5F0), Color(0xFFFFB86B), Color(0xFF6BE3A6))
     val bmp = art?.let { shrink(it, 3) } ?: return fallback
     val spots = listOf(0 to 0, 2 to 0, 1 to 1, 0 to 2, 2 to 2)
@@ -83,8 +91,9 @@ fun coverColors(art: Bitmap?): List<Color> {
         val hsv = FloatArray(3)
         android.graphics.Color.colorToHSV(bmp.getPixel(x, y), hsv)
         // a little more colour and light than the raw pixel, so the background feels alive, not muddy
-        Color.hsv(hsv[0], (hsv[1] * 1.25f + 0.1f).coerceIn(0f, 0.95f), (hsv[2] * 1.1f + 0.15f).coerceIn(0.35f, 1f))
-    }
+        val v = (hsv[2] * 1.1f + 0.15f).coerceIn(0.35f, 1f)
+        Color.hsv(hsv[0], (hsv[1] * 1.25f + 0.1f).coerceIn(0f, 0.95f), if (dark) v * 0.62f else v)
+    }.let { if (dark && art == null) it.map { c -> c.copy(red = c.red * 0.62f, green = c.green * 0.62f, blue = c.blue * 0.62f) } else it }
 }
 
 private fun shrink(src: Bitmap, size: Int): Bitmap? = try {

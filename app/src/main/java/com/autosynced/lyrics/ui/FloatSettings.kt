@@ -145,8 +145,8 @@ fun FloatSettingsScreen(onBack: () -> Unit) {
                 SliderRow(tr("Current line size", "当前行字号"), "${style.currentSize}", style.currentSize.toFloat(), 12f..36f, 23) {
                     set { s -> s.copy(currentSize = it.roundToInt()) } }
                 SwitchRow(tr("Bold current line", "当前行加粗"), style.boldCurrent) { set { s -> s.copy(boldCurrent = it) } }
-                GlowSettings(GlowLook(style.glow, style.glowColor, style.glowStrength, style.glowBlur)) { g ->
-                    set { s -> s.copy(glow = g.on, glowColor = g.color, glowStrength = g.strength, glowBlur = g.blur) } }
+                GlowSettings(GlowLook(style.glow, style.glowColor, style.glowStrength, style.glowBlur, style.glowSpeed)) { g ->
+                    set { s -> s.copy(glow = g.on, glowColor = g.color, glowStrength = g.strength, glowBlur = g.blur, glowSpeed = g.speed) } }
                 SliderRow(tr("Translation size", "翻译字号"), "${style.translationPct}%", style.translationPct.toFloat(), 50f..110f, 11) {
                     set { s -> s.copy(translationPct = it.roundToInt()) } }
                 SliderRow(tr("Other lines size", "其他行字号"), "${style.otherSize}", style.otherSize.toFloat(), 10f..28f, 17) {

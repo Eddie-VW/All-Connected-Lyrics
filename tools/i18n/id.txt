@@ -330,3 +330,8 @@
 341|Hampir berhenti saat musik dijeda.
 342|Kecepatan animasi
 343|Intensitas animasi
+344|Kecepatan napas cahaya
+345|tetap
+346|Teks lirik
+347|Pengaturan latar lainnya ›
+348|100% disesuaikan dengan gaya: terang di siang hari, gelap di malam hari.

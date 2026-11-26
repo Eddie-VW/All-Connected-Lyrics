@@ -245,11 +245,24 @@ class FloatingLyricsView(context: Context) : LinearLayout(context) {
             v.setPadding(v.paddingLeft, if (i == 0) 0 else dp(2f).toInt(), v.paddingRight, 0)
             if (v.text != row.text) v.text = row.text
         }
+        currentRow = rows.indexOfFirst { it.kind == Row.Kind.CURRENT }.let { rowViews.getOrNull(it) }
         val current = rows.firstOrNull { it.kind == Row.Kind.CURRENT }?.text
         val lineChanged = shownCurrent != null && current != shownCurrent
         shownRows = rows
         shownCurrent = current
         if (animate && lineChanged) animateChange()
+    }
+
+    private var currentRow: OutlineTextView? = null
+
+    /** The current line's glow breathing (called by the window ~10 times a second). */
+    fun breathe(ms: Long) {
+        val v = currentRow ?: return
+        if (!style.glow || style.glowSpeed <= 0f) return
+        val w = com.autosynced.lyrics.ui.glowWave(style.glowSpeed, ms)
+        val base = if (style.glowColor == 0) style.colors(night).current else style.glowColor
+        v.setShadowLayer(style.glowBlur * resources.displayMetrics.density * (0.75f + 0.25f * w), 0f, 0f,
+            withAlpha(base, style.glowStrength * (0.45f + 0.55f * w)))
     }
 
     private fun animateChange() {

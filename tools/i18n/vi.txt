@@ -330,3 +330,8 @@
 341|Gần như dừng lại khi nhạc tạm dừng.
 342|Tốc độ hiệu ứng
 343|Cường độ hiệu ứng
+344|Tốc độ thở của ánh sáng
+345|cố định
+346|Chữ lời bài hát
+347|Thêm cài đặt nền ›
+348|100% được tinh chỉnh theo kiểu: sáng ban ngày, tối ban đêm.

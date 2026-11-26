@@ -330,3 +330,8 @@
 341|Casi se detiene mientras la música está en pausa.
 342|Velocidad de la animación
 343|Intensidad de la animación
+344|Velocidad de respiración del brillo
+345|fijo
+346|Texto de la letra
+347|Más ajustes del fondo ›
+348|El 100 % está ajustado al estilo: claro de día, oscuro de noche.

@@ -383,5 +383,6 @@ class FloatingLyricsService : Service() {
         val title = if (track.artist.isBlank()) track.title else "${track.title} — ${track.artist}"
         box.setState(p.playing, Prefs.translate.value)
         box.show(title, rows)
+        box.breathe(android.os.SystemClock.uptimeMillis())
     }
 }

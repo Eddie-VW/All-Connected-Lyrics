@@ -330,5 +330,10 @@
  "The blurred cover slowly swells and brightens, like breathing.": "La portada difuminada crece y se ilumina despacio, como si respirara.",
  "It slows almost to a stop while the music is paused.": "Casi se detiene mientras la música está en pausa.",
  "Animation speed": "Velocidad de la animación",
- "Animation intensity": "Intensidad de la animación"
+ "Animation intensity": "Intensidad de la animación",
+ "Glow breathing speed": "Velocidad de respiración del brillo",
+ "steady": "fijo",
+ "Lyric text": "Texto de la letra",
+ "More background settings ›": "Más ajustes del fondo ›",
+ "100% is tuned for the style: bright by day, dark at night.": "El 100 % está ajustado al estilo: claro de día, oscuro de noche."
 }

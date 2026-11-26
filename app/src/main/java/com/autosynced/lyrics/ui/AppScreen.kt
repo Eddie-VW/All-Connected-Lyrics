@@ -58,6 +58,7 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -113,6 +114,7 @@ fun AppScreen(
             Page.FLOAT -> FloatSettingsScreen(back)
             Page.LOCK -> LockSettingsScreen(back)
             Page.MAIN -> MainScreenSettings(back)
+            Page.MAIN_BACKDROP -> MainScreenSettings(back, focusBackdrop = true)
             Page.TRANSLATION -> TranslationScreen(back)
             Page.EDITOR -> LyricsEditorScreen(back)
             Page.ABOUT -> AboutScreen(back)
@@ -143,37 +145,31 @@ private fun MainScreen(
     val appLyrics by Prefs.appLyrics.collectAsState()
     val full = appLyrics.fullScreen && hasAccess
     val toggleFull = { Prefs.setAppLyrics(context, Prefs.appLyrics.value.let { it.copy(fullScreen = !it.fullScreen) }) }
+    // the moving background (if chosen) sits behind the whole screen, in full screen or not
+    val moving = appLyrics.backdrop != "none" && hasAccess
+    var quick by remember { mutableStateOf(false) }
     Box(Modifier.fillMaxSize().background(pal.bg)) {
-        if (full) {
-            LyricsPanel(appLyrics, playback.art, Modifier.fillMaxSize(), corner = 0.dp) {}
-            Backdrop(appLyrics.backdrop, playback.art, playback.playing, appLyrics.backdropSpeed, appLyrics.backdropStrength,
-                Modifier.fillMaxSize())
-        }
+        if (full) LyricsPanel(appLyrics, playback.art, Modifier.fillMaxSize(), corner = 0.dp) {}
+        if (moving) Backdrop(appLyrics.backdrop, playback.art, playback.playing, appLyrics.backdropSpeed,
+            appLyrics.backdropStrength, Modifier.fillMaxSize(), appLyrics.backdropBrightness)
         Column(
             Modifier
                 .fillMaxSize()
-                .then(if (full) Modifier else Modifier
+                .then(if (full || moving) Modifier else Modifier
                     .background(Brush.verticalGradient(listOf(bgTop, pal.bg), endY = 1400f))
                     .background(if (pal.night) Color.Transparent else pal.bg.copy(alpha = .55f)))
                 .systemBarsPadding()
         ) {
-            if (full) {
-                Row(Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 4.dp)) {
-                    Spacer(Modifier.weight(1f))
-                    Text(tr("⤡ Exit full screen", "⤡ 退出全屏"), color = pal.text, fontSize = 13.sp, fontWeight = FontWeight.SemiBold,
-                        modifier = Modifier.clip(RoundedCornerShape(50)).background(pal.surface.copy(alpha = 0.45f))
-                            .clickable(onClick = toggleFull).padding(horizontal = 12.dp, vertical = 7.dp))
-                }
-            } else {
-                TopBar(style, floatingOn, translateOn, onToggleStyle, onToggleFloating,
-                    onTranslation = { open(Page.TRANSLATION, false) }, onFloatSettings = { open(Page.HUB, false) })
-            }
+            if (!full) TopBar(style, floatingOn, translateOn, onToggleStyle, onToggleFloating,
+                onTranslation = { open(Page.TRANSLATION, false) }, onFloatSettings = { open(Page.HUB, false) })
             if (!hasAccess) {
                 AccessCard(onGrantAccess)
             } else {
-                NowPlayingScreen(tint, translateOn, full, onEdit = { open(Page.EDITOR, false) }, onFullScreen = toggleFull)
+                NowPlayingScreen(tint, translateOn, full, onEdit = { open(Page.EDITOR, false) }, onFullScreen = toggleFull,
+                    onQuick = { quick = true })
             }
         }
+        QuickPanel(quick, onClose = { quick = false }, onMore = { quick = false; open(Page.MAIN_BACKDROP, false) })
     }
 }
 
@@ -255,7 +251,8 @@ private fun AccessCard(onGrantAccess: () -> Unit) {
 // ---- now playing ----------------------------------------------------------------------------
 @Composable
 private fun ColumnScope.NowPlayingScreen(tint: Color?, translateOn: Boolean, full: Boolean, onEdit: () -> Unit,
-                                         onFullScreen: () -> Unit) {
+                                         onFullScreen: () -> Unit, onQuick: () -> Unit) {
+    val context = androidx.compose.ui.platform.LocalContext.current
     val pal = LocalPalette.current
     val appLyrics by Prefs.appLyrics.collectAsState()
     val playback by NowPlaying.state.collectAsState()
@@ -275,19 +272,21 @@ private fun ColumnScope.NowPlayingScreen(tint: Color?, translateOn: Boolean, ful
             Text(track?.artist ?: tr("Play a song in any music app", "在任意音乐应用中播放一首歌"), color = if (pal.night) pal.sub else pal.accent,
                 fontSize = 15.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
             if (track != null && track.album.isNotBlank()) Text(track.album, color = pal.sub, fontSize = 13.sp, maxLines = 1,
-                overflow = TextOverflow.Ellipsis)
-            if (track != null) Text(trf("on {0}", "来自 {0}", track.player), color = pal.faint, fontSize = 12.sp)
+                overflow = TextOverflow.Ellipsis, fontStyle = if (full) FontStyle.Italic else FontStyle.Normal)
+            if (track != null && !full) Text(trf("on {0}", "来自 {0}", track.player), color = pal.faint, fontSize = 12.sp)
         }
     }
     val coverShown = cover.source != "none"
     if (coverShown && cover.size >= CoverStyle.LARGE) {
-        Column(Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 6.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+        Column(Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = if (full) 2.dp else 6.dp),
+            horizontalAlignment = Alignment.CenterHorizontally) {
             AlbumCover(cover, playback.art, playback.playing, cover.size.dp, track?.title ?: "", track?.title ?: "")
             Spacer(Modifier.height(8.dp))
             titleBlock(true)
         }
     } else {
-        Row(Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp), verticalAlignment = Alignment.CenterVertically) {
+        Row(Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = if (full) 4.dp else 8.dp),
+            verticalAlignment = Alignment.CenterVertically) {
             if (coverShown) {
                 AlbumCover(cover, playback.art, playback.playing, cover.size.dp, track?.title ?: "", track?.title ?: "")
                 Spacer(Modifier.width(14.dp))
@@ -303,8 +302,19 @@ private fun ColumnScope.NowPlayingScreen(tint: Color?, translateOn: Boolean, ful
         found.translating -> tr("Finding translations…", "正在查找翻译…")
         else -> found.note
     }
-    // translation status on the left; edit (or add) the lyrics on the right
-    if (track != null || status != null || !full) {
+    // full screen: icons only. Translation on the left; edit, quick settings, exit on the right
+    if (full) {
+        Row(Modifier.fillMaxWidth().padding(horizontal = 8.dp), verticalAlignment = Alignment.CenterVertically) {
+            IconText(translateIcon(), translateOn) { Prefs.setTranslate(context, !translateOn) }
+            Text(status ?: "", color = pal.sub, fontSize = 12.sp, lineHeight = 16.sp, maxLines = 2,
+                modifier = Modifier.weight(1f).padding(horizontal = 6.dp))
+            if (track != null && lyricsState !is LyricsState.Loading) {
+                IconText(if (lyricsState is LyricsState.Found) "✎" else "＋", false, onEdit)
+            }
+            IconText("⚙", false, onQuick)
+            IconText("⤡", false, onFullScreen)
+        }
+    } else {
         Row(Modifier.fillMaxWidth().padding(start = 20.dp, end = 8.dp), verticalAlignment = Alignment.CenterVertically) {
             Text(status ?: "", color = pal.sub, fontSize = 12.sp, lineHeight = 16.sp, modifier = Modifier.weight(1f))
             if (!full) Text(tr("⤢ Full screen", "⤢ 全屏"), color = pal.accent, fontSize = 13.sp, fontWeight = FontWeight.SemiBold,
@@ -351,6 +361,10 @@ private fun LyricsList(lyrics: com.autosynced.lyrics.Lyrics, now: Long, canSeek:
     val pal = LocalPalette.current
     val appLyrics by Prefs.appLyrics.collectAsState()
     val c = appLyrics.colors(pal.night, pal.text.toArgb())
+    val ctx = androidx.compose.ui.platform.LocalContext.current
+    val family = remember(appLyrics.font) {
+        androidx.compose.ui.text.font.FontFamily(com.autosynced.lyrics.FloatingLyricsView.loadTypeface(ctx, appLyrics.font)) }
+    val size = appLyrics.fontSize.toFloat()
     val listState = rememberLazyListState()
     val current = if (lyrics.synced) lyrics.indexAt(now) else -1
     BoxWithConstraints(Modifier.fillMaxSize()) {
@@ -377,11 +391,12 @@ private fun LyricsList(lyrics: com.autosynced.lyrics.Lyrics, now: Long, canSeek:
                     Text(
                         line.text.ifBlank { "♪" },
                         color = color,
-                        fontSize = (if (lyrics.synced) 24 else 18).sp * scale,
+                        fontFamily = family,
+                        fontSize = (if (lyrics.synced) size else size * 0.75f).sp * scale,
                         fontWeight = if (lyrics.synced) FontWeight.ExtraBold else FontWeight.SemiBold,
-                        lineHeight = 30.sp,
+                        lineHeight = (size * 1.25f).sp,
                         style = glowStyle(GlowLook(appLyrics.glow && isNow && lyrics.synced, appLyrics.glowColor,
-                            appLyrics.glowStrength, appLyrics.glowBlur), color),
+                            appLyrics.glowStrength, appLyrics.glowBlur, appLyrics.glowSpeed), color),
                         modifier = Modifier.softFocus(soft),
                     )
                     val lineTr = line.translation
@@ -390,7 +405,8 @@ private fun LyricsList(lyrics: com.autosynced.lyrics.Lyrics, now: Long, canSeek:
                             lineTr,
                             color = if (isNow || !lyrics.synced) Color(c.translation)
                                 else Color(c.translation).copy(alpha = color.alpha * .85f),
-                            fontSize = 17.sp * scale,
+                            fontFamily = family,
+                            fontSize = (size * 0.7f).sp * scale,
                             fontWeight = FontWeight.SemiBold,
                             lineHeight = 23.sp,
                             modifier = Modifier.padding(top = 2.dp).softFocus(soft),
@@ -450,36 +466,6 @@ private fun RoundButton(size: androidx.compose.ui.unit.Dp, color: Color, onClick
         contentAlignment = Alignment.Center) { content() }
 }
 
-// ---- spinning record ------------------------------------------------------------------------
-@Composable
-fun SpinningRecord(art: Bitmap?, playing: Boolean, size: androidx.compose.ui.unit.Dp) {
-    var angle by remember { mutableFloatStateOf(0f) }
-    LaunchedEffect(playing) {
-        var last = 0L
-        while (playing) {
-            withFrameNanos { t ->
-                if (last != 0L) angle = (angle + (t - last) / 1e9f * 360f / 7f) % 360f   // one turn per 7 s
-                last = t
-            }
-        }
-    }
-    Box(Modifier.size(size).rotate(angle), contentAlignment = Alignment.Center) {
-        Canvas(Modifier.fillMaxSize()) {
-            val r = this.size.minDimension / 2
-            drawCircle(Color(0xFF0D0D10), r)
-            for (k in 1..7) drawCircle(Color(0x14FFFFFF), r * (0.95f - k * 0.07f), style = Stroke(1f))
-            drawCircle(Color(0x33FFFFFF), r, style = Stroke(1.5f))
-        }
-        val labelMod = Modifier.size(size * 0.56f).clip(CircleShape)
-        if (art != null) {
-            Image(art.asImageBitmap(), contentDescription = null, contentScale = ContentScale.Crop, modifier = labelMod)
-        } else {
-            Box(labelMod.background(Color(0xFF3A3A3A)))
-        }
-        Box(Modifier.size(size * 0.06f).clip(CircleShape).background(Color(0xFF0A0A0A))
-            .border(1.dp, Color(0x55FFFFFF), CircleShape))
-    }
-}
 
 // ---- small drawn icons (play, pause, skip, sun, moon) ------------------------------------------
 /** Three sliders: "adjust the floating window". */

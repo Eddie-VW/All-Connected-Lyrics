@@ -330,5 +330,10 @@
  "The blurred cover slowly swells and brightens, like breathing.": "흐린 커버가 숨쉬듯 천천히 커지고 밝아집니다.",
  "It slows almost to a stop while the music is paused.": "음악이 일시정지되면 거의 멈춥니다.",
  "Animation speed": "애니메이션 속도",
- "Animation intensity": "애니메이션 강도"
+ "Animation intensity": "애니메이션 강도",
+ "Glow breathing speed": "빛 숨쉬기 속도",
+ "steady": "고정",
+ "Lyric text": "가사 글자",
+ "More background settings ›": "배경 설정 더 보기 ›",
+ "100% is tuned for the style: bright by day, dark at night.": "100%는 스타일에 맞춘 값입니다: 주간엔 밝게, 야간엔 어둡게."
 }

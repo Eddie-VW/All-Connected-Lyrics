@@ -247,7 +247,7 @@ private fun Lyrics(style: LockStyle, c: LockContent, family: FontFamily) {
                         Text(line.text.ifBlank { "♪" }, color = Color(colors.current), fontSize = style.currentSize.sp,
                             fontFamily = family, textAlign = align, lineHeight = (style.currentSize * 1.25f).sp,
                             fontWeight = if (style.boldCurrent) FontWeight.Bold else FontWeight.Normal,
-                            style = glowStyle(GlowLook(style.glow, style.glowColor, style.glowStrength, style.glowBlur),
+                            style = glowStyle(GlowLook(style.glow, style.glowColor, style.glowStrength, style.glowBlur, style.glowSpeed),
                                 Color(colors.current)),
                             modifier = Modifier.fillMaxWidth())
                         val tr = line.translation

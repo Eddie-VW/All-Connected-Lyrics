@@ -26,6 +26,10 @@ data class AppLyricsStyle(
     val backdrop: String = "mesh",               // full screen's moving background: none / mesh / fluid / glow / aurora / breathing
     val backdropSpeed: Float = 1f,               // 0.25..3
     val backdropStrength: Float = 0.8f,          // 0.1..1
+    val backdropBrightness: Float = 1f,          // 0.3..1.7; 1 = tuned for the style (bright by day, dark at night)
+    val font: String = "sans-serif",             // the lyrics' font (as FloatStyle.font)
+    val fontSize: Int = 24,                      // sp, the current line
+    val glowSpeed: Float = 0.3f,                 // glow breathing, 0 = steady
 ) {
     data class Colors(val current: Int, val past: Int, val upcoming: Int, val translation: Int)
 
@@ -50,6 +54,8 @@ data class AppLyricsStyle(
         .put("glowColor", glowColor).put("glowStrength", glowStrength.toDouble()).put("glowBlur", glowBlur)
         .put("lively", lively).put("backdrop", backdrop).put("backdropSpeed", backdropSpeed.toDouble())
         .put("backdropStrength", backdropStrength.toDouble())
+        .put("backdropBrightness", backdropBrightness.toDouble()).put("font", font).put("fontSize", fontSize)
+        .put("glowSpeed", glowSpeed.toDouble())
         .toString()
 
     companion object {
@@ -80,6 +86,9 @@ data class AppLyricsStyle(
                 backdrop = j.optString("backdrop", "").takeIf { it in BACKDROPS }
                     ?: if (!j.has("lively")) d.backdrop else if (j.optBoolean("lively", true)) "glow" else "none",
                 backdropSpeed = (if (j.has("backdropSpeed")) j.optDouble("backdropSpeed", 1.0).toFloat() else d.backdropSpeed).coerceIn(0.25f, 3f),
+                backdropBrightness = j.optDouble("backdropBrightness", 1.0).toFloat().coerceIn(0.3f, 1.7f),
+                font = j.optString("font", d.font), fontSize = i("fontSize", d.fontSize).coerceIn(14, 40),
+                glowSpeed = j.optDouble("glowSpeed", d.glowSpeed.toDouble()).toFloat().coerceIn(0f, 2f),
                 backdropStrength = (if (j.has("backdropStrength")) j.optDouble("backdropStrength", 0.8).toFloat() else d.backdropStrength).coerceIn(0.1f, 1f),
                 fullScreen = j.optBoolean("fullScreen", d.fullScreen),
             )

@@ -341,5 +341,10 @@
  "The blurred cover slowly swells and brightens, like breathing.": "模糊的封面緩緩放大、變亮，像在呼吸。",
  "It slows almost to a stop while the music is paused.": "音樂暫停時，動畫幾乎停下。",
  "Animation speed": "動畫速度",
- "Animation intensity": "動畫強度"
+ "Animation intensity": "動畫強度",
+ "Glow breathing speed": "光暈呼吸速度",
+ "steady": "常亮",
+ "Lyric text": "歌詞文字",
+ "More background settings ›": "更多背景設定 ›",
+ "100% is tuned for the style: bright by day, dark at night.": "100% 為目前風格的建議值：日間明亮，夜間偏暗。"
 }

@@ -34,6 +34,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.layout.positionInParent
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
@@ -55,7 +57,7 @@ import kotlinx.coroutines.withContext
 import kotlin.math.roundToInt
 
 /** The settings pages, opened from the main screen's top bar (or straight from the floating window). */
-enum class Page { HUB, FLOAT, LOCK, MAIN, TRANSLATION, EDITOR, ABOUT, CLOUD }
+enum class Page { HUB, FLOAT, LOCK, MAIN, MAIN_BACKDROP, TRANSLATION, EDITOR, ABOUT, CLOUD }
 
 /** Settings: the language, then one row leading to each page. */
 @Composable
@@ -152,7 +154,7 @@ private enum class MainColor(val en: String, val zh: String) {
 
 /** Settings → Main screen: the album cover's look, the lyric colours and the panel behind them, with previews. */
 @Composable
-fun MainScreenSettings(onBack: () -> Unit) {
+fun MainScreenSettings(onBack: () -> Unit, focusBackdrop: Boolean = false) {
     BackHandler(onBack = onBack)
     val pal = LocalPalette.current
     val context = LocalContext.current
@@ -189,7 +191,7 @@ fun MainScreenSettings(onBack: () -> Unit) {
                         Text(SAMPLE[i].text, color = color, fontSize = if (k == 0) 16.sp else 14.sp, fontWeight = FontWeight.ExtraBold,
                             maxLines = 1, modifier = if (k != 0) Modifier.softFocus(style.softFocus) else Modifier,
                             style = glowStyle(GlowLook(style.glow && k == 0, style.glowColor, style.glowStrength,
-                                (style.glowBlur * 0.7f).toInt()), color))
+                                (style.glowBlur * 0.7f).toInt(), style.glowSpeed), color))
                         val line = SAMPLE[i].translation
                         if (translateOn && line != null && k == 0) Text(line, color = Color(c.translation),
                             fontSize = 12.sp, fontWeight = FontWeight.SemiBold, maxLines = 1)
@@ -198,7 +200,10 @@ fun MainScreenSettings(onBack: () -> Unit) {
             }
         }
 
-        Column(Modifier.weight(1f).verticalScroll(rememberScrollState()).padding(horizontal = 18.dp)) {
+        val scroll = rememberScrollState()
+        var backdropY by remember { mutableIntStateOf(-1) }
+        if (focusBackdrop) LaunchedEffect(backdropY) { if (backdropY > 0) scroll.animateScrollTo(backdropY) }
+        Column(Modifier.weight(1f).verticalScroll(scroll).padding(horizontal = 18.dp)) {
             ThisSong()
             Section(tr("Album cover", "专辑封面")) {
                 Label(tr("Presets", "预设"))
@@ -248,30 +253,42 @@ fun MainScreenSettings(onBack: () -> Unit) {
                     SliderRow(tr("Blur", "模糊程度"), "${style.panelBlur}", style.panelBlur.toFloat(), 0f..100f, 19) { v ->
                         set { it.copy(panelBlur = v.roundToInt()) } }
                 }
-                GlowSettings(GlowLook(style.glow, style.glowColor, style.glowStrength, style.glowBlur)) { g ->
-                    set { it.copy(glow = g.on, glowColor = g.color, glowStrength = g.strength, glowBlur = g.blur) } }
+                GlowSettings(GlowLook(style.glow, style.glowColor, style.glowStrength, style.glowBlur, style.glowSpeed)) { g ->
+                    set { it.copy(glow = g.on, glowColor = g.color, glowStrength = g.strength, glowBlur = g.blur, glowSpeed = g.speed) } }
                 SwitchRow(tr("Full screen", "全屏"), style.fullScreen,
                     tr("The panel's background fills the whole screen, like the lock screen. Also: the ⤢ button above the lyrics.",
                         "面板背景铺满整个屏幕，像锁屏一样。也可以用歌词上方的 ⤢ 按钮切换。")) { on -> set { it.copy(fullScreen = on) } }
-                if (style.fullScreen) {
-                    Label(tr("Background animation", "背景动画"))
-                    ValueChips(AppLyricsStyle.BACKDROPS, style.backdrop, ::backdropLabel) { v -> set { it.copy(backdrop = v) } }
-                    Hint(backdropHint(style.backdrop))
-                    // a live sample of the chosen animation, on the song playing (or sample colours)
-                    LyricsPanel(style, playback.art, Modifier.fillMaxWidth().height(120.dp)) {
-                        Backdrop(style.backdrop, playback.art, playing = true, speed = style.backdropSpeed,
-                            strength = style.backdropStrength, modifier = Modifier.fillMaxSize())
-                    }
-                    if (style.backdrop != "none") {
-                        SliderRow(tr("Animation speed", "动画速度"), "${(style.backdropSpeed * 100).roundToInt()}%",
-                            style.backdropSpeed, 0.25f..3f, 10) { v -> set { it.copy(backdropSpeed = v) } }
-                        SliderRow(tr("Animation intensity", "动画强度"), "${(style.backdropStrength * 100).roundToInt()}%",
-                            style.backdropStrength, 0.1f..1f, 17) { v -> set { it.copy(backdropStrength = v) } }
-                    }
-                }
                 SwitchRow(tr("Soft-focus lyrics", "柔焦歌词"), style.softFocus,
                     tr("Lines other than the current one are slightly blurred (Android 12 and newer).",
                         "当前行以外的歌词略微模糊（安卓 12 及以上）。")) { on -> set { it.copy(softFocus = on) } }
+            }
+
+            // the moving background: on the main screen and in full screen alike (the ⚙ in full screen jumps here)
+            Column(Modifier.onGloballyPositioned { backdropY = it.positionInParent().y.toInt() }) {
+            Section(tr("Background animation", "背景动画")) {
+                ValueChips(AppLyricsStyle.BACKDROPS, style.backdrop, ::backdropName) { v -> set { it.copy(backdrop = v) } }
+                Hint(backdropHint(style.backdrop))
+                // a live sample, on the song playing (or sample colours)
+                Backdrop(style.backdrop, playback.art, playing = true, speed = style.backdropSpeed, strength = style.backdropStrength,
+                    modifier = Modifier.fillMaxWidth().height(120.dp).clip(RoundedCornerShape(16.dp)).background(pal.surface2),
+                    brightness = style.backdropBrightness)
+                if (style.backdrop != "none") {
+                    SliderRow(tr("Brightness", "亮度"), "${(style.backdropBrightness * 100).roundToInt()}%",
+                        style.backdropBrightness, 0.3f..1.7f, 13) { v -> set { it.copy(backdropBrightness = v) } }
+                    Hint(tr("100% is tuned for the style: bright by day, dark at night.", "100% 为当前风格的推荐值：日间明亮，夜间偏暗。"))
+                    SliderRow(tr("Animation speed", "动画速度"), "${(style.backdropSpeed * 100).roundToInt()}%",
+                        style.backdropSpeed, 0.25f..3f, 10) { v -> set { it.copy(backdropSpeed = v) } }
+                    SliderRow(tr("Animation intensity", "动画强度"), "${(style.backdropStrength * 100).roundToInt()}%",
+                        style.backdropStrength, 0.1f..1f, 17) { v -> set { it.copy(backdropStrength = v) } }
+                }
+            }
+            }
+
+            Section(tr("Lyric text", "歌词文字")) {
+                Label(tr("Font", "字体"))
+                ValueChips(com.autosynced.lyrics.FloatStyle.FONTS, style.font) { v -> set { it.copy(font = v) } }
+                SliderRow(tr("Current line size", "当前行字号"), "${style.fontSize}", style.fontSize.toFloat(), 14f..40f, 25) { v ->
+                    set { it.copy(fontSize = v.roundToInt()) } }
             }
 
             Section(tr("Lyric colours", "歌词颜色")) {
@@ -354,7 +371,7 @@ private fun ThisSong() {
     }
 }
 
-private fun backdropLabel(v: String): String = when (v) {
+internal fun backdropName(v: String): String = when (v) {
     "none" -> tr("Off", "关闭")
     "mesh" -> tr("Mesh gradient", "网格渐变")
     "fluid" -> tr("Fluid artwork", "流动封面")

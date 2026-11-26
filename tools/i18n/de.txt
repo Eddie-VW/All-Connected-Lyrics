@@ -330,3 +330,8 @@
 341|Bei pausierter Musik wird es fast ganz langsam.
 342|Animationstempo
 343|Animationsstärke
+344|Atemtempo des Leuchtens
+345|gleichmäßig
+346|Songtext-Schrift
+347|Weitere Hintergrundeinstellungen ›
+348|100 % ist auf den Stil abgestimmt: hell bei Tag, dunkel bei Nacht.

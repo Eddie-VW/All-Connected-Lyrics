@@ -332,5 +332,10 @@
  "The blurred cover slowly swells and brightens, like breathing.": "ぼかしたカバーが呼吸するようにゆっくり膨らみ、明るくなります。",
  "It slows almost to a stop while the music is paused.": "音楽が一時停止中はほとんど止まります。",
  "Animation speed": "アニメーションの速さ",
- "Animation intensity": "アニメーションの強さ"
+ "Animation intensity": "アニメーションの強さ",
+ "Glow breathing speed": "光の呼吸の速さ",
+ "steady": "一定",
+ "Lyric text": "歌詞の文字",
+ "More background settings ›": "背景の詳細設定 ›",
+ "100% is tuned for the style: bright by day, dark at night.": "100% はスタイルに合わせた値です：デイは明るく、ナイトは暗め。"
 }

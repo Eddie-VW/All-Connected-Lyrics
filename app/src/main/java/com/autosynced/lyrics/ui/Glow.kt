@@ -31,15 +31,26 @@ import com.autosynced.lyrics.tr
 import kotlin.math.roundToInt
 
 /** How a glowing line's glow looks: [color] 0 = the line's own colour; [strength] 0.1..1; [blur] in dp. */
-data class GlowLook(val on: Boolean, val color: Int, val strength: Float, val blur: Int)
+data class GlowLook(val on: Boolean, val color: Int, val strength: Float, val blur: Int, val speed: Float = 0f)
+
+/** 0..1..0 breathing wave for a glow at [speed] (0 = steady at 1); one breath ≈ 4 s at speed 1. */
+fun glowWave(speed: Float, ms: Long): Float =
+    if (speed <= 0f) 1f else ((1 - kotlin.math.cos(ms / 4000.0 * speed * 2 * Math.PI)) / 2).toFloat()
 
 /** The text style that draws [look]'s glow around a line coloured [lineColor] (plain when it's off). */
 @Composable
 fun glowStyle(look: GlowLook, lineColor: Color): TextStyle {
     if (!look.on) return TextStyle.Default
-    val px = with(LocalDensity.current) { look.blur.dp.toPx() }
+    // slow breathing: the glow swells and fades around the line
+    var ms by remember { mutableStateOf(0L) }
+    if (look.speed > 0f) androidx.compose.runtime.LaunchedEffect(look.speed) {
+        val start = System.currentTimeMillis()
+        while (true) androidx.compose.runtime.withFrameMillis { ms = System.currentTimeMillis() - start }
+    }
+    val w = glowWave(look.speed, ms)
+    val px = with(LocalDensity.current) { look.blur.dp.toPx() } * (0.75f + 0.25f * w)
     val base = if (look.color == 0) lineColor else Color(look.color)
-    return TextStyle(shadow = Shadow(base.copy(alpha = look.strength), Offset.Zero, px))
+    return TextStyle(shadow = Shadow(base.copy(alpha = look.strength * (0.45f + 0.55f * w)), Offset.Zero, px))
 }
 
 /**
@@ -67,6 +78,8 @@ internal fun GlowSettings(look: GlowLook, onChange: (GlowLook) -> Unit) {
         onChange(look.copy(strength = it)) }
     SliderRow(tr("Glow blur", "光晕模糊"), "${look.blur}", look.blur.toFloat(), 2f..40f, 37) {
         onChange(look.copy(blur = it.roundToInt())) }
+    SliderRow(tr("Glow breathing speed", "光晕呼吸速度"), if (look.speed <= 0f) tr("steady", "常亮") else "${(look.speed * 100).roundToInt()}%",
+        look.speed, 0f..2f, 19) { onChange(look.copy(speed = it)) }
     if (picking) ColorPickerDialog(tr("Glow colour", "光晕颜色"), if (look.color == 0) 0xFFFFFFFF.toInt() else look.color,
         onDismiss = { picking = false }) { c -> onChange(look.copy(color = c or 0xFF000000.toInt())); picking = false }
 }

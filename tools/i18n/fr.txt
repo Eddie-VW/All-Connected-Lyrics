@@ -330,3 +330,8 @@
 341|Elle ralentit presque jusqu’à l’arrêt quand la musique est en pause.
 342|Vitesse de l’animation
 343|Intensité de l’animation
+344|Vitesse de respiration de la lueur
+345|fixe
+346|Texte des paroles
+347|Plus de réglages du fond ›
+348|100 % est réglé selon le style : clair le jour, sombre la nuit.
